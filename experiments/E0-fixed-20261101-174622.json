@@ -1,0 +1,3947 @@
+{
+ "exp": "E0-fixed",
+ "collection": "chunks_fixed",
+ "dataset": "eval\\datasets\\so_v1.jsonl",
+ "top_k": 30,
+ "body_chars": 1500,
+ "overall": {
+  "n": 155,
+  "recall@5": 0.3657,
+  "recall@10": 0.5122,
+  "hit@5": 0.4452,
+  "mrr": 0.2996,
+  "ndcg@10": 0.3231
+ },
+ "by_library": {
+  "fastapi": {
+   "n": 155,
+   "recall@5": 0.3657,
+   "recall@10": 0.5122,
+   "hit@5": 0.4452,
+   "mrr": 0.2996,
+   "ndcg@10": 0.3231
+  }
+ },
+ "search_ms": {
+  "p50": 5.1,
+  "p95": 5.7
+ },
+ "questions": [
+  {
+   "id": "so-55873174",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-71516140",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.16666666666666666,
+   "recall@10": 0.16666666666666666,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.3026024134988135,
+   "ranked": [
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-62856818",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/"
+   ]
+  },
+  {
+   "id": "so-65635346",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/cors/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/reference/middleware/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/cors/"
+   ]
+  },
+  {
+   "id": "so-63726203",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/project-generation/",
+    "https://fastapi.tiangolo.com/reference/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/benchmarks/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/cloud/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/wsgi/"
+   ]
+  },
+  {
+   "id": "so-64943693",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/deployment/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/deployment/docker/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/how-to/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/settings/"
+   ]
+  },
+  {
+   "id": "so-67599119",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/reference/background/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-63872924",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/async/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/async-tests/"
+   ]
+  },
+  {
+   "id": "so-63169865",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0625,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/learn/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/deployment/fastapicloud/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/reference/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/"
+   ]
+  },
+  {
+   "id": "so-77001129",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1111111111111111,
+   "ndcg@10": 0.3010299956639812,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-63580229",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/reference/background/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-75740652",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.25,
+   "recall@10": 0.25,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.24630238874073,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/reference/sse/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/deployment/https/",
+    "https://fastapi.tiangolo.com/tutorial/cookie-params/",
+    "https://fastapi.tiangolo.com/tutorial/header-params/"
+   ]
+  },
+  {
+   "id": "so-63682956",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-62468402",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/"
+   ]
+  },
+  {
+   "id": "so-70872276",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.07142857142857142,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-65296604",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/templates/"
+   ]
+  },
+  {
+   "id": "so-64716495",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/"
+   ]
+  },
+  {
+   "id": "so-76322463",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.06666666666666667,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/reference/background/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/response/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-62279710",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/reference/websockets/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-64364499",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/advanced/dataclasses/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/"
+   ]
+  },
+  {
+   "id": "so-68668417",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-in-path-operation-decorators/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/"
+   ]
+  },
+  {
+   "id": "so-70658748",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.2,
+   "recall@10": 0.4,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.2530614822099702,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-73972660",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.75,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.7668091220635322,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ]
+  },
+  {
+   "id": "so-71268169",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/"
+   ]
+  },
+  {
+   "id": "so-75714883",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/events/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/testing-events/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/testing-events/"
+   ]
+  },
+  {
+   "id": "so-73700879",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.5,
+   "hit@5": 0.0,
+   "mrr": 0.14285714285714285,
+   "ndcg@10": 0.20438239758848611,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/openapi/models/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/tutorial/security/get-current-user/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/dataclasses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-60711576",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/how-to/testing-database/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/reference/testclient/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/"
+   ]
+  },
+  {
+   "id": "so-73442335",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/reference/testclient/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-72919006",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/openapi/models/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/extra-models/"
+   ]
+  },
+  {
+   "id": "so-64160594",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-operation-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-65699977",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/path-params-numeric-validations/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-73563804",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-69138537",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.07692307692307693,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/deployment/https/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/middleware/"
+   ]
+  },
+  {
+   "id": "so-71298179",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-71882419",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.08333333333333333,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/tutorial/response-status-code/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/advanced/websockets/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-71171535",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.125,
+   "ndcg@10": 0.31546487678572877,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/tutorial/security/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/deployment/docker/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/"
+   ]
+  },
+  {
+   "id": "so-66867814",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/deployment/fastapicloud/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/opentelemetry/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/middleware/"
+   ]
+  },
+  {
+   "id": "so-65059811",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/"
+   ]
+  },
+  {
+   "id": "so-69673518",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/extra-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/release-notes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ]
+  },
+  {
+   "id": "so-62705219",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1,
+   "ndcg@10": 0.2890648263178879,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/reference/status/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/tutorial/response-status-code/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ]
+  },
+  {
+   "id": "so-66680866",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/"
+   ]
+  },
+  {
+   "id": "so-71203579",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.6666666666666666,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.9325210919548239,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ]
+  },
+  {
+   "id": "so-66747059",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/deployment/fastapicloud/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/openapi-webhooks/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-70891687",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/how-to/extending-openapi/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/reference/responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/"
+   ]
+  },
+  {
+   "id": "so-73721736",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.05263157894736842,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/how-to/conditional-openapi/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-66390509",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/deployment/versions/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/fastapi-cli/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/sub-applications/"
+   ]
+  },
+  {
+   "id": "so-73155460",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.05555555555555555,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/tutorial/cookie-param-models/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/cookie-params/"
+   ]
+  },
+  {
+   "id": "so-63248112",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/security/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/reference/dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/"
+   ]
+  },
+  {
+   "id": "so-77935269",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.2,
+   "recall@10": 0.2,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.21398626473452756,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/advanced/events/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/opentelemetry/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-76142431",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.07692307692307693,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/advanced/settings/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-75998227",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.07692307692307693,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/"
+   ]
+  },
+  {
+   "id": "so-73076517",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/reference/httpconnection/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/"
+   ]
+  },
+  {
+   "id": "so-75040507",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/deployment/https/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/cors/"
+   ]
+  },
+  {
+   "id": "so-65591630",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.14285714285714285,
+   "ndcg@10": 0.3333333333333333,
+   "ranked": [
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/"
+   ]
+  },
+  {
+   "id": "so-74206034",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/deployment/docker/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/benchmarks/",
+    "https://fastapi.tiangolo.com/alternatives/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/deployment/docker/"
+   ]
+  },
+  {
+   "id": "so-76328904",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/benchmarks/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-70772733",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.25,
+   "recall@10": 0.25,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.24630238874073,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/request-forms/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/reference/sse/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/testing/"
+   ]
+  },
+  {
+   "id": "so-61952845",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/"
+   ]
+  },
+  {
+   "id": "so-71542183",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/reference/websockets/",
+    "https://fastapi.tiangolo.com/advanced/testing-websockets/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/websockets/"
+   ]
+  },
+  {
+   "id": "so-71276790",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/staticfiles/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/templates/"
+   ]
+  },
+  {
+   "id": "so-61383179",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/strict-content-type/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/reference/encoders/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/query-params/"
+   ]
+  },
+  {
+   "id": "so-76781053",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.5640920940185894,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/how-to/extending-openapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/how-to/extending-openapi/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ]
+  },
+  {
+   "id": "so-72831952",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/security/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-77690364",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/release-notes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-73585779",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.38685280723454163,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-70854314",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-69083878",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/advanced/settings/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-70690454",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.5,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.21840743681816419,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/reference/responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/",
+    "https://fastapi.tiangolo.com/advanced/templates/"
+   ]
+  },
+  {
+   "id": "so-57036856",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-72915808",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.5,
+   "hit@5": 0.0,
+   "mrr": 0.1111111111111111,
+   "ndcg@10": 0.18457569677956817,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/tutorial/path-operation-configuration/"
+   ]
+  },
+  {
+   "id": "so-65709999",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/how-to/separate-openapi-schemas/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ]
+  },
+  {
+   "id": "so-65878595",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.05555555555555555,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/conditional-openapi/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/deployment/https/"
+   ]
+  },
+  {
+   "id": "so-66612990",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/strict-content-type/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-in-path-operation-decorators/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/deployment/manually/"
+   ]
+  },
+  {
+   "id": "so-70118412",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-74009210",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.25,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.13905617951077562,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/request-forms/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/reference/parameters/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-73962743",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/response-cookies/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/cookie-param-models/",
+    "https://fastapi.tiangolo.com/advanced/response-headers/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/cors/"
+   ]
+  },
+  {
+   "id": "so-60397218",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/deployment/docker/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/how-to/conditional-openapi/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/"
+   ]
+  },
+  {
+   "id": "so-71396605",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1,
+   "ndcg@10": 0.2890648263178879,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/path-operation-configuration/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/advanced/dataclasses/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ]
+  },
+  {
+   "id": "so-69822360",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.058823529411764705,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/learn/",
+    "https://fastapi.tiangolo.com/how-to/",
+    "https://fastapi.tiangolo.com/advanced/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/reference/security/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/metadata/"
+   ]
+  },
+  {
+   "id": "so-73908734",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1111111111111111,
+   "ndcg@10": 0.3010299956639812,
+   "ranked": [
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ]
+  },
+  {
+   "id": "so-74168582",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.6666666666666666,
+   "recall@10": 0.6666666666666666,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.7653606369886217,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ]
+  },
+  {
+   "id": "so-71613305",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.06666666666666667,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/"
+   ]
+  },
+  {
+   "id": "so-67307265",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.3333333333333333,
+   "hit@5": 0.0,
+   "mrr": 0.1,
+   "ndcg@10": 0.13565197343244778,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-in-path-operation-decorators/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/global-dependencies/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/security/get-current-user/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/sub-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/security/get-current-user/"
+   ]
+  },
+  {
+   "id": "so-76012644",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/deployment/manually/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-71162915",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/dataclasses/",
+    "https://fastapi.tiangolo.com/tutorial/path-operation-configuration/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/python-types/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/"
+   ]
+  },
+  {
+   "id": "so-70975344",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/sse/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body/"
+   ]
+  },
+  {
+   "id": "so-79626334",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/advanced/events/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/release-notes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/"
+   ]
+  },
+  {
+   "id": "so-66592114",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1111111111111111,
+   "ndcg@10": 0.3010299956639812,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/advanced/response-cookies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ]
+  },
+  {
+   "id": "so-71905671",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.14285714285714285,
+   "ndcg@10": 0.3333333333333333,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/extra-models/",
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-56996170",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/",
+    "https://fastapi.tiangolo.com/advanced/json-base64-bytes/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body/"
+   ]
+  },
+  {
+   "id": "so-72801333",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body/"
+   ]
+  },
+  {
+   "id": "so-71467630",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.3333333333333333,
+   "hit@5": 0.0,
+   "mrr": 0.14285714285714285,
+   "ndcg@10": 0.15642624200758548,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ]
+  },
+  {
+   "id": "so-67636088",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-74010813",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 0.2,
+   "ndcg@10": 0.23719771276929622,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/fastapi-cli/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-73282411",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 0.2,
+   "ndcg@10": 0.23719771276929622,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/reference/background/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-72052908",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/reference/responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-72560837",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-params-numeric-validations/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/body/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/"
+   ]
+  },
+  {
+   "id": "so-75150942",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/release-notes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/"
+   ]
+  },
+  {
+   "id": "so-74936196",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/path-params-numeric-validations/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-71102658",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.5,
+   "hit@5": 0.0,
+   "mrr": 0.125,
+   "ndcg@10": 0.19342640361727081,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ]
+  },
+  {
+   "id": "so-59920126",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/extra-models/"
+   ]
+  },
+  {
+   "id": "so-74654845",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/testing-events/"
+   ]
+  },
+  {
+   "id": "so-73564771",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.6131471927654584,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ]
+  },
+  {
+   "id": "so-68278162",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.07692307692307693,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/tutorial/response-status-code/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/templates/"
+   ]
+  },
+  {
+   "id": "so-62970006",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/"
+   ]
+  },
+  {
+   "id": "so-73110208",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.75,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.6804558477306826,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/reference/response/",
+    "https://fastapi.tiangolo.com/reference/staticfiles/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/"
+   ]
+  },
+  {
+   "id": "so-71800133",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/"
+   ]
+  },
+  {
+   "id": "so-70952692",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.2,
+   "ndcg@10": 0.38685280723454163,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-74366289",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/advanced/dataclasses/",
+    "https://fastapi.tiangolo.com/how-to/migrate-from-pydantic-v1-to-pydantic-v2/",
+    "https://fastapi.tiangolo.com/tutorial/extra-models/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-71731924",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/async-tests/",
+    "https://fastapi.tiangolo.com/reference/websockets/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/async/"
+   ]
+  },
+  {
+   "id": "so-68848853",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/advanced/settings/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/"
+   ]
+  },
+  {
+   "id": "so-68815761",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.6131471927654584,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/tutorial/encoder/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-68336259",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/openapi/models/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/tutorial/extra-models/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/header-param-models/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/python-types/"
+   ]
+  },
+  {
+   "id": "so-71528875",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/events/"
+   ]
+  },
+  {
+   "id": "so-75539007",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-67111921",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/testclient/",
+    "https://fastapi.tiangolo.com/deployment/manually/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ]
+  },
+  {
+   "id": "so-62895883",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.2,
+   "ndcg@10": 0.38685280723454163,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/middleware/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/tutorial/cors/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-params-numeric-validations/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/middleware/"
+   ]
+  },
+  {
+   "id": "so-68811220",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/"
+   ]
+  },
+  {
+   "id": "so-73550398",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.6309297535714575,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-65599686",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.2,
+   "ndcg@10": 0.38685280723454163,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/conditional-openapi/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ]
+  },
+  {
+   "id": "so-72214347",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.5,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.21840743681816419,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/tutorial/security/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/python-types/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/"
+   ]
+  },
+  {
+   "id": "so-74508774",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.38685280723454163,
+   "ranked": [
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/how-to/",
+    "https://fastapi.tiangolo.com/benchmarks/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/about/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/reference/background/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/project-generation/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-73759718",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/reference/sse/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/"
+   ]
+  },
+  {
+   "id": "so-69660608",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/response-status-code/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/reference/status/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-71244472",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/cors/",
+    "https://fastapi.tiangolo.com/reference/middleware/",
+    "https://fastapi.tiangolo.com/advanced/middleware/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/advanced/strict-content-type/",
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-75184430",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/security/http-basic-auth/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/cors/"
+   ]
+  },
+  {
+   "id": "so-76970173",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/advanced/openapi-webhooks/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/fastapi-cli/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/"
+   ]
+  },
+  {
+   "id": "so-74498191",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/async/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/how-to/extending-openapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-71532080",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/first-steps/"
+   ]
+  },
+  {
+   "id": "so-70710874",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/json-base64-bytes/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms/"
+   ]
+  },
+  {
+   "id": "so-71103393",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/alternatives/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/sub-applications/"
+   ]
+  },
+  {
+   "id": "so-69292855",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.25,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.312706129752478,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/"
+   ]
+  },
+  {
+   "id": "so-68664973",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/release-notes/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-67619287",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.45749452618986164,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/request/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/"
+   ]
+  },
+  {
+   "id": "so-67402767",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/",
+    "https://fastapi.tiangolo.com/advanced/sub-applications/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/deployment/docker/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/behind-a-proxy/"
+   ]
+  },
+  {
+   "id": "so-75692370",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/reference/exceptions/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/"
+   ]
+  },
+  {
+   "id": "so-71027304",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/path-operation-configuration/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/",
+    "https://fastapi.tiangolo.com/features/",
+    "https://fastapi.tiangolo.com/tutorial/body-fields/",
+    "https://fastapi.tiangolo.com/tutorial/body-multiple-params/",
+    "https://fastapi.tiangolo.com/how-to/separate-openapi-schemas/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/"
+   ]
+  },
+  {
+   "id": "so-63233378",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/reference/openapi/docs/",
+    "https://fastapi.tiangolo.com/deployment/docker/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/tutorial/security/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-66084376",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/metadata/",
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/tutorial/header-params/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/"
+   ]
+  },
+  {
+   "id": "so-75825362",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.1111111111111111,
+   "ndcg@10": 0.3010299956639812,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/how-to/configure-swagger-ui/",
+    "https://fastapi.tiangolo.com/how-to/authentication-error-status-code/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/sse/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/how-to/custom-request-and-route/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-71595635",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/tutorial/server-sent-events/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-71650452",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/using-request-directly/",
+    "https://fastapi.tiangolo.com/advanced/wsgi/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/advanced/openapi-callbacks/",
+    "https://fastapi.tiangolo.com/advanced/generate-clients/",
+    "https://fastapi.tiangolo.com/advanced/websockets/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/request-form-models/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms/"
+   ]
+  },
+  {
+   "id": "so-69543228",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/deployment/manually/",
+    "https://fastapi.tiangolo.com/tutorial/debugging/",
+    "https://fastapi.tiangolo.com/deployment/docker/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ]
+  },
+  {
+   "id": "so-66178227",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.16666666666666666,
+   "ndcg@10": 0.3562071871080222,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/stream-data/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/reference/apirouter/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-66169994",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/path-params/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/reference/uploadfile/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/"
+   ]
+  },
+  {
+   "id": "so-76322342",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ]
+  },
+  {
+   "id": "so-75145424",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/handling-errors/",
+    "https://fastapi.tiangolo.com/deployment/concepts/",
+    "https://fastapi.tiangolo.com/reference/background/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/testing/",
+    "https://fastapi.tiangolo.com/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/middleware/",
+    "https://fastapi.tiangolo.com/alternatives/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/"
+   ]
+  },
+  {
+   "id": "so-74019260",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.3333333333333333,
+   "recall@10": 0.3333333333333333,
+   "hit@5": 1.0,
+   "mrr": 0.5,
+   "ndcg@10": 0.2960819109658652,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/",
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/security/get-current-user/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/",
+    "https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/tutorial/security/first-steps/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/bigger-applications/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/global-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/sql-databases/"
+   ]
+  },
+  {
+   "id": "so-73234675",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.2,
+   "recall@10": 0.2,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.14606834984270645,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/request-files/",
+    "https://fastapi.tiangolo.com/advanced/websockets/",
+    "https://fastapi.tiangolo.com/fastapi-cli/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms-and-files/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/reference/fastapi/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/background-tasks/",
+    "https://fastapi.tiangolo.com/tutorial/request-forms/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/"
+   ]
+  },
+  {
+   "id": "so-75448722",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 0.0,
+   "hit@5": 0.0,
+   "mrr": 0.0,
+   "ndcg@10": 0.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/tutorial/query-params/",
+    "https://fastapi.tiangolo.com/tutorial/query-param-models/",
+    "https://fastapi.tiangolo.com/tutorial/query-params-str-validations/",
+    "https://fastapi.tiangolo.com/tutorial/body/",
+    "https://fastapi.tiangolo.com/reference/parameters/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/how-to/separate-openapi-schemas/",
+    "https://fastapi.tiangolo.com/advanced/response-change-status-code/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/"
+   ]
+  },
+  {
+   "id": "so-73911250",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.5,
+   "recall@10": 0.5,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 0.6131471927654584,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/reference/staticfiles/",
+    "https://fastapi.tiangolo.com/how-to/custom-docs-ui-assets/",
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/deployment/server-workers/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/tutorial/frontend/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/",
+    "https://fastapi.tiangolo.com/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/templates/",
+    "https://fastapi.tiangolo.com/tutorial/static-files/"
+   ]
+  },
+  {
+   "id": "so-76446783",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 0.0,
+   "recall@10": 1.0,
+   "hit@5": 0.0,
+   "mrr": 0.125,
+   "ndcg@10": 0.31546487678572877,
+   "ranked": [
+    "https://fastapi.tiangolo.com/reference/dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/",
+    "https://fastapi.tiangolo.com/advanced/advanced-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/classes-as-dependencies/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-in-path-operation-decorators/",
+    "https://fastapi.tiangolo.com/reference/security/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/dependencies-with-yield/",
+    "https://fastapi.tiangolo.com/tutorial/dependencies/sub-dependencies/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/testing-dependencies/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/tutorial/dependencies/sub-dependencies/"
+   ]
+  },
+  {
+   "id": "so-76122326",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.3333333333333333,
+   "ndcg@10": 0.5,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/tutorial/stream-json-lines/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/first-steps/",
+    "https://fastapi.tiangolo.com/reference/responses/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/custom-response/"
+   ]
+  },
+  {
+   "id": "so-76070545",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 0.25,
+   "ndcg@10": 0.43067655807339306,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/additional-status-codes/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/tutorial/body-nested-models/",
+    "https://fastapi.tiangolo.com/tutorial/schema-extra-example/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/alternatives/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/response-directly/"
+   ]
+  },
+  {
+   "id": "so-75724033",
+   "library": "fastapi",
+   "type": "real",
+   "recall@5": 1.0,
+   "recall@10": 1.0,
+   "hit@5": 1.0,
+   "mrr": 1.0,
+   "ndcg@10": 1.0,
+   "ranked": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/",
+    "https://fastapi.tiangolo.com/advanced/custom-response/",
+    "https://fastapi.tiangolo.com/reference/responses/",
+    "https://fastapi.tiangolo.com/reference/apirouter/",
+    "https://fastapi.tiangolo.com/reference/fastapi/",
+    "https://fastapi.tiangolo.com/release-notes/",
+    "https://fastapi.tiangolo.com/advanced/response-directly/",
+    "https://fastapi.tiangolo.com/tutorial/response-model/"
+   ],
+   "gold": [
+    "https://fastapi.tiangolo.com/advanced/additional-responses/"
+   ]
+  }
+ ]
+}

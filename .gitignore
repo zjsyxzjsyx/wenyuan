@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Docker volumes (Milvus, MySQL, Redis data)
+volumes/
+
+# Crawled pages, DevDocs downloads, run logs; model and eval caches
+data/
+.cache/
+
+# Logs
+model_server/*.log
+
+# Full design notes incl. personal planning (kept local and in Notion; docs/design.md is the public version)
+设计文档_学习资料RAG服务.md
