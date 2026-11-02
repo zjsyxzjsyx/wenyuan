@@ -50,3 +50,22 @@ def test_build_sources_respects_budget_and_truncates_first():
     assert [s.sid for s in sources] == ["S1"] and sources[0].tokens == 40
     sources = build_sources(CharTokenizer(), blocks[1:], budget=40)
     assert [s.text[0] for s in sources] == ["y", "z"]
+
+
+def test_expand_steps_down_from_oversized_parent():
+    from app.retrieval.context import _children, expand
+    s = lambda idx, parent, level, heading, text: SimpleNamespace(idx=idx, parent_idx=parent, level=level,
+                                                                  heading=heading, text=text)
+    sections = {0: s(0, None, 1, "Page", "p" * 30), 1: s(1, 0, 2, "FLUSHALL", "f" * 20), 2: s(2, 0, 2, "Other", "o" * 50)}
+    children = _children(sections)
+    hit = {"doc_id": "d", "parent_index": 0, "section_index": 1, "chunk_id": "c", "text": "chunk"}
+    assert expand(CharTokenizer(), hit, sections, children, 1000)[0] == ("d", 0)             # whole parent fits
+    key, text = expand(CharTokenizer(), hit, sections, children, 40)
+    assert key == ("d", 1) and text == "f" * 20                                               # its own section
+    assert expand(CharTokenizer(), hit, sections, children, 10) == (("d", "chunk", "c"), "chunk")
+
+
+def test_citations_field_counts_when_text_has_no_markers():
+    a = answer(FakeLLM({"found": True, "answer": "用 dropna(subset=...)。", "citations": ["S2", "S8"]}), "q", SOURCES)
+    assert a.found and a.text == "用 dropna(subset=...)。 [S2]"
+    assert [c["sid"] for c in a.citations] == ["S2"] and a.dropped_citations == ["S8"]

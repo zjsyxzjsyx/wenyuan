@@ -19,6 +19,15 @@ class FakeLLM:
 def test_parse_json_tolerates_fences_and_chatter():
     assert parse_json('```json\n{"a": 1}\n```') == {"a": 1}
     assert parse_json('Sure! {"a": [1, 2]} hope it helps') == {"a": [1, 2]}
+    assert parse_json('<think>\nthe user wants {x}\n</think>\n{"a": 3}') == {"a": 3}
+
+
+def test_no_think_only_for_qwen3_user_turn():
+    from app.models.llm import _no_think
+    msgs = [{"role": "user", "content": "hi"}]
+    assert _no_think("qwen3:8b", msgs)[-1]["content"] == "hi\n/no_think"
+    assert _no_think("deepseek-chat", msgs) == msgs
+    assert msgs[0]["content"] == "hi"  # caller's list is not mutated
     with pytest.raises(LLMError):
         parse_json("no json here")
 

@@ -1,6 +1,6 @@
 """Run a retrieval experiment over an eval set and save the scores.
 
-`python -m eval.run --exp E2 --collection chunks_struct_merge --mode hybrid [--rerank 50] [--understand]`
+`python -m eval.run --exp E2 --collection chunks_struct_merge --mode hybrid [--rerank 50] [--understand] [--summaries]`
 Chunks are retrieved, collapsed to their pages in rank order, and scored against
 the gold pages. Results (config, metrics, per-question ranks) go to
 experiments/<exp>-<timestamp>.json so every run stays comparable.
@@ -8,9 +8,11 @@ experiments/<exp>-<timestamp>.json so every run stays comparable.
 from __future__ import annotations
 
 import argparse
+import contextvars
 import hashlib
 import json
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import mean
@@ -19,8 +21,10 @@ from app.db.models import engine
 from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
+from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.query.understand import understand
 from app.retrieval import milvus_store
+from app.retrieval.fusion import best_per_block, rrf
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
@@ -43,6 +47,10 @@ class Config:
     rerank_top: int = 0                 # rerank the first N chunks (0: off)
     rerank_body_chars: int = 500
     understand: bool = False            # LLM query understanding before retrieval (E6)
+    summaries: bool = False             # also search section summaries/questions, fuse by RRF (E5)
+    summary_weight: float = 1.0         # RRF weight of the summary list (chunks: 1.0)
+    dense_query: str = "rewritten"      # with --understand: embed the LLM rewrite or the raw question
+    llm_workers: int = 4                # parallel LLM calls (match the server's parallel slots)
     dataset: Path = DATASET
     exclude_labels: frozenset[str] = field(default_factory=lambda: frozenset({"not_applicable"}))
 
@@ -84,12 +92,18 @@ def load_labels(dataset: Path) -> dict[str, str]:
     return {row["id"]: row["label"] for row in map(json.loads, audit.read_text(encoding="utf-8").splitlines())}
 
 
-def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top_k: int, libraries: list[str]):
+def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top_k: int, libraries: list[str],
+             summaries: bool = False, summary_weight: float = 1.0):
     if mode == "dense":
-        return milvus_store.dense_search(mc, collection, vector, top_k=top_k, libraries=libraries)
-    if mode == "bm25":
-        return milvus_store.bm25_search(mc, collection, text, top_k=top_k, libraries=libraries)
-    return milvus_store.hybrid_search(mc, collection, vector, text, top_k=top_k, libraries=libraries)
+        hits = milvus_store.dense_search(mc, collection, vector, top_k=top_k, libraries=libraries)
+    elif mode == "bm25":
+        hits = milvus_store.bm25_search(mc, collection, text, top_k=top_k, libraries=libraries)
+    else:
+        hits = milvus_store.hybrid_search(mc, collection, vector, text, top_k=top_k, libraries=libraries)
+    if not summaries:
+        return hits
+    extra = best_per_block(milvus_store.dense_search(mc, SUMMARIES, vector, top_k=top_k, libraries=libraries))
+    return rrf([hits, extra], limit=top_k, weights=[1.0, summary_weight])
 
 
 def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple[list[list[float]], list[str]]:
@@ -100,17 +114,26 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
             return (embed_queries(models, [query_text(r, cfg.body_chars) for r in rows]),
                     [query_text(r, bm25_chars) for r in rows])
     llm = LLM()
-    with spans.span("stage", "understand_queries", n=len(rows)):
+    with spans.span("stage", "understand_queries", n=len(rows), workers=cfg.llm_workers):
         # Library routing is not scored here (each question's library is given), so offer only its own.
-        parsed = [understand(llm, query_text(r, cfg.body_chars), libraries=[r["library"]]) for r in rows]
+        # Each call runs in a copy of this context so its span stays under this stage in the trace.
+        def one(row: dict):
+            return contextvars.copy_context().run(
+                understand, llm, query_text(row, cfg.body_chars), libraries=[row["library"]])
+        with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
+            parsed = list(pool.map(one, rows))
+    # The rewrite drops the body's error text and code, which the dense model can use;
+    # "raw" keeps the question for dense and gives the LLM's API names to BM25 only.
+    dense_texts = ([query_text(r, cfg.body_chars) for r in rows] if cfg.dense_query == "raw"
+                   else [u.search_query_en for u in parsed])
     with spans.span("stage", "embed_queries", n=len(rows)):
-        vectors = embed_queries(models, [u.search_query_en for u in parsed])
+        vectors = embed_queries(models, dense_texts)
     return vectors, [u.bm25_text() for u in parsed]
 
 
 def run(cfg: Config) -> dict:
     with spans.span("eval", cfg.exp, collection=cfg.collection, mode=cfg.mode, rerank_top=cfg.rerank_top,
-                    understand=cfg.understand) as root:
+                    understand=cfg.understand, summaries=cfg.summaries) as root:
         result = _run(cfg)
         root.set(**result["overall"])
         result["trace_id"] = root.trace_id
@@ -130,7 +153,8 @@ def _run(cfg: Config) -> dict:
     for row, vector, text in zip(rows, vectors, texts):
         with spans.span("retrieval", f"{cfg.mode}_search", question=row["id"]) as s:
             began = time.perf_counter()  # timed inside the span so the trace writes are not counted
-            hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]])
+            hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]], cfg.summaries,
+                            cfg.summary_weight)
             if cfg.rerank_top:
                 with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
                     head = hits[:cfg.rerank_top]
@@ -181,6 +205,11 @@ def main() -> None:
     parser.add_argument("--rerank", type=int, default=0, metavar="N", help="rerank the first N chunks (0 = off)")
     parser.add_argument("--rerank-body-chars", type=int, default=500)
     parser.add_argument("--understand", action="store_true", help="LLM query understanding first (needs LLM_API_KEY)")
+    parser.add_argument("--llm-workers", type=int, default=4)
+    parser.add_argument("--summaries", action="store_true", help="fuse in section summary/question hits (E5)")
+    parser.add_argument("--summary-weight", type=float, default=1.0)
+    parser.add_argument("--dense-query", choices=("rewritten", "raw"), default="rewritten",
+                        help="with --understand: what the dense side embeds")
     parser.add_argument("--dataset", type=Path, default=DATASET)
     parser.add_argument("--exclude-labels", nargs="*", default=["not_applicable"],
                         help="audit labels left out of the scores (pass none to keep every question)")
@@ -189,7 +218,9 @@ def main() -> None:
     result = run(Config(
         exp=args.exp, collection=args.collection, top_k=args.top_k, body_chars=args.body_chars,
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
-        rerank_body_chars=args.rerank_body_chars, understand=args.understand, dataset=args.dataset,
+        rerank_body_chars=args.rerank_body_chars, understand=args.understand, llm_workers=args.llm_workers,
+        summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
+        dataset=args.dataset,
         exclude_labels=frozenset(args.exclude_labels)))
     print(json.dumps({k: result[k] for k in ("exp", "collection", "excluded", "overall", "by_library", "by_label",
                                              "search_ms", "saved_to", "trace_id")},

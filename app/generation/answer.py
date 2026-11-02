@@ -3,7 +3,9 @@
 The model may only use the sources it is given and must cite them as [S1], [S2]...
 Code then drops citations to sources that do not exist (a fabricated [S9]); an
 answer left with no valid citation is turned into a refusal, so nothing reaches
-the learner unsupported. Checking that each cited source really supports its
+the learner unsupported. Citations count from both the inline markers and the
+"citations" field: Qwen3-8B, answering in Chinese, often fills only the field,
+and reading only the markers turned correct answers into refusals. Checking that each cited source really supports its
 sentence (claim-level verification) is a separate step planned for W4.
 """
 from __future__ import annotations
@@ -54,13 +56,26 @@ def check_citations(text: str, sources: list[Source]) -> tuple[str, list[str], l
     return re.sub(r"[ \t]+([，。.,;；])", r"\1", text).strip(), [c for c in cited if c in known], dropped
 
 
+def merge_citations(text: str, listed, sources: list[Source]) -> tuple[str, list[str], list[str]]:
+    """check_citations plus the ids in the "citations" field; listed ids missing from the
+    text are appended at its end so the learner still sees where the answer came from."""
+    text, valid, dropped = check_citations(text, sources)
+    known = {s.sid for s in sources}
+    listed = [str(c).strip("[] ") for c in listed] if isinstance(listed, list) else []
+    extra = [c for c in dict.fromkeys(listed) if c in known and c not in valid]
+    dropped += [c for c in dict.fromkeys(listed) if c not in known and c not in dropped]
+    if extra:
+        text = f"{text} " + "".join(f"[{c}]" for c in extra)
+    return text, valid + extra, dropped
+
+
 def answer(llm: LLM, question: str, sources: list[Source]) -> Answer:
     if not sources:
         return Answer(False, REFUSAL)
     with spans.span("llm", "answer", sources=len(sources)) as s:
         raw = llm.chat_json([{"role": "user", "content": PROMPT.format(sources=format_sources(sources),
                                                                        question=question)}])
-        text, valid, dropped = check_citations(str(raw.get("answer", "")), sources)
+        text, valid, dropped = merge_citations(str(raw.get("answer", "")), raw.get("citations"), sources)
         found = bool(raw.get("found")) and bool(valid)
         s.set(found=found, citations=len(valid), dropped_citations=dropped)
     if not found:

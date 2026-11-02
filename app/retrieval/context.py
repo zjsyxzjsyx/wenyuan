@@ -1,7 +1,8 @@
 """Small-to-big context assembly under a token budget.
 
 Retrieval ranks small chunks; the LLM gets each hit's top-level section (its
-parent block) in full, read from MySQL, so an answer is not cut off mid-section.
+parent block) in full, read from MySQL, so an answer is not cut off mid-section,
+unless that section is too big, in which case it steps down (see `expand`).
 Blocks are added in rank order, a parent hit twice is added once, and a block
 that does not fit the remaining budget is skipped (the first one is truncated
 instead, so there is always some evidence). A trimmed take on LightRAG's
@@ -40,29 +41,48 @@ def _subtree_text(sections: dict[int, Section], children: dict[int, list[int]], 
     return "\n\n".join(parts)
 
 
-def parent_blocks(db: DBSession, hits: list[dict]) -> list[tuple[dict, str, str]]:
-    """(hit, document title, parent block text) for each distinct parent, in hit order."""
+def _children(sections: dict[int, Section]) -> dict[int, list[int]]:
+    children: dict[int, list[int]] = defaultdict(list)
+    for s in sorted(sections.values(), key=lambda s: s.idx):
+        if s.parent_idx is not None:
+            children[s.parent_idx].append(s.idx)
+    return children
+
+
+def expand(tokenizer: Tokenizer, hit: dict, sections: dict[int, Section], children: dict[int, list[int]],
+           max_block_tokens: int) -> tuple[tuple, str]:
+    """(dedup key, text) of the largest unit around a hit that fits `max_block_tokens`:
+    the top-level section, else the hit's own section, else the chunk itself.
+
+    Many pages have a single H1, so the top-level section is the whole page (up to
+    110k characters). Taken whole, one such block filled the entire budget and pushed
+    out the page that held the answer (FLUSHALL); stepping down keeps blocks small.
+    """
+    doc = hit["doc_id"]
+    for root in dict.fromkeys((hit["parent_index"], hit.get("section_index", -1))):
+        if root in sections:
+            text = _subtree_text(sections, children, root)
+            if len(tokenizer.encode(text)) <= max_block_tokens:
+                return (doc, root), text
+    return (doc, "chunk", hit["chunk_id"]), hit["text"]
+
+
+def parent_blocks(db: DBSession, hits: list[dict], tokenizer: Tokenizer,
+                  max_block_tokens: int = 1500) -> list[tuple[dict, str, str]]:
+    """(hit, document title, block text) for each distinct block, in hit order."""
     doc_ids = {h["doc_id"] for h in hits}
     titles = dict(db.execute(select(Document.id, Document.title).where(Document.id.in_(doc_ids))).all())
     by_doc: dict[str, dict[int, Section]] = defaultdict(dict)
     for section in db.scalars(select(Section).where(Section.doc_id.in_(doc_ids))):
         by_doc[section.doc_id][section.idx] = section
+    children = {doc: _children(sections) for doc, sections in by_doc.items()}
     blocks, seen = [], set()
     for hit in hits:
-        key = (hit["doc_id"], hit["parent_index"])
-        if key in seen:
-            continue
-        seen.add(key)
-        sections = by_doc.get(hit["doc_id"], {})
-        if hit["parent_index"] in sections:
-            children: dict[int, list[int]] = defaultdict(list)
-            for s in sorted(sections.values(), key=lambda s: s.idx):
-                if s.parent_idx is not None:
-                    children[s.parent_idx].append(s.idx)
-            text = _subtree_text(sections, children, hit["parent_index"])
-        else:  # fixed-window chunks have no section; use the chunk itself
-            text = hit["text"]
-        blocks.append((hit, titles.get(hit["doc_id"], hit["url"]), text))
+        key, text = expand(tokenizer, hit, by_doc.get(hit["doc_id"], {}), children.get(hit["doc_id"], {}),
+                           max_block_tokens)
+        if key not in seen:
+            seen.add(key)
+            blocks.append((hit, titles.get(hit["doc_id"], hit["url"]), text))
     return blocks
 
 

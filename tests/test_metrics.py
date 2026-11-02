@@ -15,3 +15,12 @@ def test_metrics():
     assert mrr(ranked, gold) == 0.5
     assert ndcg_at(["a", "b"], gold, 10) == pytest.approx(1.0)
     assert 0 < ndcg_at(ranked, gold, 10) < 1
+
+
+def test_paired_bootstrap_detects_consistent_gain_only():
+    from eval.compare import paired_bootstrap
+    a = [0.0, 1.0] * 50
+    delta, lo, hi = paired_bootstrap(a, [x + 0.1 for x in a], n=500)
+    assert round(delta, 6) == 0.1 and lo > 0                       # every question improves: significant
+    delta, lo, hi = paired_bootstrap(a, a[1:] + a[:1], n=500)        # same scores, shuffled: no effect
+    assert lo <= 0 <= hi

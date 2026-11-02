@@ -20,7 +20,8 @@
 | 检索：向量、BM25、RRF 混合检索、cross-encoder rerank | ✅ |
 | 评测：1204 道 Stack Overflow 真实问题，结果可复现，带显著性检验 | ✅ |
 | 全链路 trace（span 树写入 MySQL，可跨 Celery 进程传递） | ✅ |
-| 查询理解、small-to-big 上下文、带引用校验的回答 | 🧪 代码和单元测试完成，等接入本地 LLM |
+| 查询理解（本地 Qwen3-8B）、small-to-big 上下文、带引用校验的回答（`python -m app.query.ask`） | ✅ |
+| 章节摘要 / “学习者会怎么问”索引（E5） | ✅ 已生成；检索上是负结果，默认关闭（见设计文档 11.2） |
 | HTTP API、MCP 工具、私有库、排队限流、trace 看板 | ⏳ 计划中 |
 
 ## 评测结果
@@ -31,18 +32,23 @@
 
 | 方案 | Recall@5 | Recall@10 | MRR | 检索延迟 p50 |
 |---|---|---|---|---|
-| 纯向量（按标题分节 + 合并短小节） | 0.483 | 0.587 | **0.391** | 5 ms |
+| 纯向量（按标题分节 + 合并短小节） | 0.483 | 0.587 | 0.391 | 5 ms |
 | 向量 + BM25（RRF 融合） | 0.467 | 0.584 | 0.375 | 5 ms |
-| 混合 + rerank 前 50 | **0.490** | **0.617** | 0.390 | 437 ms |
+| 混合 + rerank 前 50 | 0.490 | 0.617 | 0.390 | 437 ms |
+| **混合 + LLM 查询理解**（BM25 用 LLM 推断的 API 名，向量用原问题） | **0.531** | **0.660** | **0.444** | 4 ms + LLM 约 0.8 s |
+| 上一行 + rerank 前 50 | 0.507 | 0.643 | 0.407 | 438 ms |
 
-和纯向量相比的配对 bootstrap 95% 置信区间：
-- 混合检索：MRR 显著下降 1.6 个点。原问题是夹杂代码和报错的长文本，而且很少直接出现 API 名，BM25 抓不到关键词。
-- rerank：Recall@10 显著提升 3.0 个点，Recall@5 和 MRR 没有显著变化。
+配对 bootstrap 95% 置信区间（`python -m eval.compare A.json B.json`）：
+- **直接加 BM25 反而变差**（MRR −1.6，显著）：原问题是夹杂代码和报错的长文本，而且很少出现 API 名。
+- **查询理解是最大的提升**：本地 Qwen3-8B 推断出问题背后的 API 名（“删光 Redis”→ `FLUSHALL`），只交给 BM25。相对“混合 + rerank”，四个指标都显著提升，例如 Recall@5 +3.7、MRR +5.2。
+- **有了查询理解后，rerank 变成负收益**（Recall@5 −2.4、MRR −3.7，显著），所以默认关闭。
+- **章节摘要索引没有带来提升**：摘要只覆盖教程页，按 RRF 等权融合会把 API 参考页挤出前 5（Recall@5 0.531 → 0.474）；降权后最多做到无害。所以默认关闭，摘要留给 `outline` 使用。
 
 几个过程中的发现：
 - **数据清洗改变了结论**：清洗前，按标题分节在 Redis 上比固定长度切块更差；排除约一半的噪声页（企业版、发布说明、9 种语言重复的示例）并剔除坏标注后，分节方案反而领先。
 - **评测本身也要可复现**：fp16 推理会按 batch 补齐长度，同一段文本在不同 batch 里算出的向量不同，曾让同一实验两次跑分相差约 0.01。现在查询向量统一缓存。
-- **reranker 偏爱 API 参考页**：参数名密集的自动生成参考页，会压过答案真正引用的教程页。
+- **reranker 偏爱 API 参考页**：参数名密集的自动生成参考页，会压过答案真正引用的教程页；加了查询理解后 FastAPI 的 Recall@5 从 0.40 跌到 0.30。
+- **端到端才暴露的问题**：只有一个 H1 的页面，整页就是一个父块，最长 11 万字符，会独占上下文预算，导致错误拒答；小模型用中文回答时只在 JSON 字段里给引用。两处都已修复，见设计文档 11.2。
 
 ## 架构
 
@@ -80,7 +86,10 @@ uv run python -m app.workers.submit python django redis --variant struct_merge -
 
 # 评测
 uv run python -m eval.build_so --tags python django --pages 3 --merge
-uv run python -m eval.run --exp demo --collection chunks_struct_merge --mode hybrid --rerank 50
+uv run python -m eval.run --exp demo --collection chunks_struct_merge --mode hybrid --understand --dense-query raw
+
+# 问答（需要 Ollama：ollama pull qwen3:8b）
+uv run python -m app.query.ask "How do I delete everything in Redis?" --library redis
 ```
 
 ## 与知秋（Koyo）的关系
