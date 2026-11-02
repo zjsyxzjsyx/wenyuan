@@ -23,9 +23,11 @@ from app.models.llm import LLM
 from app.models.local import ModelServer
 from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.query import multihop
+from app.query.hyde import hypothetical_passage
 from app.query.understand import understand
 from app.retrieval import milvus_store
 from app.retrieval.fusion import best_per_block, rrf
+from app.retrieval.llm_rerank import rerank_pages
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
@@ -34,6 +36,7 @@ from eval.metrics import hit_at, mrr, ndcg_at, percentile, recall_at, unique_in_
 DATASET = Path("eval/datasets/so_v1.jsonl")
 OUT_DIR = Path("experiments")
 QUERY_CACHE = Path(".cache/eval_query_vectors.jsonl")
+EVIDENCE_DIR = Path(".cache/eval_evidence")   # top pages' excerpts per question, for eval.judge_retrieval
 MODES = ("dense", "bm25", "hybrid")
 
 
@@ -47,6 +50,10 @@ class Config:
     mode: str = "dense"
     rerank_top: int = 0                 # rerank the first N chunks (0: off)
     rerank_body_chars: int = 500
+    llm_rerank: int = 0                 # LLM reorders the first N pages (0: off)
+    llm_rerank_plain: bool = False      # R1's page view: the best hit's first 400 characters only
+    hyde: str = ""                      # "dense" | "both": add an LLM-imagined answer passage to the query
+    generate_only: bool = False         # run (and cache) the query-side LLM calls, then stop
     understand: bool = False            # LLM query understanding before retrieval (E6)
     summaries: bool = False             # also search section summaries/questions, fuse by RRF (E5)
     summary_weight: float = 1.0         # RRF weight of the summary list (chunks: 1.0)
@@ -114,39 +121,56 @@ def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top
     return rrf([hits, extra], limit=top_k, weights=[1.0, summary_weight])
 
 
-def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple[list[list[float]], list[str]]:
-    """Dense vector and BM25 text per question, with or without LLM query understanding."""
-    bm25_chars = cfg.body_chars if cfg.bm25_body_chars is None else cfg.bm25_body_chars
-    if not cfg.understand:
-        with spans.span("stage", "embed_queries", n=len(rows)):
-            return (embed_queries(models, [query_text(r, cfg.body_chars, cfg.question_field) for r in rows],
-                                  cfg.embed_model, cfg.query_prompt),
-                    [query_text(r, bm25_chars, cfg.question_field) for r in rows])
+def hyde_passages(cfg: Config, rows: list[dict]) -> list[str]:
     llm = LLM()
-    with spans.span("stage", "understand_queries", n=len(rows), workers=cfg.llm_workers):
-        # Library routing is not scored here (each question's library is given), so offer only its own.
-        # Each call runs in a copy of this context so its span stays under this stage in the trace.
-        def one(row: dict):
-            history = row.get("history") if cfg.history else None
+    with spans.span("stage", "hyde_queries", n=len(rows), workers=cfg.llm_workers):
+        def one(row: dict) -> str:
             return contextvars.copy_context().run(
-                understand, llm, query_text(row, cfg.body_chars, cfg.question_field), history,
-                libraries=[row["library"]])
+                hypothetical_passage, llm, query_text(row, 1000, cfg.question_field), row["library"])
         with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
-            parsed = list(pool.map(one, rows))
-    # The rewrite drops the body's error text and code, which the dense model can use;
-    # "raw" keeps the question for dense and gives the LLM's API names to BM25 only.
-    dense_texts = ([query_text(r, cfg.body_chars, cfg.question_field) for r in rows] if cfg.dense_query == "raw"
-                   else [u.search_query_en for u in parsed])
+            return list(pool.map(one, rows))
+
+
+def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple[list[list[float]], list[str]] | None:
+    """Dense vector and BM25 text per question, with or without LLM query understanding and HyDE.
+    With `generate_only`, stops after the LLM calls (they are cached) and returns None."""
+    bm25_chars = cfg.body_chars if cfg.bm25_body_chars is None else cfg.bm25_body_chars
+    raw = [query_text(r, cfg.body_chars, cfg.question_field) for r in rows]
+    if not cfg.understand:
+        dense_texts, bm25_texts = raw, [query_text(r, bm25_chars, cfg.question_field) for r in rows]
+    else:
+        llm = LLM()
+        with spans.span("stage", "understand_queries", n=len(rows), workers=cfg.llm_workers):
+            # Library routing is not scored here (each question's library is given), so offer only its own.
+            # Each call runs in a copy of this context so its span stays under this stage in the trace.
+            def one(row: dict):
+                history = row.get("history") if cfg.history else None
+                return contextvars.copy_context().run(
+                    understand, llm, query_text(row, cfg.body_chars, cfg.question_field), history,
+                    libraries=[row["library"]])
+            with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
+                parsed = list(pool.map(one, rows))
+        # The rewrite drops the body's error text and code, which the dense model can use;
+        # "raw" keeps the question for dense and gives the LLM's API names to BM25 only.
+        dense_texts = raw if cfg.dense_query == "raw" else [u.search_query_en for u in parsed]
+        bm25_texts = [u.bm25_text() for u in parsed]
+    if cfg.hyde:
+        passages = hyde_passages(cfg, rows)
+        dense_texts = [f"{t}\n\n{p}" for t, p in zip(dense_texts, passages)]
+        if cfg.hyde == "both":
+            bm25_texts = [f"{t} {p}" for t, p in zip(bm25_texts, passages)]
+    if cfg.generate_only:
+        return None
     with spans.span("stage", "embed_queries", n=len(rows)):
         vectors = embed_queries(models, dense_texts, cfg.embed_model, cfg.query_prompt)
-    return vectors, [u.bm25_text() for u in parsed]
+    return vectors, bm25_texts
 
 
 def run(cfg: Config) -> dict:
     with spans.span("eval", cfg.exp, collection=cfg.collection, mode=cfg.mode, rerank_top=cfg.rerank_top,
                     understand=cfg.understand, summaries=cfg.summaries) as root:
         result = _run(cfg)
-        root.set(**result["overall"])
+        root.set(**result.get("overall", {}))
         result["trace_id"] = root.trace_id
     return result
 
@@ -173,8 +197,11 @@ def _run(cfg: Config) -> dict:
             hopped = list(pool.map(lambda row: contextvars.copy_context().run(hop, row), rows))
         vectors, texts = [None] * len(rows), [None] * len(rows)
     else:
-        vectors, texts = prepare_queries(cfg, rows, models)
-    per_question, latencies = [], []
+        prepared = prepare_queries(cfg, rows, models)
+        if prepared is None:
+            return {"exp": cfg.exp, "generated_only": len(rows)}
+        vectors, texts = prepared
+    all_hits, latencies = [], []
     for i, (row, vector, text) in enumerate(zip(rows, vectors, texts)):
         with spans.span("retrieval", f"{cfg.mode}_search", question=row["id"]) as s:
             began = time.perf_counter()  # timed inside the span so the trace writes are not counted
@@ -191,17 +218,42 @@ def _run(cfg: Config) -> dict:
                     hits = [h for _, h in sorted(zip(scores, head), key=lambda p: -p[0])] + hits[cfg.rerank_top:]
             latencies.append((time.perf_counter() - began) * 1000)
             s.set(hits=len(hits))
+        all_hits.append(hits)
+    rerank_ms: list[float] = []
+    if cfg.llm_rerank:
+        llm = LLM()
+
+        def reorder(row: dict, hits: list[dict]) -> list[dict]:
+            with spans.span("retrieval", "llm_rerank", question=row["id"], pages=cfg.llm_rerank):
+                began = time.perf_counter()
+                view = dict(excerpt_chars=400, second_chars=0, more_headings=0) if cfg.llm_rerank_plain else {}
+                out = rerank_pages(llm, query_text(row, 1000, cfg.question_field), hits, row["library"],
+                                   top_pages=cfg.llm_rerank, **view)
+                rerank_ms.append((time.perf_counter() - began) * 1000)
+                return out
+        with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
+            all_hits = list(pool.map(lambda pair: contextvars.copy_context().run(reorder, *pair), zip(rows, all_hits)))
+    per_question, evidence = [], []
+    for row, hits in zip(rows, all_hits):
+        best = {}
+        for h in hits:
+            best.setdefault(h["url"], h)
+        evidence.append({"id": row["id"], "pages": [{"url": u, "heading_path": h["heading_path"], "text": h["text"][:1500]}
+                                                    for u, h in list(best.items())[:10]]})
         ranked = unique_in_order([h["url"] for h in hits])
         gold = set(row["gold_urls"])
         per_question.append({
             "id": row["id"], "library": row["library"], "type": row["type"], "label": row["label"],
             "recall@5": recall_at(ranked, gold, 5), "recall@10": recall_at(ranked, gold, 10),
+            "recall@20": recall_at(ranked, gold, 20),
+            # every page the top_k chunks came from: the most any reordering of this pool could reach
+            "recall@pool": recall_at(ranked, gold, len(ranked)), "pool": len(ranked),
             "hit@5": hit_at(ranked, gold, 5), "mrr": mrr(ranked, gold), "ndcg@10": ndcg_at(ranked, gold, 10),
-            "ranked": ranked[:10], "gold": sorted(gold),
+            "ranked": ranked[:30], "gold": sorted(gold),
         })
 
     def summarize(items: list[dict]) -> dict:
-        keys = ("recall@5", "recall@10", "hit@5", "mrr", "ndcg@10")
+        keys = ("recall@5", "recall@10", "recall@20", "recall@pool", "pool", "hit@5", "mrr", "ndcg@10")
         return {"n": len(items), **{k: round(mean(q[k] for q in items), 4) for k in keys}} if items else {"n": 0}
 
     config = {k: (sorted(v) if isinstance(v, frozenset) else str(v) if isinstance(v, Path) else v)
@@ -214,12 +266,17 @@ def _run(cfg: Config) -> dict:
         "by_label": {label: summarize([q for q in per_question if q["label"] == label])
                      for label in sorted({q["label"] for q in per_question})},
         "search_ms": {"p50": round(percentile(latencies, 0.5), 1), "p95": round(percentile(latencies, 0.95), 1)},
+        **({"llm_rerank_ms": {"p50": round(percentile(rerank_ms, 0.5)), "p95": round(percentile(rerank_ms, 0.95))}}
+           if rerank_ms else {}),
         "questions": per_question,
     }
     OUT_DIR.mkdir(exist_ok=True)
     path = OUT_DIR / f"{cfg.exp}-{time.strftime('%Y%m%d-%H%M%S')}.json"
     path.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     result["saved_to"] = str(path)
+    EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    (EVIDENCE_DIR / f"{path.stem}.jsonl").write_text(
+        "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in evidence), encoding="utf-8")
     return result
 
 
@@ -233,6 +290,11 @@ def main() -> None:
     parser.add_argument("--mode", choices=MODES, default="dense")
     parser.add_argument("--rerank", type=int, default=0, metavar="N", help="rerank the first N chunks (0 = off)")
     parser.add_argument("--rerank-body-chars", type=int, default=500)
+    parser.add_argument("--llm-rerank", type=int, default=0, metavar="N", help="LLM reorders the first N pages (0 = off)")
+    parser.add_argument("--llm-rerank-plain", action="store_true", help="show the reranker only the best hit's opening")
+    parser.add_argument("--hyde", choices=("dense", "both"), help="add a hypothetical answer passage to the dense (or both) queries")
+    parser.add_argument("--generate-only", action="store_true",
+                        help="only run and cache the query-side LLM calls (no model server needed)")
     parser.add_argument("--understand", action="store_true", help="LLM query understanding first (needs LLM_API_KEY)")
     parser.add_argument("--llm-workers", type=int, default=4)
     parser.add_argument("--summaries", action="store_true", help="fuse in section summary/question hits (E5)")
@@ -253,14 +315,15 @@ def main() -> None:
     result = run(Config(
         exp=args.exp, collection=args.collection, top_k=args.top_k, body_chars=args.body_chars,
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
-        rerank_body_chars=args.rerank_body_chars, understand=args.understand, llm_workers=args.llm_workers,
+        rerank_body_chars=args.rerank_body_chars, llm_rerank=args.llm_rerank, llm_rerank_plain=args.llm_rerank_plain, hyde=args.hyde or "",
+        generate_only=args.generate_only, understand=args.understand, llm_workers=args.llm_workers,
         summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
         history=not args.no_history, question_field=args.question_field, multihop=args.multihop or "",
         embed_model=args.embed_model, query_prompt=args.query_prompt,
         dataset=args.dataset,
         exclude_labels=frozenset(args.exclude_labels)))
     print(json.dumps({k: result[k] for k in ("exp", "collection", "excluded", "overall", "by_library", "by_label",
-                                             "search_ms", "saved_to", "trace_id")},
+                                             "search_ms", "saved_to", "trace_id") if k in result},
                      ensure_ascii=False, indent=1))
 
 

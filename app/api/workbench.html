@@ -31,7 +31,7 @@
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn:disabled { opacity: .5; cursor: default; }
   .spacer { flex: 1; }
-  .who { color: var(--muted); font-size: 13px; }
+  #account { font-size: 13px; padding: 4px 8px; max-width: 180px; }
   a { color: var(--accent); }
   main { max-width: 920px; margin: 0 auto; padding: 16px 20px 120px; }
   section[hidden] { display: none; }
@@ -97,18 +97,19 @@
     <button role="tab" data-tab="ask" aria-selected="true">问答</button>
     <button role="tab" data-tab="notes">我的笔记</button>
     <button role="tab" data-tab="outline">学习目录</button>
-    <button role="tab" data-tab="trace" id="trace-tab">看板</button>
+    <button role="tab" data-tab="trace">看板</button>
   </nav>
   <span class="spacer"></span>
-  <span class="who" id="who"></span>
+  <select id="account" title="切换账号" hidden></select>
 </header>
 
 <main>
   <!-- first run -->
   <section id="setup" hidden>
     <div class="card">
-      <h2 style="margin-top:0">第一次使用</h2>
-      <p class="muted">起个名字就能开始。账号的 API key 只保存在这个浏览器里；换浏览器时，可以把它复制过去。</p>
+      <h2 style="margin-top:0" id="setup-title">第一次使用</h2>
+      <p class="muted">起个名字就能开始。账号的 API key 只保存在这个浏览器里，可以记住多个账号，在右上角切换。
+        想看知秋的请求，就把知秋配置里的 key 粘贴进来。</p>
       <div class="row">
         <input type="text" id="new-name" placeholder="名字，例如 koyo-web" maxlength="32">
         <button class="btn primary" id="create">创建账号</button>
@@ -119,6 +120,7 @@
         <button class="btn" id="use-key">使用这个 key</button>
       </div>
       <p class="err" id="setup-err"></p>
+      <button class="btn" id="setup-cancel" hidden>返回</button>
     </div>
   </section>
 
@@ -153,14 +155,15 @@
     <div class="card" id="ol-section" hidden></div>
   </section>
 
-  <!-- trace: every request's stages, only for this machine -->
+  <!-- trace: the caller's own requests -->
   <section id="tab-trace" hidden>
     <p class="muted" id="tr-updated">加载中…</p>
+    <p class="muted">这里只有你自己的请求。命中缓存的问答没有经过模型，不会留下记录。</p>
     <div class="stats" id="tr-cards"></div>
     <div class="card">
       <div class="legend" id="tr-legend"></div>
       <div class="scroll"><table>
-        <thead><tr><th>时间</th><th>请求</th><th>用户</th><th>总耗时</th><th>排队</th><th>各阶段</th><th>状态</th></tr></thead>
+        <thead><tr><th>时间</th><th>请求</th><th>总耗时</th><th>排队</th><th>各阶段</th><th>状态</th></tr></thead>
         <tbody id="tr-rows"></tbody>
       </table></div>
     </div>
@@ -194,7 +197,19 @@ const store = {
   set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
 };
 const TABS = ["ask", "notes", "outline", "trace"];
-let key = store.get("wenyuan_key"), libraries = [], turns = [], busy = false;
+let key = store.get("wenyuan_key"), libraries = [], turns = [], busy = false, current = "ask";
+// Accounts this browser remembers: [{name, key}]; `key` is the one in use.
+const accounts = {
+  list() { try { return JSON.parse(store.get("wenyuan_accounts") || "[]"); } catch { return []; } },
+  save(list) { store.set("wenyuan_accounts", JSON.stringify(list)); },
+  put(name, k) {
+    const list = this.list(), found = list.find(a => a.key === k);
+    if (found) found.name = name; else list.push({name, key: k});
+    this.save(list);
+  },
+  remove(k) { this.save(this.list().filter(a => a.key !== k)); },
+};
+if (key && !accounts.list().some(a => a.key === key)) accounts.put(store.get("wenyuan_name") || "我", key);
 
 async function api(path, options = {}) {
   const res = await fetch(path, {...options, headers: {...(options.headers || {}), "Authorization": `Bearer ${key}`,
@@ -213,28 +228,64 @@ async function api(path, options = {}) {
 /* ---------- setup ---------- */
 async function start() {
   const wanted = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : store.get("wenyuan_tab") || "ask";
-  if (!key) return wanted === "trace" ? show("trace") : showSetup();
+  renderAccounts();
+  if (!key) return showSetup();
   try {
-    libraries = await (await api("/v1/libraries")).json();
+    const me = await (await api("/v1/me")).json();
+    accounts.put(me.name, key);
+    renderAccounts();
+    if (!libraries.length) {
+      libraries = await (await api("/v1/libraries")).json();
+      for (const sel of [$("lib"), $("ol-lib")]) {
+        sel.insertAdjacentHTML("beforeend", libraries.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join(""));
+      }
+      $("ol-lib").insertAdjacentHTML("beforeend", `<option value="private">我的笔记</option>`);
+      $("lib").value = store.get("wenyuan_lib") || "";
+    }
   } catch (e) {
-    if (e.status === 401) { store.set("wenyuan_key", null); key = null; return showSetup("这个 key 无效，请重新设置。"); }
+    if (e.status === 401) {
+      accounts.remove(key); store.set("wenyuan_key", null); key = null; renderAccounts();
+      return showSetup("这个 key 无效，请重新设置。");
+    }
     $("ask-empty").textContent = "连不上文渊服务：" + e.message;
   }
-  $("setup").hidden = true;
-  $("who").textContent = store.get("wenyuan_name") ? `你好，${store.get("wenyuan_name")}` : "";
-  for (const sel of [$("lib"), $("ol-lib")]) {
-    sel.insertAdjacentHTML("beforeend", libraries.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join(""));
-  }
-  $("ol-lib").insertAdjacentHTML("beforeend", `<option value="private">我的笔记</option>`);
-  $("lib").value = store.get("wenyuan_lib") || "";
   show(wanted);
 }
 function showSetup(message = "") {
   for (const id of ["tab-ask", "tab-notes", "tab-outline", "tab-trace", "composer"]) $(id).hidden = true;
   stopTrace();
   $("setup").hidden = false;
+  $("setup-title").textContent = accounts.list().length ? "添加账号" : "第一次使用";
+  $("setup-cancel").hidden = !key;
   $("setup-err").textContent = message;
 }
+function renderAccounts() {
+  const list = accounts.list();
+  $("account").innerHTML = list.map((a, i) => `<option value="${i}">${esc(a.name)}</option>`).join("")
+    + `<option value="add">＋ 添加账号</option>` + (key ? `<option value="remove">从这个浏览器移除当前账号</option>` : "");
+  const i = list.findIndex(a => a.key === key);
+  $("account").value = i >= 0 ? String(i) : "add";
+  $("account").hidden = !list.length;
+}
+// Switching account starts over: the chat, the open trace and the notes belong to the old one.
+function use(k) {
+  key = k; store.set("wenyuan_key", k);
+  turns = []; $("log").innerHTML = ""; $("ask-empty").hidden = false;
+  selected = null; $("tr-detail").hidden = true; $("ol-section").hidden = true;
+  start();
+}
+$("account").onchange = () => {
+  const v = $("account").value;
+  if (v === "add") return showSetup();
+  if (v === "remove") {
+    if (!confirm("从这个浏览器移除当前账号？账号本身还在，以后要用需要重新粘贴它的 key。")) return renderAccounts();
+    accounts.remove(key);
+    const next = accounts.list()[0];
+    return next ? use(next.key) : (key = null, store.set("wenyuan_key", null), renderAccounts(), showSetup());
+  }
+  use(accounts.list()[Number(v)].key);
+};
+$("setup-cancel").onclick = () => { renderAccounts(); show(current); };
 $("create").onclick = async () => {
   const name = $("new-name").value.trim();
   if (!name) return;
@@ -243,30 +294,33 @@ $("create").onclick = async () => {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) return $("setup-err").textContent = body.detail?.message || (res.status === 403
     ? "只能在运行文渊的这台电脑上创建账号；请向管理员要一个 API key。" : `创建失败（${res.status}）`);
-  key = body.key; store.set("wenyuan_key", key); store.set("wenyuan_name", body.name);
-  start();
+  accounts.put(body.name, body.key);
+  $("new-name").value = "";
+  use(body.key);
 };
 $("use-key").onclick = () => {
   const value = $("paste-key").value.trim();
   if (!value) return;
-  key = value; store.set("wenyuan_key", key); start();
+  $("paste-key").value = "";
+  use(value);
 };
 
 /* ---------- tabs ---------- */
 function show(tab) {
-  if (!key && tab !== "trace") return showSetup();
+  if (!key) return showSetup();
   $("setup").hidden = true;
   for (const b of document.querySelectorAll("#tabs button")) b.setAttribute("aria-selected", b.dataset.tab === tab);
   for (const name of TABS) $(`tab-${name}`).hidden = name !== tab;
   $("composer").hidden = tab !== "ask";
   document.body.classList.toggle("wide", tab === "trace");
-  store.set("wenyuan_tab", tab);
+  store.set("wenyuan_tab", tab); current = tab;
   history.replaceState(null, "", `#${tab}`);
   if (tab === "notes") loadNotes();
   if (tab === "ask") $("q").focus();
   if (tab === "trace") startTrace(); else stopTrace();
 }
 $("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) show(b.dataset.tab); };
+window.addEventListener("hashchange", () => { const tab = location.hash.slice(1); if (TABS.includes(tab)) show(tab); });
 
 /* ---------- ask ---------- */
 function bubble(cls, html) {
@@ -341,7 +395,8 @@ async function ask() {
     turns.push({role: "user", content: question}, {role: "assistant", content: a.text});
   } catch (e) {
     out.querySelector(".answer").innerHTML = `<span class="err">${esc(e.message)}</span>`;
-    if (e.status === 401) { store.set("wenyuan_key", null); key = null; showSetup("key 已失效，请重新设置。"); }
+    if (e.status === 401) { accounts.remove(key); store.set("wenyuan_key", null); key = null; renderAccounts();
+                            showSetup("key 已失效，请重新设置。"); }
   } finally {
     busy = false; $("send").disabled = false; $("q").focus();
   }
@@ -414,7 +469,7 @@ $("ol-out").onclick = async e => {
   } catch (err) { box.innerHTML = `<p class="err">${esc(err.message)}</p>`; }
 };
 
-/* ---------- trace (the API under /dashboard answers only this machine) ---------- */
+/* ---------- trace: my own requests ---------- */
 const STAGES = ["understand", "retrieve", "rerank", "context", "generate"];
 const SPAN_STAGE = {query_understanding: "understand", hybrid_search: "retrieve", dense_search: "retrieve",
                     rerank: "rerank", small_to_big: "context", answer: "generate"};
@@ -434,28 +489,22 @@ function stageBar(r) {
     .join("")}</div>`;
 }
 async function refreshTrace() {
-  const res = await fetch("/dashboard/api/summary", {cache: "no-store"}).catch(() => null);
-  if (!res || !res.ok) {
-    $("tr-updated").textContent = res && res.status === 403 ? "看板只对运行文渊的这台电脑开放。" : "连不上文渊服务";
-    return;
-  }
-  const {stats, live, requests} = await res.json();
-  const cache = live.cache || {};
-  const served = (cache.hit || 0) + (cache.shared || 0), all = served + (cache.miss || 0);
+  let summary;
+  try { summary = await (await api("/v1/traces")).json(); }
+  catch (e) { $("tr-updated").textContent = e.message; return; }
+  const {stats, live, requests} = summary;
   $("tr-cards").innerHTML = [
-    stat("请求数", stats.requests, `${stats.errors} 个出错`),
+    stat("我的请求", stats.requests, `${stats.errors} 个出错`),
     stat("总耗时 p50", ms(stats.total_ms.p50), `p95 ${ms(stats.total_ms.p95)}`),
     stat("排队 p95", ms(stats.queued_ms.p95), "等 GPU 槽位"),
     ...STAGES.filter(s => stats.stages_ms[s].p50 != null)
       .map(s => stat(`${s} p50`, ms(stats.stages_ms[s].p50), `p95 ${ms(stats.stages_ms[s].p95)}`)),
-    stat("GPU 闸门", `${live.gate_in_use ?? "–"} / ${live.gate_slots ?? "–"}`, "占用 / 槽位"),
-    stat("问答缓存", all ? `${Math.round(100 * served / all)}%` : "–",
-         `hit ${cache.hit || 0} · shared ${cache.shared || 0} · miss ${cache.miss || 0}`),
+    stat("GPU 现在", `${live.gate_in_use ?? "–"} / ${live.gate_slots ?? "–"}`, "占用 / 槽位（所有人）"),
   ].join("");
   $("tr-rows").innerHTML = requests.map(r => `
     <tr data-trace="${esc(r.trace_id)}" class="${r.trace_id === selected ? "sel" : ""}">
       <td>${new Date(r.started_ns / 1e6).toLocaleTimeString()}</td><td>${esc(r.name)}</td>
-      <td>${r.user_id ?? "–"}</td><td>${ms(r.duration_ms)}</td><td>${ms(r.queued_ms)}</td>
+      <td>${ms(r.duration_ms)}</td><td>${ms(r.queued_ms)}</td>
       <td>${stageBar(r)}</td>
       <td class="${r.status === "error" ? "err" : ""}">${esc(r.status)}${r.error ? " · " + esc(r.error) : ""}</td>
     </tr>`).join("");
@@ -465,7 +514,7 @@ function startTrace() { refreshTrace(); traceTimer ??= setInterval(refreshTrace,
 function stopTrace() { clearInterval(traceTimer); traceTimer = null; }
 async function showTrace(traceId) {
   selected = traceId;
-  const spans = await (await fetch(`/dashboard/api/traces/${encodeURIComponent(traceId)}`, {cache: "no-store"})).json();
+  const spans = await (await api(`/v1/traces/${encodeURIComponent(traceId)}`)).json();
   const start = Math.min(...spans.map(s => s.started_at_ns));
   const end = Math.max(...spans.map(s => s.started_at_ns + (s.duration_ms || 0) * 1e6));
   const span = Math.max(end - start, 1);
@@ -485,10 +534,6 @@ async function showTrace(traceId) {
   refreshTrace();
 }
 $("tr-rows").onclick = e => { const row = e.target.closest("tr[data-trace]"); if (row) showTrace(row.dataset.trace); };
-// Other machines cannot read traces: no tab for them.
-fetch("/dashboard/api/summary?limit=1", {cache: "no-store"})
-  .then(r => { if (r.status === 403) $("trace-tab").hidden = true; }).catch(() => {});
-
 start();
 </script>
 </body>

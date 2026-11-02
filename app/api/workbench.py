@@ -2,8 +2,8 @@
 
 Ask questions (stages stream in over SSE, citations link to the docs), keep
 private notes, browse a library's outline. The page talks to the same /v1 API as
-any client, with the caller's API key kept in the browser. Its 看板 tab is the trace
-dashboard (app.api.dashboard), shown only on this machine and needing no key.
+any client, with the caller's API key kept in the browser. Its 看板 tab shows the
+caller's own request traces (GET /v1/traces).
 
 POST /ui/api/key creates a user and returns its key once, so a first-time local
 user needs no command line. It is answered only for this machine, like the

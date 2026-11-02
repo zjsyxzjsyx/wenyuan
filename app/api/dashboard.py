@@ -1,10 +1,15 @@
-"""Local trace dashboard: the JSON under /dashboard/api, shown in the workbench's 看板 tab (GET /ui#trace).
+"""Request traces, read-only. Adapted from Koyo's dashboard (zhiqiu.dashboard /
+zhiqiu.traces): a request is a span tree; a summary lists recent requests with a
+per-stage breakdown and p50/p95 per stage, so "slow" can be attributed to queueing,
+the LLM, or retrieval, and one trace opens as a waterfall.
 
-Read-only, and answered only for requests from this machine (traces hold user ids
-and what the model inferred from their questions). Adapted from Koyo's dashboard
-(zhiqiu.dashboard / zhiqiu.traces): a request is a span tree; the page lists recent
-requests with a per-stage breakdown, opens one as a waterfall, and summarizes
-p50/p95 per stage, so "slow" can be attributed to queueing, the LLM, or retrieval.
+GET /v1/traces, /v1/traces/{id}   the caller's own requests (the workbench's 看板 tab).
+    A trace holds the question and what the model made of it, so nobody sees another
+    user's: requests are selected by the user id on their root span, and a trace id
+    that is not the caller's answers 404 like a missing one.
+GET /dashboard/api/...            every user's requests, for the operator (load tests);
+    answered only on this machine and not linked from any page.
+GET /dashboard                    redirects to the workbench tab.
 """
 from __future__ import annotations
 
@@ -15,7 +20,9 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import RedirectResponse
-from sqlalchemy import select
+from sqlalchemy import func, select, true
+
+from app.api.auth import Caller, current_user
 
 from app.db.models import engine
 from app.tracing.spans import spans_table as T
@@ -45,9 +52,10 @@ def _rows(where, limit: int | None = None, order=T.c.started_at_ns.desc()) -> li
     return [{**r, "attrs": json.loads(r["attrs_json"] or "{}")} for r in rows]
 
 
-def requests_summary(limit: int = 50) -> list[dict[str, Any]]:
-    """Recent API requests (root spans of kind http) with their stage durations."""
-    roots = _rows((T.c.kind == "http") & T.c.parent_span_id.is_(None), limit)
+def requests_summary(limit: int = 50, user_id: int | None = None) -> list[dict[str, Any]]:
+    """Recent API requests (root spans of kind http) with their stage durations; one user's if given."""
+    mine = func.json_extract(T.c.attrs_json, "$.user_id") == user_id if user_id is not None else true()
+    roots = _rows((T.c.kind == "http") & T.c.parent_span_id.is_(None) & mine, limit)
     stages: dict[str, dict[str, int]] = defaultdict(dict)
     for span in _rows(T.c.trace_id.in_([r["trace_id"] for r in roots]) & T.c.name.in_(list(STAGES))):
         if span["duration_ms"] is not None:
@@ -96,4 +104,22 @@ async def trace(trace_id: str) -> list[dict[str, Any]]:
     spans = await run_in_threadpool(trace_detail, trace_id)
     if not spans:
         raise HTTPException(404, "no such trace")
+    return spans
+
+
+@router.get("/v1/traces")
+async def my_summary(request: Request, user: Caller = Depends(current_user), limit: int = 200) -> dict[str, Any]:
+    recent = await run_in_threadpool(requests_summary, min(max(limit, 1), 1000), user.id)
+    guards = getattr(request.app.state, "guards", None)
+    # Slots in use say how busy the GPU is, not who is using it.
+    live = {"gate_in_use": await guards.gate.in_use(), "gate_slots": guards.gate.slots} if guards else {}
+    return {"stats": stats(recent), "live": live, "requests": recent[:50]}
+
+
+@router.get("/v1/traces/{trace_id}")
+async def my_trace(trace_id: str, user: Caller = Depends(current_user)) -> list[dict[str, Any]]:
+    spans = await run_in_threadpool(trace_detail, trace_id)
+    root = next((s for s in spans if s["parent_span_id"] is None), None)
+    if root is None or root["attrs"].get("user_id") != user.id:
+        raise HTTPException(404, {"type": "not_found"})
     return spans

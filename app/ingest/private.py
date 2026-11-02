@@ -81,3 +81,44 @@ def delete_note(db: DBSession, mc: MilvusClient, collection: str, owner_id: int,
     db.delete(doc)
     db.commit()
     return True
+
+
+def main() -> None:
+    """`python -m app.ingest.private <folder> --user <name>`: add every note in a folder (same name replaces)."""
+    import argparse
+    from pathlib import Path
+
+    from app.cache.answers import invalidate_now, private_scope
+    from app.db.models import User, create_tables, engine
+    from app.query.ask import COLLECTION
+    from app.retrieval import milvus_store
+    from app.tokenizer import TiktokenTokenizer
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("folder", type=Path)
+    parser.add_argument("--user", required=True, help="account name that owns the notes")
+    args = parser.parse_args()
+    create_tables()
+    with DBSession(engine()) as db:
+        owner = db.scalar(select(User.id).where(User.name == args.user))
+    if owner is None:
+        raise SystemExit(f"no account named {args.user!r}")
+    files = sorted(p for p in args.folder.iterdir() if p.is_file() and p.suffix.lower() in EXTENSIONS)
+    mc, models, tokenizer = milvus_store.client(), ModelServer(), TiktokenTokenizer()
+    milvus_store.ensure_owner_field(mc, COLLECTION)
+    chunks = 0
+    for path in files:
+        with DBSession(engine()) as db:
+            try:
+                note = add_note(db, mc, models, tokenizer, COLLECTION, owner, path.name,
+                                path.read_text(encoding="utf-8"))
+            except NoteError as exc:
+                print(f"skipped {path.name}: {exc}")
+                continue
+        chunks += note["chunks"]
+    invalidate_now(private_scope(owner))       # cached answers for this user may now be stale
+    print(f"{len(files)} notes, {chunks} chunks -> {args.user}")
+
+
+if __name__ == "__main__":
+    main()

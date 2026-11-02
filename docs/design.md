@@ -216,7 +216,7 @@ W4 已实现以上 7 个工具（`wenyuan-mcp`，stdio，代理到 HTTP API）�
 `users`、`libraries`（文档库，含 `visibility` 公共 / 私有和 `owner_id`）、`sources`（文档站 / 网址，唯一键去重）、`documents`、`sections`（章节树，含摘要）、`ingest_tasks`、`eval_runs`、`eval_results`、`spans`。已实现：`documents`（W3 加了 `owner_id`）、`sections`、`spans`（W1），`users`（W3，只存 API key 的 SHA-256）。
 
 ### 7.3 API
-已实现：`POST /v1/ask`（SSE）、`POST /v1/search`、`GET /v1/libraries`、`POST|GET /v1/notes`、`DELETE /v1/notes/{doc_id}`、`GET /healthz`、看板（W3，现在是网页工作台的一个标签，`GET /dashboard` 跳转过去）；`GET /v1/outline?library=&topic=`、`GET /v1/sections/{doc_id}:{idx}`（W4，供 MCP 的 outline / get_section 使用）。网页工作台 `GET /ui`。
+已实现：`POST /v1/ask`（SSE）、`POST /v1/search`、`GET /v1/libraries`、`POST|GET /v1/notes`、`DELETE /v1/notes/{doc_id}`、`GET /healthz`、看板（W3）；`GET /v1/traces`、`GET /v1/traces/{id}`（调用者自己的请求 trace，供工作台的看板标签）；`GET /v1/outline?library=&topic=`、`GET /v1/sections/{doc_id}:{idx}`（W4，供 MCP 的 outline / get_section 使用）。网页工作台 `GET /ui`。
 待做：`POST /v1/sources`、`GET /v1/tasks/{id}`（提交新文档站）。
 
 ### 7.4 本地 trace 看板（仿照知秋）
@@ -365,8 +365,8 @@ RAG项目/
   - **所有检索都经过 `scope_filter`**：`library in [公共库] or (library == "private" and owner_id == 当前用户)`。客户端传来的公共库列表里如果有 `"private"`，会被剔除，所以别人的笔记只能通过 owner 条件匹配。在真实 Milvus 上测过 dense、BM25、hybrid 三种检索和五种参数组合，都看不到他人的笔记。
   - **缓存隔离（修复了一个隐私漏洞）**：原来的缓存键不区分用户，A 基于自己笔记得到的答案，B 问同一个问题时可能直接命中。现在上传过笔记的用户，缓存键里会带上他自己的私有库版本号；没有笔记的用户仍然共享公共缓存。
   - **路由**：上下文里只要出现私有来源，就用 `local_llm` 生成答案；trace 里记录 `private_context` 和 `answer_model`。
-- **看板**（工作台的「看板」标签，数据接口在 `/dashboard/api`）：只允许本机访问，只读。展示最近的请求、各阶段耗时、排队时间、p50/p95、缓存命中率和闸门占用，点开某个请求可以看 span 瀑布图。
-- **网页工作台**（`/ui`）：给不想用命令行的学习者，和其他客户端一样只调 `/v1` 接口（问答走 SSE，阶段实时显示；笔记上传、删除；按主题看章节树、点开全文），trace 看板也合并进来作为一个标签，不再单独一个页面。第一次打开时可以起名建号，但这个接口和看板一样只允许本机访问，共享部署时仍由管理员发 key。`scripts/wenyuan.ps1` 按依赖顺序拉起 Docker、模型服务、专用 Ollama 和 API，已在运行的部分跳过。
+- **看板**（工作台的「看板」标签，`/v1/traces`）：**每个用户只看得到自己的请求**。trace 里有提问内容和模型对它的理解，多用户共享时不能互相可见：按根 span 上的 `user_id` 筛选，别人的 trace 编号返回 404（和不存在一样，不暴露它是否存在）。GPU 闸门只显示占用了几个槽位，不显示是谁。全站视图 `/dashboard/api` 只留给运维（压测脚本用），只允许本机访问，页面上不再链接。只读，展示最近的请求、各阶段耗时、排队时间、p50/p95、缓存命中率和闸门占用，点开某个请求可以看 span 瀑布图。
+- **网页工作台**（`/ui`）：给不想用命令行的学习者，和其他客户端一样只调 `/v1` 接口（问答走 SSE，阶段实时显示；笔记上传、删除；按主题看章节树、点开全文），trace 看板也合并进来作为一个标签，只显示自己的请求。浏览器可以记住多个账号并在右上角切换（`GET /v1/me` 取账号名）。第一次打开时可以起名建号，但这个接口和看板一样只允许本机访问，共享部署时仍由管理员发 key。`scripts/wenyuan.ps1` 按依赖顺序拉起 Docker、模型服务、专用 Ollama 和 API，已在运行的部分跳过。
 
 **压测**（`python -m eval.loadtest`）：N 个独立用户，每人连续问 3 个不同的真实 SO 问题；客户端 30 s 超时；每轮开始前让缓存失效。Ollama 并行数 2，一块 RTX 5070 Ti 16GB，同时运行 bge-m3 模型服务。
 

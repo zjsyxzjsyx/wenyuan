@@ -84,6 +84,10 @@ def test_dependency_failures_are_named(client, monkeypatch):
     assert client.post("/v1/ask", json={"question": "q", "stream": False}).json()["detail"]["type"] == "llm_error"
 
 
+def test_me_names_the_caller(client):
+    assert client.get("/v1/me").json() == {"id": 1, "name": "alice"}
+
+
 def test_requests_without_a_valid_key_are_rejected(monkeypatch):
     monkeypatch.setattr("app.api.auth.lookup", lambda key: Caller(7, "bob") if key == "wy_good" else None)
     c = TestClient(main.app)
@@ -178,3 +182,29 @@ def test_workbench_page_and_local_key_setup(monkeypatch):
     remote = TestClient(main.app, client=("10.0.0.5", 5000))
     assert remote.get("/ui").status_code == 200                    # the page itself holds nothing
     assert remote.post("/ui/api/key", json={"name": "x"}).status_code == 403
+
+
+def test_traces_show_only_the_callers_own_requests(client, monkeypatch):
+    from sqlalchemy import create_engine, insert
+    from sqlalchemy.pool import StaticPool
+
+    from app.api import dashboard
+    from app.tracing.spans import spans_table
+    db = create_engine("sqlite://", poolclass=StaticPool, connect_args={"check_same_thread": False})
+    spans_table.metadata.create_all(db)
+
+    def span(trace, sid, parent, name, user=None, at=0):
+        return {"span_id": sid, "trace_id": trace, "parent_span_id": parent, "kind": "http" if parent is None else "stage",
+                "name": name, "started_at_ns": at, "duration_ms": 10, "status": "ok", "error_kind": None,
+                "attrs_json": json.dumps({"user_id": user} if user else {"question": "secret"})}
+    with db.begin() as conn:
+        conn.execute(insert(spans_table), [span("mine", "a", None, "POST /v1/ask", user=1, at=1),
+                                           span("mine", "b", "a", "answer"),
+                                           span("theirs", "c", None, "POST /v1/ask", user=2, at=2),
+                                           span("theirs", "d", "c", "answer")])
+    monkeypatch.setattr(dashboard, "engine", lambda: db)
+    body = client.get("/v1/traces").json()                          # the client is user 1
+    assert [r["trace_id"] for r in body["requests"]] == ["mine"] and set(body["live"]) == {"gate_in_use", "gate_slots"}
+    assert len(client.get("/v1/traces/mine").json()) == 2
+    assert client.get("/v1/traces/theirs").status_code == 404        # someone else's trace looks missing
+    assert client.get("/v1/traces/nothing").status_code == 404

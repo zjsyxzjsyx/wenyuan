@@ -85,6 +85,11 @@ if (-not (Test-Port $OllamaPort)) {
 }
 
 # 4. API（启动时要连 Milvus，所以等模型服务和数据库都起来后再起）
+# 容器显示 Running 时 Milvus 可能还在初始化（刚启动 Docker Desktop 时要一两分钟），API 启动时连不上会直接退出
+Wait-Until {
+    try { (Invoke-WebRequest "http://127.0.0.1:9091/healthz" -UseBasicParsing -TimeoutSec 2).StatusCode -eq 200 }
+    catch { $false }
+} 300 "Milvus"
 Wait-Until { Test-Port $ModelPort } 180 "模型服务"
 Wait-Until { Test-Port $OllamaPort } 60 "Ollama"
 if (-not (Test-Port $ApiPort)) {

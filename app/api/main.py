@@ -2,11 +2,11 @@
 
 POST /v1/search  sources for a question, no generation (what a tutor agent quotes from)
 POST /v1/ask     cited answer; server-sent events by default ("stream": false for one JSON body)
-GET  /v1/libraries
+GET  /v1/libraries, GET /v1/me
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
 GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
-GET  /ui         web workbench: ask, notes, outline, trace dashboard (the last and first-run key
-                 setup only on this machine); GET /dashboard opens its trace tab
+GET  /v1/traces, /v1/traces/{id}   the caller's own request traces
+GET  /ui         web workbench: ask, notes, outline, my traces (first-run key setup on this machine only)
 Every request needs `Authorization: Bearer <key>` (`python -m app.api.auth create <name>`).
 
 Query requests pass Redis guards before any work: a per-user token bucket (429 +
@@ -213,6 +213,11 @@ def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/v1/me")
+def me(user: Caller = Depends(current_user)) -> dict:
+    return {"id": user.id, "name": user.name}
+
+
 @app.get("/v1/libraries")
 def libraries(_: Caller = Depends(current_user)) -> list[dict]:
     return [{"id": lib, "name": site.name} for lib, site in sorted(SITES.items())]
@@ -277,7 +282,7 @@ async def add_note(req: NoteRequest, user: Caller = Depends(rate_limited("notes"
 @app.get("/v1/notes")
 async def list_notes(user: Caller = Depends(current_user)):
     def run():
-        with _db() as db:
+        with spans.span("http", "GET /v1/notes", user_id=user.id), _db() as db:
             return notes.list_notes(db, user.id)
     return await run_in_threadpool(run)
 
@@ -285,8 +290,10 @@ async def list_notes(user: Caller = Depends(current_user)):
 @app.delete("/v1/notes/{doc_id}")
 async def delete_note(doc_id: str, user: Caller = Depends(current_user), g: Guards = Depends(guards)):
     def run():
-        with _db() as db:
-            return notes.delete_note(db, milvus_store.client(), chain.COLLECTION, user.id, doc_id)
+        with spans.span("http", "DELETE /v1/notes", user_id=user.id, doc_id=doc_id) as s, _db() as db:
+            deleted = notes.delete_note(db, milvus_store.client(), chain.COLLECTION, user.id, doc_id)
+            s.set(deleted=deleted)
+            return deleted
     if not await run_in_threadpool(run):
         raise HTTPException(404, {"type": "not_found"})
     await g.cache.invalidate(private_scope(user.id))
