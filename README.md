@@ -25,8 +25,7 @@
 | HTTP API（SSE）、API key 认证 | ✅ `uvicorn app.api.main:app` |
 | Redis：按用户限流、GPU 闸门（公平排队 + 准入控制）、问答缓存 + 防击穿 | ✅ 压测验证 |
 | 私有笔记库（按用户隔离检索和缓存，私有内容只走本地模型） | ✅ 用作者 6 篇笔记出 60 题：本人前 5 命中 87%，其他用户检索到私有内容 0 条 |
-| 本地 trace 看板（`/dashboard`） | ✅ |
-| 网页工作台（`/ui`）：问答、我的笔记、学习目录；一键启动脚本 | ✅ `scripts\wenyuan.cmd` |
+| 网页工作台（`/ui`）：问答、我的笔记、学习目录、trace 看板；一键启动脚本 | ✅ `scripts\wenyuan.cmd` |
 | MCP 服务（7 个工具，已用知秋的 MCP 客户端验证） | ✅ `wenyuan-mcp` |
 | 论断级引用校验：逐句核对引用的原文是否支持，不支持就删掉 | ✅ 默认开启 |
 | 多跳检索：跨库问题按需拆成子查询，结果交错合并 | ✅ 默认开启 |
@@ -141,7 +140,7 @@ Windows 上配好 `.env`、拉好 `qwen3:8b` 并完成入库后，双击 `script
 - **问答**：每一步（理解问题 → 查找资料 → 生成并校验答案）实时显示；可以连续追问；`[S1]` 链接到官方文档的对应章节；可以选文档库、选择是否检索自己的笔记。
 - **我的笔记**：上传 `.md` 到自己的私有库，列表、删除。
 - **学习目录**：选一个库、填一个主题，看相关文档的章节树和摘要，点章节看全文。
-- 右上角链接到 trace 看板，每次操作（包括看章节全文）都会记 trace。
+- **看板**：每次请求（包括看章节全文）的各阶段耗时、排队时间、p50/p95、缓存命中率和 GPU 闸门占用，点一行看 span 瀑布图。只在运行文渊的这台电脑上显示，不需要 key。
 
 ### 命令行
 
@@ -175,7 +174,7 @@ uv run python -m app.query.ask "How do I delete everything in Redis?" --library 
 
 # HTTP 服务
 uv run python -m app.api.auth create alice             # 打印一次 API key
-uv run uvicorn app.api.main:app --port 8000            # 看板：http://127.0.0.1:8000/dashboard
+uv run uvicorn app.api.main:app --port 8000            # 工作台和看板：http://127.0.0.1:8000/ui
 curl -N localhost:8000/v1/ask -H "Authorization: Bearer <key>" -H "Content-Type: application/json" \
      -d '{"question": "How do I make a key expire in Redis?", "libraries": ["redis"]}'
 uv run python -m eval.loadtest --label demo --users 1 5 10 20   # 压测

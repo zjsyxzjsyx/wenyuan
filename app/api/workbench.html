@@ -9,11 +9,12 @@
     --bg: #f6f5f1; --panel: #ffffff; --text: #1f2328; --muted: #6a737d; --line: #e3e1da;
     --accent: #2f6f9f; --accent-soft: #e8f0f7; --ok: #2e7d4f; --warn: #a15c00; --err: #b3261e;
     --user: #eef3f8; --private: #7a4fa0;
+    --queue: #b8b8b2; --understand: #6c8ebf; --retrieve: #5aa27c; --rerank: #9a7fc4; --context: #c9a14a; --generate: #d07a5f;
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #16181b; --panel: #1f2226; --text: #e6e6e3; --muted: #9aa0a6; --line: #30343a;
-      --accent: #7fb3dd; --accent-soft: #23303b; --user: #242b33; --private: #c3a2e0;
+      --accent: #7fb3dd; --accent-soft: #23303b; --user: #242b33; --private: #c3a2e0; --queue: #5b5f66;
     }
   }
   * { box-sizing: border-box; }
@@ -68,6 +69,25 @@
                 max-height: 60vh; overflow: auto; background: var(--bg); padding: 10px; border-radius: 8px; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
   td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  /* trace */
+  body.wide main { max-width: 1280px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 12px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  .stat b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  #tab-trace table { font-size: 13px; font-variant-numeric: tabular-nums; }
+  #tab-trace td, #tab-trace th { white-space: nowrap; }
+  #tab-trace th { color: var(--muted); font-weight: 500; }
+  #tab-trace tbody tr { cursor: pointer; }
+  #tab-trace tbody tr:hover, #tab-trace tbody tr.sel { background: var(--accent-soft); }
+  .bar { display: flex; height: 10px; min-width: 240px; border-radius: 3px; overflow: hidden; background: var(--line); }
+  .bar span { height: 100%; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; margin-bottom: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .wf { display: grid; grid-template-columns: minmax(180px, 30%) 1fr 70px; gap: 4px 10px; align-items: center; font-size: 13px; }
+  .wf .track { position: relative; height: 12px; }
+  .wf .track span { position: absolute; top: 0; height: 12px; border-radius: 2px; background: var(--accent); }
+  .wf .attrs { grid-column: 1 / -1; color: var(--muted); font-size: 12px; margin: -2px 0 4px; word-break: break-all; }
+  .scroll { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -77,10 +97,10 @@
     <button role="tab" data-tab="ask" aria-selected="true">问答</button>
     <button role="tab" data-tab="notes">我的笔记</button>
     <button role="tab" data-tab="outline">学习目录</button>
+    <button role="tab" data-tab="trace" id="trace-tab">看板</button>
   </nav>
   <span class="spacer"></span>
   <span class="who" id="who"></span>
-  <a href="/dashboard" target="_blank" class="muted">看板 ↗</a>
 </header>
 
 <main>
@@ -132,6 +152,23 @@
     <div id="ol-out"></div>
     <div class="card" id="ol-section" hidden></div>
   </section>
+
+  <!-- trace: every request's stages, only for this machine -->
+  <section id="tab-trace" hidden>
+    <p class="muted" id="tr-updated">加载中…</p>
+    <div class="stats" id="tr-cards"></div>
+    <div class="card">
+      <div class="legend" id="tr-legend"></div>
+      <div class="scroll"><table>
+        <thead><tr><th>时间</th><th>请求</th><th>用户</th><th>总耗时</th><th>排队</th><th>各阶段</th><th>状态</th></tr></thead>
+        <tbody id="tr-rows"></tbody>
+      </table></div>
+    </div>
+    <div class="card" id="tr-detail" hidden>
+      <div class="muted" id="tr-title"></div>
+      <div class="wf" id="tr-waterfall"></div>
+    </div>
+  </section>
 </main>
 
 <div id="composer" hidden>
@@ -156,7 +193,8 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
 };
-let key = store.get("wenyuan_key"), libraries = [], history = [], busy = false;
+const TABS = ["ask", "notes", "outline", "trace"];
+let key = store.get("wenyuan_key"), libraries = [], turns = [], busy = false;
 
 async function api(path, options = {}) {
   const res = await fetch(path, {...options, headers: {...(options.headers || {}), "Authorization": `Bearer ${key}`,
@@ -174,7 +212,8 @@ async function api(path, options = {}) {
 
 /* ---------- setup ---------- */
 async function start() {
-  if (!key) return showSetup();
+  const wanted = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : store.get("wenyuan_tab") || "ask";
+  if (!key) return wanted === "trace" ? show("trace") : showSetup();
   try {
     libraries = await (await api("/v1/libraries")).json();
   } catch (e) {
@@ -188,10 +227,11 @@ async function start() {
   }
   $("ol-lib").insertAdjacentHTML("beforeend", `<option value="private">我的笔记</option>`);
   $("lib").value = store.get("wenyuan_lib") || "";
-  show(store.get("wenyuan_tab") || "ask");
+  show(wanted);
 }
 function showSetup(message = "") {
-  for (const id of ["tab-ask", "tab-notes", "tab-outline", "composer"]) $(id).hidden = true;
+  for (const id of ["tab-ask", "tab-notes", "tab-outline", "tab-trace", "composer"]) $(id).hidden = true;
+  stopTrace();
   $("setup").hidden = false;
   $("setup-err").textContent = message;
 }
@@ -214,14 +254,19 @@ $("use-key").onclick = () => {
 
 /* ---------- tabs ---------- */
 function show(tab) {
+  if (!key && tab !== "trace") return showSetup();
+  $("setup").hidden = true;
   for (const b of document.querySelectorAll("#tabs button")) b.setAttribute("aria-selected", b.dataset.tab === tab);
-  for (const name of ["ask", "notes", "outline"]) $(`tab-${name}`).hidden = name !== tab;
+  for (const name of TABS) $(`tab-${name}`).hidden = name !== tab;
   $("composer").hidden = tab !== "ask";
+  document.body.classList.toggle("wide", tab === "trace");
   store.set("wenyuan_tab", tab);
+  history.replaceState(null, "", `#${tab}`);
   if (tab === "notes") loadNotes();
   if (tab === "ask") $("q").focus();
+  if (tab === "trace") startTrace(); else stopTrace();
 }
-$("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b && key) show(b.dataset.tab); };
+$("tabs").onclick = e => { const b = e.target.closest("button[data-tab]"); if (b) show(b.dataset.tab); };
 
 /* ---------- ask ---------- */
 function bubble(cls, html) {
@@ -254,7 +299,7 @@ async function ask() {
     <span class="chip" data-s="sources">查找资料</span><span class="chip" data-s="done">生成并校验答案</span></div>
     <div class="answer muted">…</div>`);
   const chip = (name, state) => { const c = out.querySelector(`[data-s="${name}"]`); if (c) c.className = `chip ${state}`; };
-  const body = {question, history: history.slice(-6), include_private: $("private").checked, stream: true,
+  const body = {question, history: turns.slice(-6), include_private: $("private").checked, stream: true,
                 libraries: $("lib").value ? [$("lib").value] : null};
   let sources = [], answered = null, understood = null;
   try {
@@ -293,7 +338,7 @@ async function ask() {
     out.querySelector(".answer").innerHTML = asked + linkCitations(a.text, a.citations) +
       (note ? `<div class="muted" style="margin-top:6px">${esc(note)}</div>` : "") +
       (sources.length ? `<details><summary>参考资料（${sources.length}）</summary>${sourceList(sources)}</details>` : "");
-    history.push({role: "user", content: question}, {role: "assistant", content: a.text});
+    turns.push({role: "user", content: question}, {role: "assistant", content: a.text});
   } catch (e) {
     out.querySelector(".answer").innerHTML = `<span class="err">${esc(e.message)}</span>`;
     if (e.status === 401) { store.set("wenyuan_key", null); key = null; showSetup("key 已失效，请重新设置。"); }
@@ -303,7 +348,7 @@ async function ask() {
 }
 $("send").onclick = ask;
 $("q").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask(); } });
-$("new-chat").onclick = () => { history = []; $("log").innerHTML = ""; $("ask-empty").hidden = false; $("q").focus(); };
+$("new-chat").onclick = () => { turns = []; $("log").innerHTML = ""; $("ask-empty").hidden = false; $("q").focus(); };
 $("lib").onchange = () => store.set("wenyuan_lib", $("lib").value);
 
 /* ---------- notes ---------- */
@@ -368,6 +413,81 @@ $("ol-out").onclick = async e => {
     box.scrollIntoView({behavior: "smooth"});
   } catch (err) { box.innerHTML = `<p class="err">${esc(err.message)}</p>`; }
 };
+
+/* ---------- trace (the API under /dashboard answers only this machine) ---------- */
+const STAGES = ["understand", "retrieve", "rerank", "context", "generate"];
+const SPAN_STAGE = {query_understanding: "understand", hybrid_search: "retrieve", dense_search: "retrieve",
+                    rerank: "rerank", small_to_big: "context", answer: "generate"};
+const color = name => `var(--${name})`;
+const ms = v => v == null ? "–" : v >= 1000 ? (v / 1000).toFixed(1) + " s" : Math.round(v) + " ms";
+let selected = null, traceTimer = null;
+
+$("tr-legend").innerHTML = ["queue", ...STAGES].map(s => `<span><i style="background:${color(s)}"></i>${s}</span>`).join("");
+function stat(label, value, sub = "") {
+  return `<div class="stat"><span class="muted">${label}</span><b>${value}</b><span class="muted">${sub}</span></div>`;
+}
+function stageBar(r) {
+  const total = Math.max(r.duration_ms || 1, 1);
+  const parts = [["queue", r.queued_ms], ...STAGES.map(s => [s, r.stages[s] || 0])];
+  return `<div class="bar">${parts.filter(([, v]) => v > 0)
+    .map(([s, v]) => `<span title="${s} ${ms(v)}" style="width:${100 * v / total}%;background:${color(s)}"></span>`)
+    .join("")}</div>`;
+}
+async function refreshTrace() {
+  const res = await fetch("/dashboard/api/summary", {cache: "no-store"}).catch(() => null);
+  if (!res || !res.ok) {
+    $("tr-updated").textContent = res && res.status === 403 ? "看板只对运行文渊的这台电脑开放。" : "连不上文渊服务";
+    return;
+  }
+  const {stats, live, requests} = await res.json();
+  const cache = live.cache || {};
+  const served = (cache.hit || 0) + (cache.shared || 0), all = served + (cache.miss || 0);
+  $("tr-cards").innerHTML = [
+    stat("请求数", stats.requests, `${stats.errors} 个出错`),
+    stat("总耗时 p50", ms(stats.total_ms.p50), `p95 ${ms(stats.total_ms.p95)}`),
+    stat("排队 p95", ms(stats.queued_ms.p95), "等 GPU 槽位"),
+    ...STAGES.filter(s => stats.stages_ms[s].p50 != null)
+      .map(s => stat(`${s} p50`, ms(stats.stages_ms[s].p50), `p95 ${ms(stats.stages_ms[s].p95)}`)),
+    stat("GPU 闸门", `${live.gate_in_use ?? "–"} / ${live.gate_slots ?? "–"}`, "占用 / 槽位"),
+    stat("问答缓存", all ? `${Math.round(100 * served / all)}%` : "–",
+         `hit ${cache.hit || 0} · shared ${cache.shared || 0} · miss ${cache.miss || 0}`),
+  ].join("");
+  $("tr-rows").innerHTML = requests.map(r => `
+    <tr data-trace="${esc(r.trace_id)}" class="${r.trace_id === selected ? "sel" : ""}">
+      <td>${new Date(r.started_ns / 1e6).toLocaleTimeString()}</td><td>${esc(r.name)}</td>
+      <td>${r.user_id ?? "–"}</td><td>${ms(r.duration_ms)}</td><td>${ms(r.queued_ms)}</td>
+      <td>${stageBar(r)}</td>
+      <td class="${r.status === "error" ? "err" : ""}">${esc(r.status)}${r.error ? " · " + esc(r.error) : ""}</td>
+    </tr>`).join("");
+  $("tr-updated").textContent = `更新于 ${new Date().toLocaleTimeString()} · 每 5 秒刷新 · 点一行看 span 瀑布图`;
+}
+function startTrace() { refreshTrace(); traceTimer ??= setInterval(refreshTrace, 5000); }
+function stopTrace() { clearInterval(traceTimer); traceTimer = null; }
+async function showTrace(traceId) {
+  selected = traceId;
+  const spans = await (await fetch(`/dashboard/api/traces/${encodeURIComponent(traceId)}`, {cache: "no-store"})).json();
+  const start = Math.min(...spans.map(s => s.started_at_ns));
+  const end = Math.max(...spans.map(s => s.started_at_ns + (s.duration_ms || 0) * 1e6));
+  const span = Math.max(end - start, 1);
+  const depth = {}, byId = Object.fromEntries(spans.map(s => [s.span_id, s]));
+  const level = s => depth[s.span_id] ??= s.parent_span_id && byId[s.parent_span_id] ? level(byId[s.parent_span_id]) + 1 : 0;
+  $("tr-detail").hidden = false;
+  $("tr-title").textContent = `trace ${traceId} · ${ms(span / 1e6)}`;
+  $("tr-waterfall").innerHTML = spans.map(s => {
+    const left = 100 * (s.started_at_ns - start) / span, width = Math.max(0.4, 100 * (s.duration_ms || 0) * 1e6 / span);
+    const attrs = Object.entries(s.attrs).map(([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : v}`).join("  ");
+    const fill = SPAN_STAGE[s.name] ? color(SPAN_STAGE[s.name]) : "var(--accent)";
+    return `<div style="padding-left:${level(s) * 14}px" class="${s.status === "error" ? "err" : ""}">${esc(s.kind)} · ${esc(s.name)}</div>
+      <div class="track"><span style="left:${left}%;width:${width}%;background:${fill}"></span></div>
+      <div>${ms(s.duration_ms)}</div>
+      ${attrs ? `<div class="attrs">${esc(attrs)}</div>` : ""}`;
+  }).join("");
+  refreshTrace();
+}
+$("tr-rows").onclick = e => { const row = e.target.closest("tr[data-trace]"); if (row) showTrace(row.dataset.trace); };
+// Other machines cannot read traces: no tab for them.
+fetch("/dashboard/api/summary?limit=1", {cache: "no-store"})
+  .then(r => { if (r.status === 403) $("trace-tab").hidden = true; }).catch(() => {});
 
 start();
 </script>

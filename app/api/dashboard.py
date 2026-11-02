@@ -1,4 +1,4 @@
-"""Local trace dashboard: GET /dashboard (one HTML page) and its JSON under /dashboard/api.
+"""Local trace dashboard: the JSON under /dashboard/api, shown in the workbench's 看板 tab (GET /ui#trace).
 
 Read-only, and answered only for requests from this machine (traces hold user ids
 and what the model inferred from their questions). Adapted from Koyo's dashboard
@@ -10,19 +10,17 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 
 from app.db.models import engine
 from app.tracing.spans import spans_table as T
 
 router = APIRouter()
-PAGE = Path(__file__).with_name("dashboard.html")
 LOCAL = {"127.0.0.1", "::1", "localhost", "testclient"}
 
 # Child spans reported as stages, by span name.
@@ -79,9 +77,9 @@ def trace_detail(trace_id: str) -> list[dict[str, Any]]:
                                "status", "error_kind", "attrs")} for s in spans]
 
 
-@router.get("/dashboard", response_class=HTMLResponse, dependencies=[Depends(local_only)])
-def page() -> str:
-    return PAGE.read_text(encoding="utf-8")
+@router.get("/dashboard", dependencies=[Depends(local_only)])
+def page() -> RedirectResponse:
+    return RedirectResponse("/ui#trace")
 
 
 @router.get("/dashboard/api/summary", dependencies=[Depends(local_only)])

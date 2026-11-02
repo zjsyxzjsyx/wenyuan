@@ -155,7 +155,8 @@ def test_dashboard_is_local_only_and_summarizes_stages(monkeypatch):
     local = TestClient(main.app)                                   # TestClient's host is "testclient"
     body = local.get("/dashboard/api/summary").json()
     assert body["stats"]["total_ms"]["p50"] == 3000 and body["stats"]["stages_ms"]["generate"]["p50"] == 1500
-    assert "<title>" in local.get("/dashboard").text
+    opened = local.get("/dashboard", follow_redirects=False)
+    assert opened.status_code == 307 and opened.headers["location"] == "/ui#trace"
     remote = TestClient(main.app, client=("10.0.0.5", 5000))
     assert remote.get("/dashboard").status_code == 403
     assert remote.get("/dashboard/api/summary").status_code == 403

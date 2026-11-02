@@ -5,8 +5,8 @@ POST /v1/ask     cited answer; server-sent events by default ("stream": false fo
 GET  /v1/libraries
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
 GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
-GET  /dashboard  local trace dashboard (this machine only)
-GET  /ui         web workbench: ask, notes, outline (first-run key setup on this machine only)
+GET  /ui         web workbench: ask, notes, outline, trace dashboard (the last and first-run key
+                 setup only on this machine); GET /dashboard opens its trace tab
 Every request needs `Authorization: Bearer <key>` (`python -m app.api.auth create <name>`).
 
 Query requests pass Redis guards before any work: a per-user token bucket (429 +
