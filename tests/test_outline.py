@@ -37,3 +37,11 @@ def test_private_sections_are_hidden_from_other_users():
     doc = SimpleNamespace(library="private", owner_id=1)
     assert o._visible(doc, 1) and not o._visible(doc, 2) and not o._visible(None, 1)
     assert o._visible(SimpleNamespace(library="redis", owner_id=None), 2)
+
+
+def test_course_documents_are_visible_only_inside_their_course():
+    doc = SimpleNamespace(library="cs50", owner_id=None)
+    assert o._visible(doc, 2, ["cs50"]) and not o._visible(doc, 2, ["algo"]) and not o._visible(doc, 2, [])
+    assert o._visible(doc, 2)                                     # no course limit (eval, CLI)
+    note = SimpleNamespace(library="private", owner_id=2)
+    assert o._visible(note, 2, []) and not o._visible(note, 3, ["cs50"])

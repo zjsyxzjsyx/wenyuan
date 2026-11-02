@@ -86,22 +86,24 @@ def save_document(db: DBSession, page: Page, sections) -> str:
     return doc_id
 
 
-def chunk_page(tokenizer: Tokenizer, page: Page, sections, variant: str) -> list[Chunk]:
+def chunk_page(tokenizer: Tokenizer, page: Page, sections, variant: str, site_name: str | None = None) -> list[Chunk]:
+    """`site_name` heads every chunk's context; it defaults to the site's name ("My notes" for notes)."""
     doc_id = doc_id_for(page.url)
     if variant == "fixed":
         return chunk_fixed(tokenizer, page.markdown, library=page.library, url=page.url, doc_id=doc_id)
-    site_name = SITES[page.library].name if page.library in SITES else "My notes"   # private notes
+    site_name = site_name or (SITES[page.library].name if page.library in SITES else "My notes")
     return chunk_sections(tokenizer, sections, library=page.library, site_name=site_name,
                           url=page.url, doc_id=doc_id, context_header=variant != "struct_nohdr",
                           merge_sections=variant == "struct_merge")
 
 
-def process_page(db: DBSession, tokenizer: Tokenizer, page: Page, variant: str) -> tuple[str, list[dict]]:
+def process_page(db: DBSession, tokenizer: Tokenizer, page: Page, variant: str,
+                 site_name: str | None = None) -> tuple[str, list[dict]]:
     """CPU half of a page: sections into MySQL, chunks out as plain dicts (they cross a queue)."""
     sections = split_sections(page.markdown, page.title)
     doc_id = save_document(db, page, sections)
     rows = []
-    for chunk in chunk_page(tokenizer, page, sections, variant):
+    for chunk in chunk_page(tokenizer, page, sections, variant, site_name):
         row = asdict(chunk)
         row.update(doc_id=doc_id, doc_type=doc_type(page.url))
         rows.append(row)

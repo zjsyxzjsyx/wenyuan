@@ -97,6 +97,7 @@
     <button role="tab" data-tab="ask" aria-selected="true">问答</button>
     <button role="tab" data-tab="notes">我的笔记</button>
     <button role="tab" data-tab="outline">学习目录</button>
+    <button role="tab" data-tab="courses">课程</button>
     <button role="tab" data-tab="trace">看板</button>
   </nav>
   <span class="spacer"></span>
@@ -127,7 +128,7 @@
   <!-- ask -->
   <section id="tab-ask" hidden>
     <div id="log"></div>
-    <p class="muted" id="ask-empty">问一个关于 Python、Redis、PostgreSQL、Django、FastAPI、Docker、PyTorch 等官方文档的问题，或你自己笔记里的内容。可以连续追问，“它 / 那个”会结合上文理解。</p>
+    <p class="muted" id="ask-empty"></p>
   </section>
 
   <!-- notes -->
@@ -155,6 +156,26 @@
     <div class="card" id="ol-section" hidden></div>
   </section>
 
+  <!-- courses: mine, joining with a code, and a teacher's tools -->
+  <section id="tab-courses" hidden>
+    <div class="card">
+      <div class="row">
+        <input type="text" id="join-code" placeholder="老师给的邀请码，例如 join-…" style="flex:1;min-width:220px">
+        <button class="btn primary" id="join">加入课程</button>
+      </div>
+      <p class="muted" id="course-msg"></p>
+    </div>
+    <div id="course-list"></div>
+    <details class="card">
+      <summary>开一门新课（你会成为这门课的老师）</summary>
+      <div class="row" style="margin-top:8px">
+        <input type="text" id="new-course-id" placeholder="课程 id，如 algo-2026" maxlength="41">
+        <input type="text" id="new-course-name" placeholder="课程名称" style="flex:1;min-width:200px">
+        <button class="btn" id="create-course">创建</button>
+      </div>
+    </details>
+  </section>
+
   <!-- trace: the caller's own requests -->
   <section id="tab-trace" hidden>
     <p class="muted" id="tr-updated">加载中…</p>
@@ -177,7 +198,7 @@
 <div id="composer" hidden>
   <div class="inner">
     <div class="row">
-      <select id="lib"><option value="">全部文档库</option></select>
+      <select id="lib"><option value="">全部课程</option></select>
       <label class="muted"><input type="checkbox" id="private" checked> 包含我的笔记</label>
       <span class="spacer"></span>
       <button class="btn" id="new-chat">新对话</button>
@@ -196,8 +217,8 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
 };
-const TABS = ["ask", "notes", "outline", "trace"];
-let key = store.get("wenyuan_key"), libraries = [], turns = [], busy = false, current = "ask";
+const TABS = ["ask", "notes", "outline", "courses", "trace"];
+let key = store.get("wenyuan_key"), courses = [], turns = [], busy = false, current = "ask";
 // Accounts this browser remembers: [{name, key}]; `key` is the one in use.
 const accounts = {
   list() { try { return JSON.parse(store.get("wenyuan_accounts") || "[]"); } catch { return []; } },
@@ -234,14 +255,7 @@ async function start() {
     const me = await (await api("/v1/me")).json();
     accounts.put(me.name, key);
     renderAccounts();
-    if (!libraries.length) {
-      libraries = await (await api("/v1/libraries")).json();
-      for (const sel of [$("lib"), $("ol-lib")]) {
-        sel.insertAdjacentHTML("beforeend", libraries.map(l => `<option value="${esc(l.id)}">${esc(l.name)}</option>`).join(""));
-      }
-      $("ol-lib").insertAdjacentHTML("beforeend", `<option value="private">我的笔记</option>`);
-      $("lib").value = store.get("wenyuan_lib") || "";
-    }
+    await loadCourses();          // every time: each account has its own courses
   } catch (e) {
     if (e.status === 401) {
       accounts.remove(key); store.set("wenyuan_key", null); key = null; renderAccounts();
@@ -252,7 +266,7 @@ async function start() {
   show(wanted);
 }
 function showSetup(message = "") {
-  for (const id of ["tab-ask", "tab-notes", "tab-outline", "tab-trace", "composer"]) $(id).hidden = true;
+  for (const id of ["tab-ask", "tab-notes", "tab-outline", "tab-courses", "tab-trace", "composer"]) $(id).hidden = true;
   stopTrace();
   $("setup").hidden = false;
   $("setup-title").textContent = accounts.list().length ? "添加账号" : "第一次使用";
@@ -271,7 +285,7 @@ function renderAccounts() {
 function use(k) {
   key = k; store.set("wenyuan_key", k);
   turns = []; $("log").innerHTML = ""; $("ask-empty").hidden = false;
-  selected = null; $("tr-detail").hidden = true; $("ol-section").hidden = true;
+  selected = null; $("tr-detail").hidden = true; $("ol-section").hidden = true; $("course-msg").textContent = "";
   start();
 }
 $("account").onchange = () => {
@@ -305,6 +319,94 @@ $("use-key").onclick = () => {
   use(value);
 };
 
+/* ---------- courses ---------- */
+async function loadCourses() {
+  courses = await (await api("/v1/courses")).json();
+  const options = courses.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
+  $("lib").innerHTML = `<option value="">全部课程</option>` + options;
+  $("ol-lib").innerHTML = options + `<option value="private">我的笔记</option>`;
+  const saved = store.get("wenyuan_lib") || "";
+  $("lib").value = courses.some(c => c.id === saved) ? saved : "";
+  $("ask-empty").textContent = courses.length
+    ? `问一个关于${courses.map(c => `「${c.name}」`).join("")}的问题，或你自己笔记里的内容。可以连续追问，“它 / 那个”会结合上文理解。`
+    : "你还没有加入课程：到「课程」页输入老师给的邀请码。现在只能检索你自己的笔记。";
+}
+function renderCourses() {
+  $("course-list").innerHTML = courses.length ? courses.map(c => `<div class="card" data-course="${esc(c.id)}">
+      <div class="row"><b>${esc(c.name)}</b><span class="muted">${esc(c.id)}</span>
+        <span class="badge">${c.role === "teacher" ? "老师" : "学生"}</span></div>
+      ${c.role !== "teacher" ? "" : `
+      <div class="row" style="margin-top:8px">
+        <button class="btn" data-act="invite">生成邀请码</button><span data-out="invite"></span></div>
+      <div class="row" style="margin-top:8px">
+        <input type="file" accept=".md,.markdown" multiple data-in="files">
+        <button class="btn primary" data-act="upload">上传课程资料</button><span class="muted" data-out="upload"></span></div>
+      <details style="margin-top:8px"><summary data-out="count">课程资料</summary>
+        <table><tbody data-out="materials"><tr><td class="muted">加载中…</td></tr></tbody></table></details>`}
+    </div>`).join("") : `<p class="muted">还没有加入任何课程。</p>`;
+  for (const c of courses) if (c.role === "teacher") loadMaterials(c.id);
+}
+const part = (id, name) => document.querySelector(`[data-course="${CSS.escape(id)}"] [data-out="${name}"]`);
+async function loadMaterials(id) {
+  try {
+    const docs = await (await api(`/v1/courses/${encodeURIComponent(id)}/materials`)).json();
+    part(id, "count").textContent = `课程资料（${docs.length}）`;
+    part(id, "materials").innerHTML = docs.length ? docs.map(d => `<tr><td>${esc(d.title)}</td>
+      <td class="muted">${esc((d.updated_at || "").replace("T", " ").slice(0, 16))}</td>
+      <td><button class="btn" data-act="del" data-doc="${esc(d.doc_id)}" data-name="${esc(d.title)}">删除</button></td></tr>`).join("")
+      : `<tr><td class="muted">还没有资料。</td></tr>`;
+  } catch (e) { part(id, "materials").innerHTML = `<tr><td class="err">${esc(e.message)}</td></tr>`; }
+}
+$("course-list").onclick = async e => {
+  const b = e.target.closest("button[data-act]"), card = e.target.closest("[data-course]");
+  if (!b || !card) return;
+  const id = card.dataset.course, base = `/v1/courses/${encodeURIComponent(id)}`;
+  b.disabled = true;
+  try {
+    if (b.dataset.act === "invite") {
+      const r = await (await api(`${base}/invites`, {method: "POST", body: "{}"})).json();
+      part(id, "invite").innerHTML = `邀请码 <code>${esc(r.code)}</code> <span class="muted">（只显示这一次；可用 ${esc(r.max_uses)} 次，到 ${esc(r.expires_at.replace("T", " "))} 为止）</span>`;
+    }
+    if (b.dataset.act === "upload") {
+      const files = [...card.querySelector("[data-in=files]").files], done = [];
+      for (const file of files) {
+        try {
+          const r = await (await api(`${base}/materials`, {method: "POST",
+            body: JSON.stringify({filename: file.name, content: await file.text()})})).json();
+          done.push(`${r.filename}（${r.chunks} 段）`);
+        } catch (err) { done.push(`${file.name}：${err.message}`); }
+      }
+      part(id, "upload").textContent = files.length ? "已处理：" + done.join("；") : "先选择文件";
+      card.querySelector("[data-in=files]").value = "";
+      loadMaterials(id);
+    }
+    if (b.dataset.act === "del" && confirm(`从课程里删除“${b.dataset.name}”？全班之后都检索不到它。`)) {
+      await api(`${base}/materials/${encodeURIComponent(b.dataset.doc)}`, {method: "DELETE"});
+      loadMaterials(id);
+    }
+  } catch (err) { $("course-msg").textContent = err.message; }
+  finally { b.disabled = false; }
+};
+$("join").onclick = async () => {
+  const code = $("join-code").value.trim();
+  if (!code) return;
+  try {
+    const c = await (await api("/v1/courses/join", {method: "POST", body: JSON.stringify({code})})).json();
+    $("course-msg").textContent = `已加入「${c.name}」`; $("join-code").value = "";
+    await loadCourses(); renderCourses();
+  } catch (e) { $("course-msg").textContent = e.message; }
+};
+$("create-course").onclick = async () => {
+  const id = $("new-course-id").value.trim(), name = $("new-course-name").value.trim();
+  if (!id || !name) return;
+  try {
+    await api("/v1/courses", {method: "POST", body: JSON.stringify({id, name})});
+    $("course-msg").textContent = `已创建「${name}」，你是这门课的老师`;
+    $("new-course-id").value = $("new-course-name").value = "";
+    await loadCourses(); renderCourses();
+  } catch (e) { $("course-msg").textContent = e.message; }
+};
+
 /* ---------- tabs ---------- */
 function show(tab) {
   if (!key) return showSetup();
@@ -316,6 +418,7 @@ function show(tab) {
   store.set("wenyuan_tab", tab); current = tab;
   history.replaceState(null, "", `#${tab}`);
   if (tab === "notes") loadNotes();
+  if (tab === "courses") loadCourses().then(renderCourses).catch(e => $("course-msg").textContent = e.message);
   if (tab === "ask") $("q").focus();
   if (tab === "trace") startTrace(); else stopTrace();
 }

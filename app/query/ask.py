@@ -91,11 +91,23 @@ def _noop(name: str, data: dict) -> None:
     pass
 
 
+def offered(libraries: list[str] | None) -> list[str]:
+    """Libraries the router may choose among: the caller's (possibly none), or all when unrestricted."""
+    return sorted(SITES) if libraries is None else list(libraries)
+
+
+def narrowed(routed: list[str], libraries: list[str] | None) -> list[str] | None:
+    """The search scope: the router may narrow `libraries`, never widen them. From the API they are
+    the caller's courses, and a model's guess must not send a question into someone else's course.
+    An empty routing answer means "could be any" of those offered; None (eval, CLI) means all."""
+    chosen = [lib for lib in routed if libraries is None or lib in libraries]
+    return chosen or libraries
+
+
 def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, models: ModelServer,
               tokenizer: TiktokenTokenizer, owner_id: int | None,
               llm: LLM | None = None) -> tuple[list[dict], list[Source]]:
-    # The router may narrow the libraries; an empty answer means "could be any" of those offered.
-    scope = u.libraries or libraries or None
+    scope = narrowed(u.libraries, libraries)
     with spans.span("retrieval", f"{cfg.mode}_search", libraries=scope) as s:
         # The standalone question keeps the learner's details (error text, code) and has its
         # references resolved; exact names go to BM25 through bm25_text().
@@ -112,7 +124,7 @@ def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, mod
             hits = rrf([hits, best_per_block(extra)], limit=cfg.top_k)
         s.set(hits=len(hits), private_hits=sum(h["library"] == milvus_store.PRIVATE for h in hits))
     if cfg.multihop and llm is not None:
-        hits = multihop.expand(u, hits, llm, models, cfg.collection, libraries or sorted(SITES), scope,
+        hits = multihop.expand(u, hits, llm, models, cfg.collection, offered(libraries), scope,
                                mode=cfg.multihop, top_k=cfg.top_k, owner_id=owner_id, mc=mc).hits
     if cfg.rerank_top and hits:
         with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
@@ -129,7 +141,7 @@ def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, mod
 
 def _search(question: str, history: list[dict] | None, libraries: list[str] | None, cfg: AskConfig,
             llm: LLM, models: ModelServer, on_event: OnEvent, owner_id: int | None = None) -> SearchResult:
-    u = understand(llm, question, history, libraries=libraries or sorted(SITES))
+    u = understand(llm, question, history, libraries=offered(libraries))
     on_event("understanding", asdict(u))
     if not u.needs_retrieval:
         return SearchResult(u)

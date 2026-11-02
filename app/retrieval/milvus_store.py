@@ -84,15 +84,20 @@ def insert_rows(mc: MilvusClient, name: str, rows: list[dict[str, Any]]) -> None
 
 
 def scope_filter(libraries: list[str] | None, owner_id: int | None = None) -> str:
-    """Public chunks of `libraries` (all public ones if None), plus the caller's own notes.
+    """Shared chunks of `libraries`, plus the caller's own notes.
 
-    Private rows are matched only by the owner clause: "private" is removed from the
-    public list, so no list a client sends can reach another user's notes. Public rows
-    are selected by library alone, so the filter does not depend on how rows indexed
-    before `owner_id` existed read that field.
+    `None` means every shared library (evaluation and command-line use); a list, even an
+    empty one, is a limit: the API passes the caller's courses, and a student enrolled in
+    none still searches their own notes but nothing shared. Private rows are matched only
+    by the owner clause: "private" is removed from the list, so no list a client sends can
+    reach another user's notes. Shared rows are selected by library alone, so the filter
+    does not depend on how rows indexed before `owner_id` existed read that field.
     """
     public = [lib for lib in libraries or [] if lib != PRIVATE]
-    expr = f"library in {public!r}" if public else f'library != "{PRIVATE}"'
+    if libraries is None:
+        expr = f'library != "{PRIVATE}"'
+    else:
+        expr = f"library in {public!r}" if public else 'library == ""'      # matches nothing
     if owner_id is not None:
         expr = f'({expr}) or (library == "{PRIVATE}" and owner_id == {int(owner_id)})'
     return expr

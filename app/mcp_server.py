@@ -104,13 +104,14 @@ def format_outline(docs: list[dict], budget: int = BUDGET) -> str:
 
 @mcp.tool()
 def libraries() -> str:
-    """列出可检索的文档库 id（search/ask/outline 的 libraries 参数用这些 id；"private" 是用户自己的笔记）。"""
-    return "\n".join(f"{lib['id']}: {lib['name']}" for lib in _call("GET", "/v1/libraries")) + "\nprivate: 我的笔记"
+    """列出用户所在的课程 id（search/ask/outline 的 libraries 参数用这些 id；"private" 是用户自己的笔记）。"""
+    rows = [f"{c['id']}: {c['name']}（{'老师' if c.get('role') == 'teacher' else '学生'}）" for c in _call("GET", "/v1/courses")]
+    return "\n".join(rows or ["（还没有加入任何课程）"]) + "\nprivate: 我的笔记"
 
 
 @mcp.tool()
 def search(question: str, libraries: list[str] | None = None, history: list[dict] | None = None) -> str:
-    """检索带出处的原文片段（不生成答案），用于讲解、出题。libraries 可选，如 ["redis"]；history 是最近几轮对话
+    """检索带出处的原文片段（不生成答案），用于讲解、出题。libraries 可选，如 ["cs50"]，默认是用户所在的全部课程；history 是最近几轮对话
     [{"role": "user"|"assistant", "content": ...}]，用于理解"它""那个"指什么。"""
     body = {"question": question, "libraries": libraries or None, "history": _turns(history)}
     return format_sources(_call("POST", "/v1/search", json=body)["sources"])
@@ -118,14 +119,14 @@ def search(question: str, libraries: list[str] | None = None, history: list[dict
 
 @mcp.tool()
 def ask(question: str, libraries: list[str] | None = None, history: list[dict] | None = None) -> str:
-    """回答学习者的问题：简短答案 + 官方文档出处；资料里没有就明确说没有。参数同 search。"""
+    """回答学习者的问题：简短答案 + 课程资料或笔记的出处；资料里没有就明确说没有。参数同 search。"""
     body = {"question": question, "libraries": libraries or None, "history": _turns(history), "stream": False}
     return format_answer(_call("POST", "/v1/ask", json=body))
 
 
 @mcp.tool()
 def outline(library: str, topic: str | None = None) -> str:
-    """查看一个文档库的章节结构，用于制定学习计划。给 topic（如 "持久化"）时只列相关页面。
+    """查看一门课程（或 "private" 我的笔记）的章节结构，用于制定学习计划。给 topic（如 "持久化"）时只列相关页面。
     每个小节带 [section_id]，可用 get_section 取整节内容。"""
     return format_outline(_call("GET", "/v1/outline", params={"library": library, **({"topic": topic} if topic else {})}))
 

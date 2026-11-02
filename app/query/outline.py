@@ -35,8 +35,14 @@ from app.retrieval.milvus_store import PRIVATE
 MAX_LEVEL = 3          # deeper headings make an outline unreadable
 
 
-def _visible(doc: Document | None, owner_id: int | None) -> bool:
-    return doc is not None and (doc.library != PRIVATE or doc.owner_id == owner_id)
+def _visible(doc: Document | None, owner_id: int | None, courses: list[str] | None = None) -> bool:
+    """Notes are their owner's; shared documents are visible to everyone in their course (`courses`:
+    the caller's, or None for no course limit as in eval and CLI use)."""
+    if doc is None:
+        return False
+    if doc.library == PRIVATE:
+        return doc.owner_id == owner_id
+    return courses is None or doc.library in courses
 
 
 def _summaries(mc: MilvusClient, blocks: list[tuple[str, int]]) -> dict[tuple[str, int], str]:
@@ -87,12 +93,13 @@ def outline(db: DBSession, mc: MilvusClient, models: ModelServer, collection: st
             for d in docs]
 
 
-def get_section(db: DBSession, section_id: str, owner_id: int | None = None, max_chars: int = 20000) -> dict | None:
+def get_section(db: DBSession, section_id: str, owner_id: int | None = None, max_chars: int = 20000,
+                courses: list[str] | None = None) -> dict | None:
     doc_id, _, idx = section_id.rpartition(":")
     if not doc_id or not idx.isdigit():
         return None
     doc = db.get(Document, doc_id)
-    if not _visible(doc, owner_id):
+    if not _visible(doc, owner_id, courses):
         return None
     tree = {s.idx: s for s in db.scalars(select(Section).where(Section.doc_id == doc_id))}
     if int(idx) not in tree:

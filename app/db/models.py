@@ -1,4 +1,5 @@
-"""MySQL tables: users, and documents with their section trees (what `outline` and small-to-big read)."""
+"""MySQL tables: users, courses and who is in them, and documents with their section trees
+(what `outline` and small-to-big read)."""
 from __future__ import annotations
 
 from datetime import datetime
@@ -26,6 +27,38 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64), unique=True)
     key_hash: Mapped[str] = mapped_column(String(64), unique=True)   # sha256 hex of the API key
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Course(Base):
+    """A class. Its id is also the library id of its materials in the vector store and documents."""
+    __tablename__ = "courses"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Enrollment(Base):
+    """Who is in a course, and as what: a teacher manages its materials and invites, a student reads."""
+    __tablename__ = "enrollments"
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), primary_key=True)
+    role: Mapped[str] = mapped_column(String(16))                        # teacher | student
+    joined_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
+class Invite(Base):
+    """A code that enrolls whoever redeems it as a student. Only its hash is stored, like an API key."""
+    __tablename__ = "invites"
+
+    code_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True)
+    created_by: Mapped[int] = mapped_column(Integer)
+    max_uses: Mapped[int] = mapped_column(Integer)
+    uses: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 

@@ -27,7 +27,7 @@
 | 混合检索、查询理解、HyDE、LLM 重排、论断级引用校验、多跳检索 | ✅ 已实现；HyDE 和 LLM 重排在新评测集上验证中 |
 | Redis：按用户限流、GPU 闸门（公平排队 + 准入控制）、问答缓存 + 防击穿 | ✅ v0.7 压测验证，待用课程数据重测 |
 | 网页工作台（问答、我的笔记、学习目录、只看自己请求的 trace 看板）、MCP 服务（7 个工具） | ✅ |
-| 课程与角色（老师上传资料、发邀请码；学生加入课程） | ⏳ 下一步 |
+| 课程与角色：任何人可以开课并成为老师；老师上传资料、发邀请码（只存哈希），学生凭邀请码加入；检索只在自己的课程内，访问没加入的课程一律 403 | ✅ 工作台「课程」页、`python -m app.courses` |
 | 老师端：全班高频问题汇总（只看汇总，不看个人笔记） | ⏳ |
 
 ## 评测（v2）
@@ -123,6 +123,7 @@ Windows 上配好 `.env`、拉好 `qwen3:8b` 并完成入库后，双击 `script
 
 - **账号**：第一次打开时起个名字就会建号，API key 只存在这个浏览器里；可以记住多个账号，在右上角切换。只有在运行文渊的这台电脑上才能这样建号，别的机器需要粘贴管理员给的 key。
 - **问答**：每一步（理解问题 → 查找资料 → 生成并校验答案）实时显示；可以连续追问；`[S1]` 链接到原资料的对应位置；可以选择是否检索自己的笔记。
+- **课程**：输入老师给的邀请码加入课程，或者开一门新课。老师可以生成邀请码（只显示一次）、上传和删除课程资料。
 - **我的笔记**：上传 `.md` 到自己的私有库，列表、删除。
 - **学习目录**：选一个库、填一个主题，看相关章节树和摘要，点章节看全文。
 - **看板**：只看得到自己的请求：各阶段耗时、排队时间、p50/p95，点一行看 span 瀑布图。
@@ -142,6 +143,11 @@ cd model_server && uv sync && uv run uvicorn server:app --port 8001
 # 课程资料：下载 CS50 数据集（CC BY-NC-SA 4.0，放在 data/ 下，不进仓库）并入库
 uvx --from huggingface_hub hf download dev-jonathanb/cs50-educational-rag --repo-type dataset --local-dir data/raw/cs50
 uv run python -m app.ingest.cs50
+
+# 课程：开课（指定老师）、生成邀请码（只显示一次）；学生也可以在工作台里用邀请码加入
+uv run python -m app.api.auth create teacher           # 打印一次 API key
+uv run python -m app.courses create cs50 "CS50x 2024" --teacher teacher
+uv run python -m app.courses invite cs50 --by teacher
 
 # 个人笔记：导入一个或多个文件夹到某个账号（子目录的文件按路径命名，可排除）
 uv run python -m app.api.auth create alice             # 打印一次 API key

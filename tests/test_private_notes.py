@@ -26,7 +26,9 @@ def test_scope_filter_never_admits_other_users_notes():
     assert scope_filter(["redis"]) == "library in ['redis']"
     assert scope_filter(None) == 'library != "private"'
     # A client listing "private" as a library gets nothing extra without an owner.
-    assert scope_filter(["private"]) == 'library != "private"'
+    assert scope_filter(["private"]) == 'library == ""'
+    # A student in no course still searches their notes, and nothing shared.
+    assert scope_filter([], 7) == '(library == "") or (library == "private" and owner_id == 7)'
     assert scope_filter(["redis", "private"], 7) == \
         '(library in [\'redis\']) or (library == "private" and owner_id == 7)'
 

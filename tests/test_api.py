@@ -25,8 +25,13 @@ def fake_ask(question, history=None, libraries=None, on_event=chain._noop, **_):
     return chain.AskResult(Answer(True, "Use FLUSHALL [S1].", [{"sid": "S1", "url": SRC[0].url}]), U, "t1")
 
 
+COURSES = [{"id": "redis", "name": "Redis course", "role": "student"},
+           {"id": "cs50", "name": "CS50x", "role": "teacher"}]
+
+
 @pytest.fixture
 def client(monkeypatch):
+    monkeypatch.setattr(main, "_courses", lambda user_id: COURSES)
     monkeypatch.setattr(chain, "ask", fake_ask)
     monkeypatch.setattr(chain, "search", lambda q, h=None, l=None, on_event=chain._noop, **_:
                         chain.SearchResult(U, SRC, [], "t2"))
@@ -66,7 +71,8 @@ def test_search_returns_source_texts(client):
 
 
 def test_validation_rejects_unknown_library_and_bad_history(client):
-    assert client.post("/v1/ask", json={"question": "q", "libraries": ["mongodb"]}).status_code == 422
+    refused = client.post("/v1/ask", json={"question": "q", "libraries": ["mongodb"]})
+    assert refused.status_code == 403 and refused.json()["detail"]["type"] == "not_enrolled"
     assert client.post("/v1/ask", json={"question": "q", "history": [{"role": "system", "content": "x"}]}
                        ).status_code == 422
     assert client.post("/v1/ask", json={"question": ""}).status_code == 422
@@ -90,6 +96,7 @@ def test_me_names_the_caller(client):
 
 def test_requests_without_a_valid_key_are_rejected(monkeypatch):
     monkeypatch.setattr("app.api.auth.lookup", lambda key: Caller(7, "bob") if key == "wy_good" else None)
+    monkeypatch.setattr(main, "_courses", lambda user_id: [])
     c = TestClient(main.app)
     assert c.get("/v1/libraries").status_code == 401
     assert c.get("/v1/libraries", headers={"Authorization": "Bearer wy_bad"}).status_code == 401
@@ -167,7 +174,7 @@ def test_dashboard_is_local_only_and_summarizes_stages(monkeypatch):
 
 
 def test_outline_rejects_unknown_libraries(client):
-    assert client.get("/v1/outline", params={"library": "mongodb"}).status_code == 422
+    assert client.get("/v1/outline", params={"library": "mongodb"}).status_code == 403
 
 
 def test_workbench_page_and_local_key_setup(monkeypatch):
@@ -208,3 +215,50 @@ def test_traces_show_only_the_callers_own_requests(client, monkeypatch):
     assert len(client.get("/v1/traces/mine").json()) == 2
     assert client.get("/v1/traces/theirs").status_code == 404        # someone else's trace looks missing
     assert client.get("/v1/traces/nothing").status_code == 404
+
+
+def test_queries_search_only_the_callers_courses(client, monkeypatch):
+    seen = []
+    monkeypatch.setattr(chain, "ask", lambda q, h=None, libraries=None, **kw: seen.append(libraries) or fake_ask(q))
+    client.post("/v1/ask", json={"question": "a", "stream": False})
+    client.post("/v1/ask", json={"question": "b", "libraries": ["cs50", "private"], "stream": False})
+    assert seen == [["redis", "cs50"], ["cs50"]]          # default: every course of mine; "private" adds nothing
+    monkeypatch.setattr(main, "_courses", lambda user_id: [])
+    client.post("/v1/ask", json={"question": "c", "stream": False})
+    assert seen[-1] == []                                   # no course: notes only, never "everything"
+    assert client.get("/v1/courses").json() == [] and client.get("/v1/libraries").json() == []
+
+
+def test_course_management_is_for_its_teachers(client, monkeypatch):
+    from app import courses as courses_
+    from app.ingest import materials
+    monkeypatch.setattr(main, "_db", lambda: __import__("contextlib").nullcontext())
+    monkeypatch.setattr(main.milvus_store, "client", lambda: None)
+    monkeypatch.setattr(courses_, "create_invite", lambda db, cid, uid, uses, days: {"code": "join-x", "course_id": cid})
+    monkeypatch.setattr(materials, "add_material", lambda db, mc, models, tok, coll, cid, name, fn, text:
+                        {"doc_id": "d1", "filename": fn, "course": name})
+    invalidated = []
+    monkeypatch.setattr(main.AnswerCache, "invalidate", lambda self, scope: invalidated.append(scope) or _done())
+    monkeypatch.setattr(main.app.state, "clients", {"models": None}, raising=False)
+    assert client.post("/v1/courses/cs50/invites", json={}).json()["code"] == "join-x"
+    added = client.post("/v1/courses/cs50/materials", json={"filename": "week1.md", "content": "# W1"}).json()
+    assert added["course"] == "CS50x" and invalidated == ["cs50"]
+    for path, body in [("/v1/courses/redis/invites", {}), ("/v1/courses/redis/materials", {"filename": "a.md", "content": "x"}),
+                       ("/v1/courses/algo/invites", {})]:
+        assert client.post(path, json=body).status_code == 403         # a student, and not in the course at all
+    assert client.get("/v1/courses/redis/materials").status_code == 403
+
+
+async def _done():
+    return None
+
+
+def test_joining_with_a_bad_code_is_a_clear_error(client, monkeypatch):
+    from app import courses as courses_
+
+    def refuse(db, uid, code):
+        raise courses_.CourseError("this invite code is not valid (unknown, expired or used up)")
+    monkeypatch.setattr(main, "_db", lambda: __import__("contextlib").nullcontext())
+    monkeypatch.setattr(courses_, "join", refuse)
+    r = client.post("/v1/courses/join", json={"code": "join-nope"})
+    assert r.status_code == 422 and r.json()["detail"]["type"] == "bad_invite"

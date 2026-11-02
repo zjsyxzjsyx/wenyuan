@@ -2,12 +2,16 @@
 
 POST /v1/search  sources for a question, no generation (what a tutor agent quotes from)
 POST /v1/ask     cited answer; server-sent events by default ("stream": false for one JSON body)
-GET  /v1/libraries, GET /v1/me
+GET  /v1/me, GET /v1/courses (also /v1/libraries)   the caller and the courses they are in
+POST /v1/courses, POST /v1/courses/join                  create a course (as its teacher), join with a code
+POST /v1/courses/{id}/invites; GET|POST /v1/courses/{id}/materials, DELETE .../materials/{doc_id}   teachers
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
 GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
 GET  /v1/traces, /v1/traces/{id}   the caller's own request traces
 GET  /ui         web workbench: ask, notes, outline, my traces (first-run key setup on this machine only)
 Every request needs `Authorization: Bearer <key>` (`python -m app.api.auth create <name>`).
+A query searches the courses the caller is in (or those it names among them) plus the caller's
+own notes; naming a course they are not in is a 403, never a wider search.
 
 Query requests pass Redis guards before any work: a per-user token bucket (429 +
 Retry-After), then the answer cache (app.cache.answers: a hit, or the result of an
@@ -25,17 +29,18 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from redis.asyncio import BlockingConnectionPool, Redis
 
+from app import courses as courses_
 from app.api import dashboard, sse, workbench
 from app.api.auth import Caller, current_user
 from app.cache.answers import AnswerCache, private_scope
 from app.cache.limits import Gate, GateBusy, RateLimiter, Ticket
 from app.config import get_settings
 from app.db.models import create_tables, engine
+from app.ingest import materials
 from app.ingest import private as notes
-from app.ingest.sites import SITES
 from app.models.llm import LLM, LLMError
 from app.models.local import ModelServer
 from app.query import ask as chain
@@ -93,17 +98,9 @@ class Turn(BaseModel):
 class QueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     history: list[Turn] = Field(default_factory=list, max_length=20)
-    libraries: list[str] | None = None
+    libraries: list[str] | None = Field(default=None, max_length=20)   # courses; default: all of the caller's
     include_private: bool = True        # also search the caller's own notes
     stream: bool = True
-
-    @field_validator("libraries")
-    @classmethod
-    def known_libraries(cls, value: list[str] | None) -> list[str] | None:
-        unknown = sorted(set(value or []) - SITES.keys())
-        if unknown:
-            raise ValueError(f"unknown libraries: {unknown}")
-        return value or None
 
 
 def error_payload(exc: Exception) -> dict:
@@ -133,6 +130,35 @@ def rate_limited(route: str):
                                 headers={"Retry-After": str(max(1, round(decision.retry_after_s)))})
         return user
     return check
+
+
+def _courses(user_id: int) -> list[dict]:
+    with _db() as db:
+        return courses_.courses_of(db, user_id)
+
+
+async def my_courses(user: Caller = Depends(current_user)) -> list[dict]:
+    """The caller's courses ({id, name, role}), looked up once per request."""
+    return await run_in_threadpool(_courses, user.id)
+
+
+def course_scope(requested: list[str] | None, mine: list[dict]) -> list[str]:
+    """Libraries a query may search: all the caller's courses, or those it asks for among them.
+    An empty list is a real limit (the caller's notes only), never "everything"."""
+    ids = [c["id"] for c in mine]
+    if not requested:
+        return ids
+    outside = sorted(set(requested) - set(ids) - {milvus_store.PRIVATE})
+    if outside:
+        raise HTTPException(403, {"type": "not_enrolled", "message": f"not enrolled in {outside}"})
+    return [lib for lib in dict.fromkeys(requested) if lib != milvus_store.PRIVATE]
+
+
+def teaching(course_id: str, mine: list[dict]) -> dict:
+    found = next((c for c in mine if c["id"] == course_id), None)
+    if found is None or found["role"] != "teacher":
+        raise HTTPException(403, {"type": "not_teacher", "message": f"only a teacher of {course_id!r} can do this"})
+    return found
 
 
 def _history(req: QueryRequest) -> list[dict]:
@@ -218,35 +244,38 @@ def me(user: Caller = Depends(current_user)) -> dict:
     return {"id": user.id, "name": user.name}
 
 
-@app.get("/v1/libraries")
-def libraries(_: Caller = Depends(current_user)) -> list[dict]:
-    return [{"id": lib, "name": site.name} for lib, site in sorted(SITES.items())]
+@app.get("/v1/courses")
+@app.get("/v1/libraries")       # the v0.7 name, kept for MCP clients: a course is a library of shared materials
+async def courses(mine: list[dict] = Depends(my_courses)) -> list[dict]:
+    return mine
 
 
 @app.post("/v1/search")
 async def search(req: QueryRequest, user: Caller = Depends(rate_limited("search")), g: Guards = Depends(guards),
-                 c: dict = Depends(clients)):
+                 c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
+    scope = course_scope(req.libraries, mine)
     ticket = g.gate.ticket(user.id)
 
     def run(emit):
         with spans.span("http", "POST /v1/search", user_id=user.id, queued_s=round(ticket.waited_s, 3)):
-            return chain.search(req.question, _history(req), req.libraries, on_event=emit,
+            return chain.search(req.question, _history(req), scope, on_event=emit,
                                 owner_id=_owner(req, user), **c)
-    key = await g.cache.key("search", req.question, req.libraries, _history(req), _owner(req, user))
+    key = await g.cache.key("search", req.question, scope, _history(req), _owner(req, user))
     return await _respond(g, key, ticket, run, search_payload)
 
 
 @app.post("/v1/ask")
 async def ask(req: QueryRequest, user: Caller = Depends(rate_limited("ask")), g: Guards = Depends(guards),
-              c: dict = Depends(clients)):
+              c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
+    scope = course_scope(req.libraries, mine)
     ticket = g.gate.ticket(user.id)
 
     def run(emit):
         # queued_s: time spent waiting for a GPU slot, so a trace separates queueing from model time.
         with spans.span("http", "POST /v1/ask", user_id=user.id, queued_s=round(ticket.waited_s, 3)):
-            return chain.ask(req.question, _history(req), req.libraries, on_event=emit,
+            return chain.ask(req.question, _history(req), scope, on_event=emit,
                              owner_id=_owner(req, user), **c)
-    key = await g.cache.key("ask", req.question, req.libraries, _history(req), _owner(req, user))
+    key = await g.cache.key("ask", req.question, scope, _history(req), _owner(req, user))
     if not req.stream:
         return await _respond(g, key, ticket, run, ask_payload)
     return StreamingResponse(_stream_events(g, key, ticket, lambda emit: ask_payload(run(emit))),
@@ -302,11 +331,11 @@ async def delete_note(doc_id: str, user: Caller = Depends(current_user), g: Guar
 
 @app.get("/v1/outline")
 async def outline(library: str, topic: str | None = None, user: Caller = Depends(rate_limited("outline")),
-                  g: Guards = Depends(guards), c: dict = Depends(clients)):
-    """Section trees of a library ("private" for the caller's notes), around `topic` if given.
+                  g: Guards = Depends(guards), c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
+    """Section trees of a course ("private" for the caller's notes), around `topic` if given.
     A topic costs an LLM call (query understanding), so it takes a GPU-gate slot like a query."""
-    if library not in SITES and library != milvus_store.PRIVATE:
-        raise HTTPException(422, {"type": "unknown_library", "message": library})
+    if library != milvus_store.PRIVATE:
+        course_scope([library], mine)
     topic = (topic or "").strip()[:500] or None
     ticket = g.gate.ticket(user.id)
 
@@ -329,13 +358,107 @@ async def outline(library: str, topic: str | None = None, user: Caller = Depends
 
 
 @app.get("/v1/sections/{section_id}")
-async def section(section_id: str, user: Caller = Depends(current_user)):
+async def section(section_id: str, user: Caller = Depends(current_user), mine: list[dict] = Depends(my_courses)):
     def run():
         with spans.span("http", "GET /v1/sections", user_id=user.id, section_id=section_id) as s, _db() as db:
-            found = outline_.get_section(db, section_id, owner_id=user.id)
+            found = outline_.get_section(db, section_id, owner_id=user.id, courses=[c["id"] for c in mine])
             s.set(found=found is not None, chars=len(found["text"]) if found else 0)
             return found
     found = await run_in_threadpool(run)
     if found is None:
         raise HTTPException(404, {"type": "not_found"})
     return found
+
+
+class CourseRequest(BaseModel):
+    id: str = Field(min_length=2, max_length=41)
+    name: str = Field(min_length=1, max_length=255)
+
+
+class JoinRequest(BaseModel):
+    code: str = Field(min_length=4, max_length=64)
+
+
+class InviteRequest(BaseModel):
+    max_uses: int = Field(default=courses_.INVITE_USES, ge=1, le=5000)
+    days: int = Field(default=courses_.INVITE_DAYS, ge=1, le=365)
+
+
+@app.post("/v1/courses")
+async def create_course(req: CourseRequest, user: Caller = Depends(rate_limited("courses"))):
+    """Anyone may start a course and becomes its teacher; students then join with an invite code."""
+    def run():
+        with spans.span("http", "POST /v1/courses", user_id=user.id, course=req.id), _db() as db:
+            return courses_.create_course(db, req.id, req.name, user.id)
+    try:
+        return await run_in_threadpool(run)
+    except courses_.CourseError as exc:
+        raise HTTPException(422, {"type": "bad_course", "message": str(exc)}) from exc
+
+
+@app.post("/v1/courses/join")
+async def join_course(req: JoinRequest, user: Caller = Depends(rate_limited("join"))):
+    """Rate limited like a query, which also slows down guessing codes."""
+    def run():
+        with spans.span("http", "POST /v1/courses/join", user_id=user.id) as s, _db() as db:
+            course = courses_.join(db, user.id, req.code)
+            s.set(course=course["id"])
+            return course
+    try:
+        return await run_in_threadpool(run)
+    except courses_.CourseError as exc:
+        raise HTTPException(422, {"type": "bad_invite", "message": str(exc)}) from exc
+
+
+@app.post("/v1/courses/{course_id}/invites")
+async def invite(course_id: str, req: InviteRequest, user: Caller = Depends(current_user),
+                 mine: list[dict] = Depends(my_courses)):
+    """A new invite code, shown only in this response (only its hash is stored)."""
+    teaching(course_id, mine)
+
+    def run():
+        with _db() as db:
+            return courses_.create_invite(db, course_id, user.id, req.max_uses, req.days)
+    return await run_in_threadpool(run)
+
+
+@app.get("/v1/courses/{course_id}/materials")
+async def list_materials(course_id: str, mine: list[dict] = Depends(my_courses)):
+    teaching(course_id, mine)
+
+    def run():
+        with _db() as db:
+            return materials.list_materials(db, course_id)
+    return await run_in_threadpool(run)
+
+
+@app.post("/v1/courses/{course_id}/materials")
+async def add_material(course_id: str, req: NoteRequest, user: Caller = Depends(rate_limited("materials")),
+                       g: Guards = Depends(guards), c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
+    course = teaching(course_id, mine)
+
+    def run():
+        with spans.span("http", "POST /v1/courses/materials", user_id=user.id, course=course_id), _db() as db:
+            return materials.add_material(db, milvus_store.client(), c["models"], TiktokenTokenizer(), chain.COLLECTION,
+                                          course_id, course["name"], req.filename, req.content)
+    try:
+        result = await run_in_threadpool(run)
+    except notes.NoteError as exc:
+        raise HTTPException(422, {"type": "bad_material", "message": str(exc)}) from exc
+    await g.cache.invalidate(course_id)       # answers cached before the upload may miss it
+    return result
+
+
+@app.delete("/v1/courses/{course_id}/materials/{doc_id}")
+async def delete_material(course_id: str, doc_id: str, user: Caller = Depends(current_user),
+                          g: Guards = Depends(guards), mine: list[dict] = Depends(my_courses)):
+    teaching(course_id, mine)
+
+    def run():
+        with spans.span("http", "DELETE /v1/courses/materials", user_id=user.id, course=course_id, doc_id=doc_id), \
+                _db() as db:
+            return materials.delete_material(db, milvus_store.client(), chain.COLLECTION, course_id, doc_id)
+    if not await run_in_threadpool(run):
+        raise HTTPException(404, {"type": "not_found"})
+    await g.cache.invalidate(course_id)
+    return {"deleted": doc_id}

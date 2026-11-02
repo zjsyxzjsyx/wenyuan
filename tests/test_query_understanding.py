@@ -109,3 +109,13 @@ def test_a_repetition_loop_is_retried_with_sampling(tmp_path, monkeypatch):
     with pytest.raises(LLMError, match="looping"):
         client.chat_json([{"role": "user", "content": "z"}])
     assert len(temperatures) == 4                    # plain, plain retry, then two sampled attempts
+
+
+def test_routing_narrows_the_callers_libraries_but_never_widens_them():
+    from app.query.ask import narrowed, offered
+    assert narrowed(["cs50"], ["cs50", "algo"]) == ["cs50"]
+    assert narrowed(["redis"], ["cs50"]) == ["cs50"]          # a guess outside the caller's courses is ignored
+    assert narrowed([], ["cs50"]) == ["cs50"]
+    assert narrowed(["redis"], []) == []                       # no courses: still none
+    assert narrowed(["redis"], None) == ["redis"] and narrowed([], None) is None
+    assert offered([]) == [] and "cs50" in offered(None)
