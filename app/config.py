@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     llm_base_url: str = "http://127.0.0.1:11434/v1"
     llm_api_key: str = "ollama"
     llm_model: str = "qwen3:8b"
+    # Eval judge (eval/answers.py). Unset: the LLM_* model with thinking on, which shares the
+    # answering model's biases; point these at a stronger API model for results worth reporting.
+    judge_base_url: str | None = None
+    judge_api_key: str | None = None
+    judge_model: str | None = None
     # The model that answers whenever a private note is in the context. Unset: the LLM_* model,
     # which is right while that is local; set these when LLM_* points at a remote API.
     local_llm_base_url: str | None = None

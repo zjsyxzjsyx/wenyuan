@@ -20,7 +20,8 @@ from dataclasses import asdict, dataclass, field
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import engine
-from app.generation.answer import REFUSAL, Answer, answer
+from app.generation.answer import REFUSAL, Answer, answer, apply_verification
+from app.generation.verify import verify
 from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.ingest.sites import SITES
 from app.models.llm import LLM
@@ -48,6 +49,10 @@ class AskConfig:
     rerank_top: int = 0          # rerank the first N hits; 0: off
     summaries: bool = False      # also search section summaries/questions (E5)
     budget: int = 6000           # context tokens for the answer
+    # Claim-level citation check after generation (E8, 99 SO questions, DeepSeek as judge): answers
+    # with an unsupported claim 47.8% -> 23.0% (significant), fully correct answers unchanged,
+    # 5 more refusals (none of them correct before), about +0.85 s per answer.
+    verify: bool = True
 
 
 @dataclass
@@ -148,6 +153,9 @@ def ask(question: str, history: list[dict] | None = None, libraries: list[str] |
         writer = (local_llm or llm) if private else llm
         result = (answer(writer, found.understanding.standalone_question, found.sources)
                   if found.understanding.needs_retrieval else Answer(False, REFUSAL))
+        if cfg.verify and result.found:
+            # Same routing as the answer: a private source never leaves the local model.
+            result = apply_verification(result, verify(writer, result.text, found.sources))
         root.set(found=result.found, citations=len(result.citations), private_context=private,
                  answer_model=writer.model)
         return AskResult(result, found.understanding, root.trace_id, found.retrieved, found.sources)

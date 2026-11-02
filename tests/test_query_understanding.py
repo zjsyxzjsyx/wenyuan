@@ -63,3 +63,49 @@ def test_llm_uses_cache_and_requires_key(tmp_path, monkeypatch):
         client.chat_json(messages)
     (tmp_path / "llm.jsonl").write_text(json.dumps({"key": client._key(messages), "response": {"ok": 1}}) + "\n")
     assert LLM(base_url="http://unused", api_key="", model="m").chat_json(messages) == {"ok": 1}
+
+
+
+def test_one_server_error_is_retried_but_client_errors_are_not(tmp_path, monkeypatch):
+    import httpx
+    monkeypatch.setattr(llm_module, "CACHE", tmp_path / "llm.jsonl")
+    monkeypatch.setattr(llm_module.time, "sleep", lambda s: None)
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        if len(calls) == 1:
+            return httpx.Response(500, text="boom")
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"ok": 1}'}}]})
+    client = LLM(base_url="http://llm", api_key="k", model="m", use_cache=False)
+    client._http = httpx.Client(base_url="http://llm", transport=httpx.MockTransport(handler))
+    assert client.chat_json([{"role": "user", "content": "x"}]) == {"ok": 1} and len(calls) == 2
+    calls.clear()
+    client._http = httpx.Client(base_url="http://llm", transport=httpx.MockTransport(
+        lambda r: calls.append(1) or httpx.Response(400, text="bad request")))
+    with pytest.raises(httpx.HTTPStatusError):
+        client.chat_json([{"role": "user", "content": "y"}])
+    assert len(calls) == 1
+
+
+
+def test_a_repetition_loop_is_retried_with_sampling(tmp_path, monkeypatch):
+    import httpx
+    monkeypatch.setattr(llm_module.time, "sleep", lambda s: None)
+    temperatures = []
+
+    def handler(request):
+        temperatures.append(json.loads(request.content)["temperature"])
+        if temperatures[-1] == 0.0:
+            return httpx.Response(500, json={"error": {"message": "prediction aborted, token repeat limit reached"}})
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"ok": 1}'}}]})
+    client = LLM(base_url="http://llm", api_key="k", model="m", use_cache=False)
+    client._http = httpx.Client(base_url="http://llm", transport=httpx.MockTransport(handler))
+    assert client.chat_json([{"role": "user", "content": "x"}]) == {"ok": 1}
+    assert temperatures == [0.0, 0.0, 0.4]          # the plain retry, then one with sampling
+    temperatures.clear()
+    client._http = httpx.Client(base_url="http://llm", transport=httpx.MockTransport(
+        lambda r: temperatures.append(1) or httpx.Response(500, text="token repeat limit reached")))
+    with pytest.raises(LLMError, match="looping"):
+        client.chat_json([{"role": "user", "content": "z"}])
+    assert len(temperatures) == 4                    # plain, plain retry, then two sampled attempts

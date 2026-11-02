@@ -41,6 +41,7 @@ class Answer:
     text: str
     citations: list[dict] = field(default_factory=list)   # {"sid", "url", "title", "heading_path"}
     dropped_citations: list[str] = field(default_factory=list)
+    verification: dict | None = None    # claim verdict counts and removed sentences (app.generation.verify)
 
 
 def format_sources(sources: list[Source]) -> str:
@@ -83,3 +84,16 @@ def answer(llm: LLM, question: str, sources: list[Source]) -> Answer:
     by_id = {src.sid: src for src in sources}
     return Answer(True, text, [{"sid": c, "url": by_id[c].url, "title": by_id[c].title,
                                 "heading_path": by_id[c].heading_path} for c in valid], dropped)
+
+
+def apply_verification(result: Answer, verified) -> Answer:
+    """The answer after claim-level checking: unsupported sentences removed, citations narrowed
+    to those still in the text (all of them if the kept sentences carry no markers)."""
+    record = {"counts": verified.counts, "removed": verified.removed}
+    if not verified.removed:
+        return Answer(result.found, result.text, result.citations, result.dropped_citations, record)
+    if not verified.text.strip():
+        return Answer(False, REFUSAL, [], result.dropped_citations, record)
+    still = set(_CITE.findall(verified.text))
+    citations = [c for c in result.citations if c["sid"] in still] or result.citations
+    return Answer(True, verified.text, citations, result.dropped_citations, record)

@@ -170,7 +170,7 @@ Celery 流水线，按内容 hash 保证幂等；CPU 队列负责抓取、解析
    - **rerank 默认关闭**：加了查询理解之后，rerank 显著变差（见 11.2），保留为可选项。
    - **父块逐级回退**：很多页面只有一个 H1，"顶层章节"就是整页（最长 11 万字符）。最初的实现里，排在前面的一个巨型页被截断后独占了全部预算，把有答案的 `FLUSHALL` 页挤了出去，导致错误拒答。现在单块超过 1500 token 就退到命中所在的小节，还太大就只用命中的 chunk。
 4. **生成（仅 `ask`）**：简洁答案 + 引用（链接到官方文档的具体章节）；JSON 结构 + SSE 流式；证据不足时拒答。讲解交给知秋。
-5. **论断级引用校验**：程序先校验引用的 chunk 是否在本次上下文里，再由校验子 Agent 逐条判断结论是否被证据支持，不支持的删掉或重写。
+5. **论断级引用校验**（W4 实现，默认开启）：程序先校验引用的 chunk 是否在本次上下文里，再由一次 LLM 调用逐句判断结论是否被引用的原文支持，不支持的句子删掉（不改写：改写会产生新的、没有校验过的内容）。效果见 11.4。
 6. **Agentic 多跳**：证据不足时再检索一轮（例如跨文档库的问题），最多 3 轮，并设 token 预算上限。
 
 ### 5.1 记忆分层：文渊记资料，知秋记人
@@ -193,13 +193,14 @@ RAG 常被称为 Agent 的"外部长期记忆"。本项目把记忆按内容拆�
 ## 6. MCP 工具
 | 工具 | 输入 | 输出 | 知秋用在哪 |
 |---|---|---|---|
-| `search` | query、libraries、top_k、history | 带出处的资料片段 | 讲课、出题 |
-| `ask` | question、libraries、history | 简洁答案 + 引用 | 学习者提问 |
-| `outline` | library、topic | 章节树 + 每节摘要 | 制定学习计划 |
+| `libraries` | — | 可检索的文档库 | 选库 |
+| `search` | question、libraries、history | 带出处的资料片段 | 讲课、出题 |
+| `ask` | question、libraries、history | 简洁答案 + 引用（经过论断级校验） | 学习者提问 |
+| `outline` | library、topic | 章节树 + 顶层章节摘要 + section_id | 制定学习计划 |
 | `get_section` | section_id | 整节原文 | 讲课时取完整章节 |
-| `add_source` | url | task_id | 学新框架时提交文档 |
-| `add_private` | 文件路径或 Notion 页面、user | task_id | 把用户自己的资料入私有库 |
-| `source_status` | task_id 或 url | 入库进度 | 查询进度 |
+| `add_note` / `list_notes` | filename、content | 存入 / 列出私有笔记 | 把学习者自己的笔记交给文渊 |
+
+W4 已实现以上 7 个工具（`wenyuan-mcp`，stdio，代理到 HTTP API）。`add_source` / `source_status`（提交新文档站）尚未做。
 
 ---
 
@@ -215,8 +216,8 @@ RAG 常被称为 Agent 的"外部长期记忆"。本项目把记忆按内容拆�
 `users`、`libraries`（文档库，含 `visibility` 公共 / 私有和 `owner_id`）、`sources`（文档站 / 网址，唯一键去重）、`documents`、`sections`（章节树，含摘要）、`ingest_tasks`、`eval_runs`、`eval_results`、`spans`。已实现：`documents`（W3 加了 `owner_id`）、`sections`、`spans`（W1），`users`（W3，只存 API key 的 SHA-256）。
 
 ### 7.3 API
-已实现（W3）：`POST /v1/ask`（SSE）、`POST /v1/search`、`GET /v1/libraries`、`POST|GET /v1/notes`、`DELETE /v1/notes/{doc_id}`、`GET /healthz`；看板：`GET /dashboard`。
-待做：`GET /v1/libraries/{id}/outline`、`GET /v1/sections/{id}`、`POST /v1/sources`、`GET /v1/tasks/{id}`（随 MCP 一起做）。
+已实现：`POST /v1/ask`（SSE）、`POST /v1/search`、`GET /v1/libraries`、`POST|GET /v1/notes`、`DELETE /v1/notes/{doc_id}`、`GET /healthz`、看板 `GET /dashboard`（W3）；`GET /v1/outline?library=&topic=`、`GET /v1/sections/{doc_id}:{idx}`（W4，供 MCP 的 outline / get_section 使用）。
+待做：`POST /v1/sources`、`GET /v1/tasks/{id}`（提交新文档站）。
 
 ### 7.4 本地 trace 看板（仿照知秋）
 - 参考知秋 `src/zhiqiu/tracing.py`：一次请求是一棵 span 树；ContextVar 保存当前 span；开始时写入 running、结束时更新；写入尽力而为，失败不影响主流程；`reconcile` 把进程退出后遗留的 running span 标记为中断。
@@ -387,13 +388,49 @@ RAG项目/
   3. 客户端断开时，Starlette 会取消流式响应，`finally` 里的 `await ticket.release()` 也被取消，槽位一直泄漏到租约过期（两个超时请求让整个闸门被占了好几分钟）→ 释放操作放进 `anyio.CancelScope(shield=True)`，并用"模拟真实网络让出事件循环"的测试复现。
   4. API 每个请求都新建 LLM 客户端，并且读取评测用的磁盘缓存 → 进程内共享客户端；线上服务不使用评测缓存。
 
+### 11.4 W4（2026-11-02）：MCP、论断级校验、多轮评测
+- **MCP 服务**（`wenyuan-mcp`，stdio）：作为 HTTP API 的薄代理。限流、GPU 闸门、缓存和私有库隔离对 MCP 调用同样生效，MCP 不会成为绕过保护的后门。
+  - **7 个工具**：`libraries`、`search`、`ask`、`outline`、`get_section`、`add_note`、`list_notes`。
+  - **输出**：紧凑的中文纯文本，每段都带出处链接，控制在 5500 字符以内。知秋会把工具输出当作一份资料，默认上限是 6000 字符。
+  - **错误**：繁忙、限流、没找到都转成模型能看懂的提示，并附上建议的重试时间。
+  - **验证方式**：用知秋自己的 `McpClientPool` 以 stdio 子进程方式连接（没有改知秋的代码），7 个工具全部可调用。配置示例见 `examples/koyo-mcp.json`，写操作 `add_note` 的权限设为 `external_mcp`，其余为 `read`。
+- **`outline` 的主题定位**：最初只用 dense 检索，"持久化"排第一的是 `PERSIST` 命令页，持久化指南连前 14 名都没进。改为和 `ask` 一样先做查询理解再做混合检索，并把主题包装成学习目标（"我想系统学习 Redis 的「持久化」"），教程页排在参考页前面。改完后排第一的是 Redis persistence 指南，顶层章节挂上了 E5 生成的摘要。
+- **E8 论断级引用校验**：把答案拆成句子，每句带上它引用的来源；一次 LLM 调用逐句判断"引用的原文是否支持这句话"，删掉不支持的句子，全部删光就拒答。拆句时，代码里的点号（如 `df.dropna()`）不算句号。
+
+  | 100 道 SO 题，裁判 DeepSeek（独立于被评的 Qwen3-8B） | 校验前 | 校验后 |
+  |---|---|---|
+  | 不受原文支持的论断占比 | 23.4% | **10.3%** |
+  | 含不受支持论断的答案占比 | 47.8% | **23.0%**（−26 个百分点，CI [−36, −17]） |
+  | 完全正确（对照 SO 采纳答案，2 分） | 44% | 44%（差值 0，CI [−5, +6]） |
+  | 给出答案的题数 | 92 | 87 |
+
+  - 删除的精确率 64%，召回率 67%：删掉的句子里约 2/3 确实不受支持，不受支持的句子里约 2/3 被删掉了。
+  - 新增的 5 个拒答，在校验前没有一个是完全正确的（评分 1、1、0、1、0）。
+  - 校验器未命中缓存时的耗时 p50 为 846 ms，最长 2.2 s。
+  - **结论**：默认开启。学习场景里学错比没学更糟，用不到 1 秒的代价换来"含错答案减半"，而且正确率没有损失。
+  - **裁判**：先试过本地 Qwen3 开启思考模式当裁判，但它和被评的是同一个模型，而且每题要 30 秒以上；最终改用 DeepSeek，通过 `JUDGE_*` 配置。
+- **E6 多轮子集**：把 199 道 SO 题改写成两轮对话。第一轮引入话题，第二轮的追问把**最具体的技术对象**换成"它 / 那个"。改写由 DeepSeek 完成，和负责消解指代的本地模型不同。第一版 prompt 生成的题里，71/200 只隐藏了库名，可评测时本来就会告诉检索器是哪个库，这些题测不出任何东西；改 prompt 并加了过滤之后才有效。
+
+  | 199 道两轮对话 | Recall@5 | MRR |
+  |---|---|---|
+  | 原问题（上限） | 0.543 | 0.446 |
+  | 只有追问，不给历史 | 0.215 | 0.182 |
+  | 追问 + 历史（文渊的做法） | **0.488** | **0.395** |
+
+  - 没有历史时召回率不到一半；带上历史后显著回升（Recall@5 +27.3，CI [+21.3, +33.5]），收回了 83% 的损失。
+  - 离上限还差 5.5 个点（Recall@5 的差距不显著，MRR 的差距显著）。剩下的失败题大多是对话本身就有歧义，例如第一轮问"什么是 tensor"，追问"how do I get it"。
+- **健壮性**（评测中发现）：
+  - Ollama 偶尔返回 500：LLM 客户端对 5xx 和网络错误重试一次。
+  - 模型在 JSON 模式下陷入重复循环（`token repeat limit reached`）：温度为 0 时每次都会重现，所以改用采样加频率惩罚重试两次，仍然失败就抛出明确的 `LLMError`。
+  - 评测按题记录错误，不会因为一道题失败而整轮作废。
+
 ## 12. 里程碑（从 2026-11-03 开始）
 | 周 | 交付 |
 |---|---|
 | W1 | 项目骨架 + Docker Compose + GPU 模型服务；抓取 2～3 个文档站，结构切块 + 纯向量 baseline；Stack Overflow 评测集首批 100 条；跑出 E0；trace 骨架 |
 | W2 | DevDocs 公共库入库（Celery 流水线），评测集映射到 DevDocs 并扩展标签；章节摘要；BM25 + RRF + rerank；查询理解；`ask` 带引用；E2～E6 |
 | W3 | ✅ FastAPI + SSE；Redis 排队限流、缓存；Ollama 本地模型与 LLM 路由；压测；私有库（上传入库、按用户权限过滤）；本地 trace 看板。MCP Server、知秋接入、私有评测题顺延到 W4 |
-| W4 | 论断级引用校验、Agentic 多跳；BGE 对比 Qwen3；E7～E9 消融报告；README、演示、CI 评测门禁 |
+| W4 | ✅ MCP Server（7 个工具，经知秋的 MCP 客户端验证）；论断级引用校验（E8）；多轮评测子集（E6）。尚未完成：Agentic 多跳（E9）、BGE 对比 Qwen3（E7）、CI 评测门禁、知秋里的端到端对话演示、私有库评测题 |
 
 每周最低标准：评测脚本能跑通，`experiments/` 里有新的实验记录。
 

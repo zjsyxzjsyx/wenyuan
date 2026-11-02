@@ -50,13 +50,15 @@ class Config:
     summaries: bool = False             # also search section summaries/questions, fuse by RRF (E5)
     summary_weight: float = 1.0         # RRF weight of the summary list (chunks: 1.0)
     dense_query: str = "rewritten"      # with --understand: embed the LLM rewrite or the raw question
+    history: bool = True                # multi-turn rows: give the conversation so far to understanding
+    question_field: str = "question"    # e.g. "original_question" for the multi-turn upper bound
     llm_workers: int = 4                # parallel LLM calls (match the server's parallel slots)
     dataset: Path = DATASET
     exclude_labels: frozenset[str] = field(default_factory=lambda: frozenset({"not_applicable"}))
 
 
-def query_text(row: dict, body_chars: int) -> str:
-    return f"{row['question']}\n\n{row['body'][:body_chars]}".strip()
+def query_text(row: dict, body_chars: int, field: str = "question") -> str:
+    return f"{row[field]}\n\n{row.get('body', '')[:body_chars]}".strip()
 
 
 def embed_queries(models: ModelServer, texts: list[str], model: str = "BAAI/bge-m3") -> list[list[float]]:
@@ -111,20 +113,22 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
     bm25_chars = cfg.body_chars if cfg.bm25_body_chars is None else cfg.bm25_body_chars
     if not cfg.understand:
         with spans.span("stage", "embed_queries", n=len(rows)):
-            return (embed_queries(models, [query_text(r, cfg.body_chars) for r in rows]),
-                    [query_text(r, bm25_chars) for r in rows])
+            return (embed_queries(models, [query_text(r, cfg.body_chars, cfg.question_field) for r in rows]),
+                    [query_text(r, bm25_chars, cfg.question_field) for r in rows])
     llm = LLM()
     with spans.span("stage", "understand_queries", n=len(rows), workers=cfg.llm_workers):
         # Library routing is not scored here (each question's library is given), so offer only its own.
         # Each call runs in a copy of this context so its span stays under this stage in the trace.
         def one(row: dict):
+            history = row.get("history") if cfg.history else None
             return contextvars.copy_context().run(
-                understand, llm, query_text(row, cfg.body_chars), libraries=[row["library"]])
+                understand, llm, query_text(row, cfg.body_chars, cfg.question_field), history,
+                libraries=[row["library"]])
         with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
             parsed = list(pool.map(one, rows))
     # The rewrite drops the body's error text and code, which the dense model can use;
     # "raw" keeps the question for dense and gives the LLM's API names to BM25 only.
-    dense_texts = ([query_text(r, cfg.body_chars) for r in rows] if cfg.dense_query == "raw"
+    dense_texts = ([query_text(r, cfg.body_chars, cfg.question_field) for r in rows] if cfg.dense_query == "raw"
                    else [u.search_query_en for u in parsed])
     with spans.span("stage", "embed_queries", n=len(rows)):
         vectors = embed_queries(models, dense_texts)
@@ -208,6 +212,9 @@ def main() -> None:
     parser.add_argument("--llm-workers", type=int, default=4)
     parser.add_argument("--summaries", action="store_true", help="fuse in section summary/question hits (E5)")
     parser.add_argument("--summary-weight", type=float, default=1.0)
+    parser.add_argument("--no-history", action="store_true", help="multi-turn rows: drop the conversation so far")
+    parser.add_argument("--question-field", default="question",
+                        help="row field to ask (multi-turn upper bound: original_question)")
     parser.add_argument("--dense-query", choices=("rewritten", "raw"), default="rewritten",
                         help="with --understand: what the dense side embeds")
     parser.add_argument("--dataset", type=Path, default=DATASET)
@@ -220,6 +227,7 @@ def main() -> None:
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
         rerank_body_chars=args.rerank_body_chars, understand=args.understand, llm_workers=args.llm_workers,
         summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
+        history=not args.no_history, question_field=args.question_field,
         dataset=args.dataset,
         exclude_labels=frozenset(args.exclude_labels)))
     print(json.dumps({k: result[k] for k in ("exp", "collection", "excluded", "overall", "by_library", "by_label",

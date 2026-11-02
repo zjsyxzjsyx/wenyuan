@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "wenyuan": {
+      "command": "<path-to-wenyuan>/.venv/Scripts/wenyuan-mcp.exe",
+      "args": [],
+      "env": {"WENYUAN_URL": "http://127.0.0.1:8000", "WENYUAN_API_KEY": "<key from: python -m app.api.auth create koyo>"},
+      "tools": {
+        "libraries":   {"permission": "read", "timeout_s": 10},
+        "search":      {"permission": "read", "timeout_s": 60, "max_output_chars": 6000},
+        "ask":         {"permission": "read", "timeout_s": 90, "max_output_chars": 6000},
+        "outline":     {"permission": "read", "timeout_s": 30, "max_output_chars": 6000},
+        "get_section": {"permission": "read", "timeout_s": 15, "max_output_chars": 6000},
+        "list_notes":  {"permission": "read", "timeout_s": 10},
+        "add_note":    {"permission": "external_mcp", "timeout_s": 60}
+      }
+    }
+  }
+}

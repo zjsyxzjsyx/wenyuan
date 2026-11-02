@@ -4,6 +4,7 @@ POST /v1/search  sources for a question, no generation (what a tutor agent quote
 POST /v1/ask     cited answer; server-sent events by default ("stream": false for one JSON body)
 GET  /v1/libraries
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
+GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
 GET  /dashboard  local trace dashboard (this machine only)
 Every request needs `Authorization: Bearer <key>` (`python -m app.api.auth create <name>`).
 
@@ -37,6 +38,7 @@ from app.ingest.sites import SITES
 from app.models.llm import LLM, LLMError
 from app.models.local import ModelServer
 from app.query import ask as chain
+from app.query import outline as outline_
 from app.retrieval import milvus_store
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
@@ -287,3 +289,42 @@ async def delete_note(doc_id: str, user: Caller = Depends(current_user), g: Guar
         raise HTTPException(404, {"type": "not_found"})
     await g.cache.invalidate(private_scope(user.id))
     return {"deleted": doc_id}
+
+
+@app.get("/v1/outline")
+async def outline(library: str, topic: str | None = None, user: Caller = Depends(rate_limited("outline")),
+                  g: Guards = Depends(guards), c: dict = Depends(clients)):
+    """Section trees of a library ("private" for the caller's notes), around `topic` if given.
+    A topic costs an LLM call (query understanding), so it takes a GPU-gate slot like a query."""
+    if library not in SITES and library != milvus_store.PRIVATE:
+        raise HTTPException(422, {"type": "unknown_library", "message": library})
+    topic = (topic or "").strip()[:500] or None
+    ticket = g.gate.ticket(user.id)
+
+    def run(_emit=None):
+        with (spans.span("http", "GET /v1/outline", user_id=user.id, library=library,
+                         queued_s=round(ticket.waited_s, 3)), _db() as db):
+            return outline_.outline(db, milvus_store.client(), c.get("models"), chain.COLLECTION, library,
+                                    topic=topic, owner_id=user.id, llm=c.get("llm"))
+    if topic is None or library == milvus_store.PRIVATE:
+        return await run_in_threadpool(run)
+    try:
+        async for _ in ticket.wait():
+            pass
+    except GateBusy as exc:
+        raise HTTPException(503, error_payload(exc), headers={"Retry-After": str(exc.retry_after_s)}) from exc
+    try:
+        return await run_in_threadpool(run)
+    finally:
+        await ticket.release()
+
+
+@app.get("/v1/sections/{section_id}")
+async def section(section_id: str, user: Caller = Depends(current_user)):
+    def run():
+        with _db() as db:
+            return outline_.get_section(db, section_id, owner_id=user.id)
+    found = await run_in_threadpool(run)
+    if found is None:
+        raise HTTPException(404, {"type": "not_found"})
+    return found

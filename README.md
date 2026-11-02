@@ -26,7 +26,9 @@
 | Redis：按用户限流、GPU 闸门（公平排队 + 准入控制）、问答缓存 + 防击穿 | ✅ 压测验证 |
 | 私有笔记库（按用户隔离检索和缓存，私有内容只走本地模型） | ✅ |
 | 本地 trace 看板（`/dashboard`） | ✅ |
-| MCP 工具、知秋接入、论断级引用校验、多跳检索 | ⏳ 计划中 |
+| MCP 服务（7 个工具，已用知秋的 MCP 客户端验证） | ✅ `wenyuan-mcp` |
+| 论断级引用校验：逐句核对引用的原文是否支持，不支持就删掉 | ✅ 默认开启 |
+| 多跳检索、BGE 对比 Qwen3、CI 评测门禁 | ⏳ 计划中 |
 
 ## 评测结果
 
@@ -53,6 +55,30 @@
 - **评测本身也要可复现**：fp16 推理会按 batch 补齐长度，同一段文本在不同 batch 里算出的向量不同，曾让同一实验两次跑分相差约 0.01。现在查询向量统一缓存。
 - **reranker 偏爱 API 参考页**：参数名密集的自动生成参考页，会压过答案真正引用的教程页；加了查询理解后 FastAPI 的 Recall@5 从 0.40 跌到 0.30。
 - **端到端才暴露的问题**：只有一个 H1 的页面，整页就是一个父块，最长 11 万字符，会独占上下文预算，导致错误拒答；小模型用中文回答时只在 JSON 字段里给引用。两处都已修复，见设计文档 11.2。
+
+## 答案层评测：逐句核对出处
+
+`python -m eval.answers`：100 道题，答案由本地 Qwen3-8B 生成，用 **DeepSeek 当独立裁判**，同时对照 SO 采纳答案判断正确性。
+
+| | 校验前 | 逐句校验后 |
+|---|---|---|
+| 含无依据论断的答案 | 47.8% | **23.0%**（显著） |
+| 完全正确的答案 | 44% | 44% |
+| 增加的耗时 | — | 约 0.85 s |
+
+新增的 5 个拒答，在校验前没有一个是完全正确的。
+
+## 多轮对话：「它」指什么
+
+199 道题改写成两轮对话，追问里把具体对象换成「它 / 那个」，改写由 DeepSeek 完成：
+
+| | Recall@5 |
+|---|---|
+| 原问题 | 0.543 |
+| 只有追问 | 0.215 |
+| 追问 + 对话历史 | **0.488** |
+
+不带历史时召回率不到一半；带上历史后收回了 83% 的损失（显著）。
 
 ## 共享部署：一块 GPU，20 人同时提问
 
@@ -115,6 +141,15 @@ uv run uvicorn app.api.main:app --port 8000            # 看板：http://127.0.0
 curl -N localhost:8000/v1/ask -H "Authorization: Bearer <key>" -H "Content-Type: application/json" \
      -d '{"question": "How do I make a key expire in Redis?", "libraries": ["redis"]}'
 uv run python -m eval.loadtest --label demo --users 1 5 10 20   # 压测
+uv run python -m eval.answers --exp demo --n 100                 # 答案层评测（裁判见 .env.example 的 JUDGE_*）
+```
+
+### 接入 Agent（MCP）
+
+`wenyuan-mcp` 是一个 stdio MCP 服务，它会代理到上面的 HTTP API，所以限流、GPU 闸门和私有库隔离都照常生效。在知秋（Koyo）里，把 `examples/koyo-mcp.json` 复制一份，填好路径和 API key，再用 `ZHIQIU_MCP_CONFIG` 指向它。其他 MCP 客户端的配置方式类似：
+
+```json
+{"command": "<wenyuan>/.venv/Scripts/wenyuan-mcp.exe", "env": {"WENYUAN_API_KEY": "<key>"}}
 ```
 
 ## 与知秋（Koyo）的关系

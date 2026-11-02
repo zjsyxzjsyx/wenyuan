@@ -69,3 +69,43 @@ def test_citations_field_counts_when_text_has_no_markers():
     a = answer(FakeLLM({"found": True, "answer": "用 dropna(subset=...)。", "citations": ["S2", "S8"]}), "q", SOURCES)
     assert a.found and a.text == "用 dropna(subset=...)。 [S2]"
     assert [c["sid"] for c in a.citations] == ["S2"] and a.dropped_citations == ["S8"]
+
+
+
+class ScriptedLLM:
+    def __init__(self, reply):
+        self.reply, self.prompts = reply, []
+
+    def chat_json(self, messages, temperature=0.0):
+        self.prompts.append(messages[0]["content"])
+        return self.reply
+
+
+def test_claims_split_on_sentences_not_on_code_dots():
+    from app.generation.verify import split_claims
+    claims = split_claims("用 `df.dropna(subset=[\"a\"])` 删除。Python 3.14 也支持 [S1][S2]. 好的 [S3]")
+    assert [c.cites for c in claims] == [[], ["S1", "S2"], ["S3"]]
+    assert claims[0].text.startswith("用 `df.dropna(")
+
+
+def test_unsupported_claims_are_removed_and_citations_narrowed():
+    from app.generation.answer import Answer, apply_verification
+    from app.generation.verify import verify
+    text = "用 FLUSHALL 删除所有 key [S1]。它会顺便重启服务器 [S2]。"
+    llm = ScriptedLLM({"claims": [{"id": "C1", "verdict": "supported"}, {"id": "C2", "verdict": "unsupported"}]})
+    v = verify(llm, text, SOURCES)
+    assert v.counts == {"supported": 1, "partial": 0, "unsupported": 1}
+    assert "Deletes keys of the current db." in llm.prompts[0]                 # cited sources are shown
+    before = Answer(True, text, [{"sid": "S1"}, {"sid": "S2"}])
+    after = apply_verification(before, v)
+    assert after.text == "用 FLUSHALL 删除所有 key [S1]。" and [c["sid"] for c in after.citations] == ["S1"]
+    assert after.verification["removed"] == ["它会顺便重启服务器 [S2]。"]
+
+
+def test_answer_with_no_supported_claim_becomes_refusal_and_skipped_claims_are_kept():
+    from app.generation.answer import Answer, apply_verification
+    from app.generation.verify import verify
+    v = verify(ScriptedLLM({"claims": [{"id": "C1", "verdict": "unsupported"}]}), "瞎编的 [S1]。", SOURCES)
+    assert apply_verification(Answer(True, "瞎编的 [S1]。", [{"sid": "S1"}]), v).text == REFUSAL
+    kept = verify(ScriptedLLM({"claims": []}), "没被判的一句 [S1]。", SOURCES)    # checker said nothing
+    assert kept.removed == [] and kept.counts["supported"] == 1

@@ -159,3 +159,7 @@ def test_dashboard_is_local_only_and_summarizes_stages(monkeypatch):
     remote = TestClient(main.app, client=("10.0.0.5", 5000))
     assert remote.get("/dashboard").status_code == 403
     assert remote.get("/dashboard/api/summary").status_code == 403
+
+
+def test_outline_rejects_unknown_libraries(client):
+    assert client.get("/v1/outline", params={"library": "mongodb"}).status_code == 422
