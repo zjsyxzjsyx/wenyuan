@@ -83,8 +83,34 @@ def delete_note(db: DBSession, mc: MilvusClient, collection: str, owner_id: int,
     return True
 
 
+SKIP_DIRS = {".git", ".venv", "node_modules", "site-packages", ".cache", ".pytest_cache", "__pycache__"}
+
+
+FOLDER_EXTENSIONS = {".md", ".markdown"}   # a folder holds code projects' .txt files too; take notes only
+
+
+def note_names(roots: list, exclude: tuple[str, ...] = ()) -> dict:
+    """Note name per file under `roots` (recursive). Files at a folder's top level keep their own name
+    (as single-folder imports always did); files in subfolders are named by their path in the folder
+    ("mcp__README.md"), and names that still clash across folders get the folder's name in front.
+    A file is skipped when any part of its path in the folder matches an `exclude` glob."""
+    from fnmatch import fnmatch
+    found = []
+    for root in roots:
+        for path in sorted(root.rglob("*")):
+            rel = path.relative_to(root)
+            if (path.is_file() and path.suffix.lower() in FOLDER_EXTENSIONS and not SKIP_DIRS.intersection(rel.parts[:-1])
+                    and not any(fnmatch(part, pattern) for part in rel.parts for pattern in exclude)):
+                found.append((root, path, "__".join(rel.parts)))
+    counts: dict[str, int] = {}
+    for _, _, name in found:
+        counts[name] = counts.get(name, 0) + 1
+    return {path: (f"{root.name}__{name}" if counts[name] > 1 else name) for root, path, name in found}
+
+
 def main() -> None:
-    """`python -m app.ingest.private <folder> --user <name>`: add every note in a folder (same name replaces)."""
+    """`python -m app.ingest.private <folder>... --user <name>`: add every note under the folders
+    (same name replaces; names that already exist are listed first)."""
     import argparse
     from pathlib import Path
 
@@ -95,29 +121,33 @@ def main() -> None:
     from app.tokenizer import TiktokenTokenizer
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("folder", type=Path)
+    parser.add_argument("folders", type=Path, nargs="+")
     parser.add_argument("--user", required=True, help="account name that owns the notes")
+    parser.add_argument("--exclude", nargs="*", default=[], help="glob patterns of files or folders to leave out")
     args = parser.parse_args()
     create_tables()
     with DBSession(engine()) as db:
         owner = db.scalar(select(User.id).where(User.name == args.user))
+        existing = {n["filename"] for n in list_notes(db, owner)} if owner is not None else set()
     if owner is None:
         raise SystemExit(f"no account named {args.user!r}")
-    files = sorted(p for p in args.folder.iterdir() if p.is_file() and p.suffix.lower() in EXTENSIONS)
+    names = note_names(args.folders, tuple(args.exclude))
+    if replaced := sorted(existing.intersection(names.values())):
+        print(f"replacing {len(replaced)} existing notes of the same name: {replaced[:10]}")
     mc, models, tokenizer = milvus_store.client(), ModelServer(), TiktokenTokenizer()
     milvus_store.ensure_owner_field(mc, COLLECTION)
-    chunks = 0
-    for path in files:
+    added = chunks = 0
+    for path, name in names.items():
         with DBSession(engine()) as db:
             try:
-                note = add_note(db, mc, models, tokenizer, COLLECTION, owner, path.name,
-                                path.read_text(encoding="utf-8"))
-            except NoteError as exc:
-                print(f"skipped {path.name}: {exc}")
+                note = add_note(db, mc, models, tokenizer, COLLECTION, owner, name, path.read_text(encoding="utf-8"))
+            except (NoteError, UnicodeDecodeError) as exc:
+                print(f"skipped {path}: {exc}")
                 continue
+        added += 1
         chunks += note["chunks"]
     invalidate_now(private_scope(owner))       # cached answers for this user may now be stale
-    print(f"{len(files)} notes, {chunks} chunks -> {args.user}")
+    print(f"{added} of {len(names)} notes, {chunks} chunks -> {args.user}")
 
 
 if __name__ == "__main__":

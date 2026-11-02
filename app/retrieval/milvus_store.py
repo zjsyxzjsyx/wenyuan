@@ -23,6 +23,11 @@ OUTPUT_FIELDS = ["chunk_id", "library", "doc_id", "doc_type", "url", "section_in
                  "heading_path", "text"]
 FIELDS = set(OUTPUT_FIELDS) | {"dense", "owner_id"}
 PRIVATE = "private"     # library id of users' own notes
+# BM25 tokenizer for mixed Chinese notes and English course text. The default "standard"
+# analyzer keeps a whole Chinese clause as one token (so BM25 never matched Chinese notes);
+# "chinese" splits words but keeps English case (FLUSHALL vs flushall). jieba plus these two
+# filters splits Chinese into words, lowercases English and drops punctuation.
+ANALYZER = {"tokenizer": "jieba", "filter": ["cnalphanumonly", "lowercase"]}
 
 
 @lru_cache
@@ -32,7 +37,9 @@ def client() -> MilvusClient:
     return MilvusClient(uri=get_settings().milvus_uri)
 
 
-def create_collection(mc: MilvusClient, name: str, dim: int = DIM, drop: bool = False) -> None:
+def create_collection(mc: MilvusClient, name: str, dim: int = DIM, drop: bool = False,
+                      analyzer: dict | None = ANALYZER) -> None:
+    """`analyzer` is fixed at creation; None keeps Milvus's default (the v0.7 collections)."""
     if mc.has_collection(name):
         if not drop:
             return
@@ -46,7 +53,8 @@ def create_collection(mc: MilvusClient, name: str, dim: int = DIM, drop: bool = 
     schema.add_field("section_index", DataType.INT64)
     schema.add_field("parent_index", DataType.INT64)
     schema.add_field("heading_path", DataType.VARCHAR, max_length=2048)
-    schema.add_field("text", DataType.VARCHAR, max_length=16384, enable_analyzer=True)
+    schema.add_field("text", DataType.VARCHAR, max_length=16384, enable_analyzer=True,
+                     **({"analyzer_params": analyzer} if analyzer else {}))
     schema.add_field("owner_id", DataType.INT64, nullable=True, default_value=0)   # 0: public
     schema.add_field("dense", DataType.FLOAT_VECTOR, dim=dim)
     schema.add_field("sparse", DataType.SPARSE_FLOAT_VECTOR)

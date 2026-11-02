@@ -16,7 +16,7 @@ class Site:
     drop_selectors: tuple[str, ...] = ()
     keep_code_langs: frozenset[str] = field(default_factory=frozenset)  # empty = keep all
     delay_s: float = 1.0              # politeness delay between requests to this host
-    source: str = "crawl"             # "crawl" (sitemap + crawler) or "devdocs" (downloaded docset)
+    source: str = "crawl"             # "crawl" (sitemap + crawler), "devdocs" (downloaded docset) or "markdown"
 
     def wants(self, url: str) -> bool:
         return bool(re.search(self.include, url)) and not re.search(self.exclude, url)
@@ -25,6 +25,8 @@ class Site:
 COMMON_DROP = ("script", "style", "svg", "button", "nav", "img", "noscript")
 
 SITES: dict[str, Site] = {
+    # A course library (v2 classroom scenario): Markdown files loaded by app.ingest.cs50, not crawled.
+    "cs50": Site(library="cs50", name="CS50x 2024", sitemap="", content_selector="", source="markdown"),
     "fastapi": Site(
         library="fastapi",
         name="FastAPI",

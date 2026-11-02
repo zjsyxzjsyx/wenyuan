@@ -35,7 +35,7 @@ from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
 
-COLLECTION = "chunks_struct_merge"
+COLLECTION = "chunks_v2"   # v0.7 experiments ran on "chunks_struct_merge"
 OnEvent = Callable[[str, dict], None]
 
 

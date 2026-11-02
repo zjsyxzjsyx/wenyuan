@@ -69,3 +69,16 @@ def test_users_only_ever_retrieve_their_own_notes(milvus):
             assert "bob" not in seen, (owner, libs)
             assert ("alice" in seen) == (owner == 1), (owner, libs, seen)
             assert "pub" in seen or libs == [PRIVATE]
+
+
+def test_folder_import_names_notes_by_path_and_skips_excluded(tmp_path):
+    from app.ingest.private import note_names
+    a, b = tmp_path / "backend", tmp_path / "interview"
+    for path, text in {a / "redis.md": "x", a / "sub" / "README.md": "x", a / "requirements.txt": "x",
+                       a / ".git" / "HEAD.md": "x", b / "sub" / "README.md": "x", b / "hr chat" / "notes.md": "x"}.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    names = sorted(note_names([a, b], exclude=("hr *",)).values())
+    # top-level keeps its name; subfolders join the path; a clash across folders adds the folder name;
+    # .txt, .git and excluded paths are skipped
+    assert names == ["backend__sub__README.md", "interview__sub__README.md", "redis.md"]

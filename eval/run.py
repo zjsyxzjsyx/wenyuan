@@ -31,7 +31,7 @@ from app.retrieval.llm_rerank import rerank_pages
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
-from eval.metrics import hit_at, mrr, ndcg_at, percentile, recall_at, unique_in_order
+from eval.metrics import evidence_ranks, hit_at, mrr, ndcg_at, percentile, recall_at, unique_in_order
 
 DATASET = Path("eval/datasets/so_v1.jsonl")
 OUT_DIR = Path("experiments")
@@ -51,6 +51,7 @@ class Config:
     rerank_top: int = 0                 # rerank the first N chunks (0: off)
     rerank_body_chars: int = 500
     llm_rerank: int = 0                 # LLM reorders the first N pages (0: off)
+    owner: str | None = None            # account whose notes are searched too (as a student's questions are)
     llm_rerank_plain: bool = False      # R1's page view: the best hit's first 400 characters only
     hyde: str = ""                      # "dense" | "both": add an LLM-imagined answer passage to the query
     generate_only: bool = False         # run (and cache) the query-side LLM calls, then stop
@@ -108,13 +109,14 @@ def load_labels(dataset: Path) -> dict[str, str]:
 
 
 def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top_k: int, libraries: list[str],
-             summaries: bool = False, summary_weight: float = 1.0):
+             summaries: bool = False, summary_weight: float = 1.0, owner_id: int | None = None):
     if mode == "dense":
-        hits = milvus_store.dense_search(mc, collection, vector, top_k=top_k, libraries=libraries)
+        hits = milvus_store.dense_search(mc, collection, vector, top_k=top_k, libraries=libraries, owner_id=owner_id)
     elif mode == "bm25":
-        hits = milvus_store.bm25_search(mc, collection, text, top_k=top_k, libraries=libraries)
+        hits = milvus_store.bm25_search(mc, collection, text, top_k=top_k, libraries=libraries, owner_id=owner_id)
     else:
-        hits = milvus_store.hybrid_search(mc, collection, vector, text, top_k=top_k, libraries=libraries)
+        hits = milvus_store.hybrid_search(mc, collection, vector, text, top_k=top_k, libraries=libraries,
+                                          owner_id=owner_id)
     if not summaries:
         return hits
     extra = best_per_block(milvus_store.dense_search(mc, SUMMARIES, vector, top_k=top_k, libraries=libraries))
@@ -166,6 +168,42 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
     return vectors, bm25_texts
 
 
+def owner_id_of(name: str | None) -> int | None:
+    if not name:
+        return None
+    from sqlalchemy import select
+    from sqlalchemy.orm import Session
+
+    from app.db.models import User
+    with Session(engine()) as db:
+        found = db.scalar(select(User.id).where(User.name == name))
+    if found is None:
+        raise SystemExit(f"no account named {name!r}")
+    return found
+
+
+def redact(url: str) -> str:
+    """Results are committed, so a private note is named by a hash, never by its file name."""
+    return f"private:{hashlib.sha1(url.encode()).hexdigest()[:12]}" if url.startswith("private://") else url
+
+
+def body_of(chunk_text: str) -> str:
+    """A chunk without its context header ("Site > Page > Section"), which no gold passage contains."""
+    head, sep, rest = chunk_text.partition("\n\n")
+    return rest if sep and " > " in head else chunk_text
+
+
+def evidence_metrics(evidence: list[str] | None, chunks: list[str]) -> dict:
+    """Evidence-level scores over the ranked chunks; empty when the question has no gold evidence."""
+    if not evidence:
+        return {}
+    ranks = evidence_ranks(chunks, evidence)
+    within = lambda k: sum(r is not None and r < k for r in ranks) / len(ranks)
+    first = min((r for r in ranks if r is not None), default=None)
+    return {"ev_recall@5": within(5), "ev_recall@10": within(10), "ev_hit@5": float(first is not None and first < 5),
+            "ev_mrr": 1 / (first + 1) if first is not None else 0.0, "ev_ranks": ranks}
+
+
 def run(cfg: Config) -> dict:
     with spans.span("eval", cfg.exp, collection=cfg.collection, mode=cfg.mode, rerank_top=cfg.rerank_top,
                     understand=cfg.understand, summaries=cfg.summaries) as root:
@@ -183,6 +221,7 @@ def _run(cfg: Config) -> dict:
     excluded = sum(row["label"] in cfg.exclude_labels for row in rows)
     rows = [row for row in rows if row["label"] not in cfg.exclude_labels and row["library"] in SITES]
     models, mc, tokenizer = ModelServer(), milvus_store.client(), TiktokenTokenizer()
+    owner_id = owner_id_of(cfg.owner)
     if cfg.multihop:
         # The whole multi-hop chain (understanding, sub-queries, searches) per question, timed end to end.
         llm = LLM()
@@ -191,7 +230,7 @@ def _run(cfg: Config) -> dict:
             began = time.perf_counter()
             r = multihop.retrieve(query_text(row, cfg.body_chars, cfg.question_field), llm, models, cfg.collection,
                                   libraries=[row["library"]], history=row.get("history") if cfg.history else None,
-                                  mode=cfg.multihop, top_k=cfg.top_k, mc=mc)
+                                  mode=cfg.multihop, top_k=cfg.top_k, mc=mc, owner_id=owner_id)
             return r.hits, (time.perf_counter() - began) * 1000
         with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
             hopped = list(pool.map(lambda row: contextvars.copy_context().run(hop, row), rows))
@@ -210,7 +249,7 @@ def _run(cfg: Config) -> dict:
                 began -= elapsed / 1000
             else:
                 hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]],
-                                cfg.summaries, cfg.summary_weight)
+                                cfg.summaries, cfg.summary_weight, owner_id)
             if cfg.rerank_top:
                 with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
                     head = hits[:cfg.rerank_top]
@@ -242,19 +281,23 @@ def _run(cfg: Config) -> dict:
                                                     for u, h in list(best.items())[:10]]})
         ranked = unique_in_order([h["url"] for h in hits])
         gold = set(row["gold_urls"])
+        found = evidence_metrics(row.get("gold_evidence"), [body_of(h["text"]) for h in hits[:30]])
         per_question.append({
             "id": row["id"], "library": row["library"], "type": row["type"], "label": row["label"],
+            **({"qtype": row["qtype"]} if "qtype" in row else {}), **found,
             "recall@5": recall_at(ranked, gold, 5), "recall@10": recall_at(ranked, gold, 10),
             "recall@20": recall_at(ranked, gold, 20),
             # every page the top_k chunks came from: the most any reordering of this pool could reach
             "recall@pool": recall_at(ranked, gold, len(ranked)), "pool": len(ranked),
             "hit@5": hit_at(ranked, gold, 5), "mrr": mrr(ranked, gold), "ndcg@10": ndcg_at(ranked, gold, 10),
-            "ranked": ranked[:30], "gold": sorted(gold),
+            "ranked": [redact(u) for u in ranked[:30]], "gold": sorted(redact(u) for u in gold),
         })
 
     def summarize(items: list[dict]) -> dict:
-        keys = ("recall@5", "recall@10", "recall@20", "recall@pool", "pool", "hit@5", "mrr", "ndcg@10")
-        return {"n": len(items), **{k: round(mean(q[k] for q in items), 4) for k in keys}} if items else {"n": 0}
+        keys = ("recall@5", "recall@10", "recall@20", "recall@pool", "pool", "hit@5", "mrr", "ndcg@10",
+                "ev_recall@5", "ev_recall@10", "ev_hit@5", "ev_mrr")
+        return ({"n": len(items), **{k: round(mean(q[k] for q in items), 4) for k in keys if all(k in q for q in items)}}
+                if items else {"n": 0})
 
     config = {k: (sorted(v) if isinstance(v, frozenset) else str(v) if isinstance(v, Path) else v)
               for k, v in asdict(cfg).items()}
@@ -265,6 +308,8 @@ def _run(cfg: Config) -> dict:
                        for lib in sorted({q["library"] for q in per_question})},
         "by_label": {label: summarize([q for q in per_question if q["label"] == label])
                      for label in sorted({q["label"] for q in per_question})},
+        "by_qtype": {t: summarize([q for q in per_question if q.get("qtype") == t])
+                     for t in sorted({q["qtype"] for q in per_question if "qtype" in q})},
         "search_ms": {"p50": round(percentile(latencies, 0.5), 1), "p95": round(percentile(latencies, 0.95), 1)},
         **({"llm_rerank_ms": {"p50": round(percentile(rerank_ms, 0.5)), "p95": round(percentile(rerank_ms, 0.95))}}
            if rerank_ms else {}),
@@ -308,6 +353,7 @@ def main() -> None:
     parser.add_argument("--dense-query", choices=("rewritten", "raw"), default="rewritten",
                         help="with --understand: what the dense side embeds")
     parser.add_argument("--dataset", type=Path, default=DATASET)
+    parser.add_argument("--owner", help="also search this account's notes")
     parser.add_argument("--exclude-labels", nargs="*", default=["not_applicable"],
                         help="audit labels left out of the scores (pass none to keep every question)")
     args = parser.parse_args()
@@ -320,7 +366,7 @@ def main() -> None:
         summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
         history=not args.no_history, question_field=args.question_field, multihop=args.multihop or "",
         embed_model=args.embed_model, query_prompt=args.query_prompt,
-        dataset=args.dataset,
+        dataset=args.dataset, owner=args.owner,
         exclude_labels=frozenset(args.exclude_labels)))
     print(json.dumps({k: result[k] for k in ("exp", "collection", "excluded", "overall", "by_library", "by_label",
                                              "search_ms", "saved_to", "trace_id") if k in result},

@@ -1,7 +1,8 @@
-"""Page-level retrieval metrics: a retrieved chunk counts as relevant when its page is a gold page."""
+"""Retrieval metrics: page level (a chunk counts when its page is a gold page) and evidence level (below)."""
 from __future__ import annotations
 
 import math
+import re
 
 
 def unique_in_order(items: list[str]) -> list[str]:
@@ -30,3 +31,31 @@ def ndcg_at(ranked: list[str], gold: set[str], k: int) -> float:
 def percentile(values: list[float], q: float) -> float:
     ordered = sorted(values)
     return ordered[min(len(ordered) - 1, int(round(q * (len(ordered) - 1))))] if ordered else 0.0
+
+
+# Evidence-level matching: a retrieved chunk counts when it shares enough text with the gold
+# evidence (a passage, not a page id), so the gold survives changes to chunking and finer
+# relevance than "the right page" can be scored. Units are English words and single CJK
+# characters; overlap is measured on 5-grams relative to the smaller side, so a short excerpt
+# inside a long chunk and a chunk inside a long passage both count.
+_UNIT = re.compile(r"[a-z0-9_]+|[一-鿿]")
+
+
+def shingles(text: str, n: int = 5) -> set[tuple[str, ...]]:
+    units = _UNIT.findall(text.lower())
+    if len(units) < n:
+        return {tuple(units)} if units else set()
+    return {tuple(units[i:i + n]) for i in range(len(units) - n + 1)}
+
+
+def overlaps(chunk: str, evidence: str, threshold: float = 0.5) -> bool:
+    a, b = shingles(chunk), shingles(evidence)
+    return bool(a and b) and len(a & b) / min(len(a), len(b)) >= threshold
+
+
+def evidence_ranks(chunks: list[str], evidence: list[str]) -> list[int | None]:
+    """For each evidence passage, the 0-based rank of the first chunk that overlaps it (None: not found)."""
+    found: list[int | None] = []
+    for passage in evidence:
+        found.append(next((i for i, chunk in enumerate(chunks) if overlaps(chunk, passage)), None))
+    return found
