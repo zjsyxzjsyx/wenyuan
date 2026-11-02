@@ -163,3 +163,17 @@ def test_dashboard_is_local_only_and_summarizes_stages(monkeypatch):
 
 def test_outline_rejects_unknown_libraries(client):
     assert client.get("/v1/outline", params={"library": "mongodb"}).status_code == 422
+
+
+def test_workbench_page_and_local_key_setup(monkeypatch):
+    from app.api import workbench
+    taken = {"koyo"}
+    monkeypatch.setattr(workbench, "create_account", lambda name: None if name in taken else f"wy_{name}")
+    local = TestClient(main.app)
+    assert "<title>文渊</title>" in local.get("/ui").text
+    assert local.post("/ui/api/key", json={"name": "小秋-web"}).json() == {"name": "小秋-web", "key": "wy_小秋-web"}
+    assert local.post("/ui/api/key", json={"name": "koyo"}).status_code == 409
+    assert local.post("/ui/api/key", json={"name": "a b"}).status_code == 422
+    remote = TestClient(main.app, client=("10.0.0.5", 5000))
+    assert remote.get("/ui").status_code == 200                    # the page itself holds nothing
+    assert remote.post("/ui/api/key", json={"name": "x"}).status_code == 403

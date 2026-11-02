@@ -6,6 +6,7 @@ GET  /v1/libraries
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
 GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
 GET  /dashboard  local trace dashboard (this machine only)
+GET  /ui         web workbench: ask, notes, outline (first-run key setup on this machine only)
 Every request needs `Authorization: Bearer <key>` (`python -m app.api.auth create <name>`).
 
 Query requests pass Redis guards before any work: a per-user token bucket (429 +
@@ -27,7 +28,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 from redis.asyncio import BlockingConnectionPool, Redis
 
-from app.api import dashboard, sse
+from app.api import dashboard, sse, workbench
 from app.api.auth import Caller, current_user
 from app.cache.answers import AnswerCache, private_scope
 from app.cache.limits import Gate, GateBusy, RateLimiter, Ticket
@@ -81,6 +82,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="wenyuan", lifespan=lifespan)
 app.include_router(dashboard.router)
+app.include_router(workbench.router)
 
 
 class Turn(BaseModel):
@@ -322,8 +324,10 @@ async def outline(library: str, topic: str | None = None, user: Caller = Depends
 @app.get("/v1/sections/{section_id}")
 async def section(section_id: str, user: Caller = Depends(current_user)):
     def run():
-        with _db() as db:
-            return outline_.get_section(db, section_id, owner_id=user.id)
+        with spans.span("http", "GET /v1/sections", user_id=user.id, section_id=section_id) as s, _db() as db:
+            found = outline_.get_section(db, section_id, owner_id=user.id)
+            s.set(found=found is not None, chars=len(found["text"]) if found else 0)
+            return found
     found = await run_in_threadpool(run)
     if found is None:
         raise HTTPException(404, {"type": "not_found"})
