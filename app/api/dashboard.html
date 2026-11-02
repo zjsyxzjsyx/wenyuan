@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文渊 trace</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --text: #1f2328; --muted: #6a737d; --line: #e4e4e0;
+    --accent: #2f6f9f; --queue: #b8b8b2; --understand: #6c8ebf; --retrieve: #5aa27c; --rerank: #9a7fc4;
+    --context: #c9a14a; --generate: #d07a5f; --error: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17191c; --panel: #1f2226; --text: #e6e6e3; --muted: #9aa0a6; --line: #30343a;
+      --accent: #7fb3dd; --queue: #5b5f66;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; }
+  header { padding: 16px 24px; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  h1 { font-size: 18px; margin: 0; }
+  .muted { color: var(--muted); }
+  main { padding: 0 24px 32px; display: grid; gap: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .card, section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .card b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover, tbody tr.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .bar { display: flex; height: 10px; min-width: 240px; border-radius: 3px; overflow: hidden; background: var(--line); }
+  .bar span { height: 100%; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .err { color: var(--error); }
+  .wf { display: grid; grid-template-columns: minmax(180px, 30%) 1fr 70px; gap: 4px 10px; align-items: center; font-size: 13px; }
+  .wf .track { position: relative; height: 12px; }
+  .wf .track span { position: absolute; top: 0; height: 12px; border-radius: 2px; background: var(--accent); }
+  .wf .attrs { grid-column: 1 / -1; color: var(--muted); font-size: 12px; margin: -2px 0 4px; word-break: break-all; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>文渊 · trace</h1>
+  <span class="muted" id="updated">loading…</span>
+</header>
+<main>
+  <div class="cards" id="cards"></div>
+  <section>
+    <div class="legend" id="legend"></div>
+    <div class="scroll"><table>
+      <thead><tr><th>time</th><th>request</th><th>user</th><th>total</th><th>queued</th><th>stages</th><th>status</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </section>
+  <section id="detail" hidden>
+    <div class="muted" id="detail-title"></div>
+    <div class="wf" id="waterfall"></div>
+  </section>
+</main>
+<script>
+const STAGES = ["understand", "retrieve", "rerank", "context", "generate"];
+const SPAN_STAGE = {query_understanding: "understand", hybrid_search: "retrieve", dense_search: "retrieve",
+                    rerank: "rerank", small_to_big: "context", answer: "generate"};
+const color = name => `var(--${name})`;
+const ms = v => v == null ? "–" : v >= 1000 ? (v / 1000).toFixed(1) + " s" : Math.round(v) + " ms";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+let selected = null;
+
+document.getElementById("legend").innerHTML = ["queue", ...STAGES]
+  .map(s => `<span><i style="background:${color(s)}"></i>${s}</span>`).join("");
+
+function card(label, value, sub = "") {
+  return `<div class="card"><span class="muted">${label}</span><b>${value}</b><span class="muted">${sub}</span></div>`;
+}
+
+function stageBar(r) {
+  const total = Math.max(r.duration_ms || 1, 1);
+  const parts = [["queue", r.queued_ms], ...STAGES.map(s => [s, r.stages[s] || 0])];
+  return `<div class="bar">${parts.filter(([, v]) => v > 0)
+    .map(([s, v]) => `<span title="${s} ${ms(v)}" style="width:${100 * v / total}%;background:${color(s)}"></span>`)
+    .join("")}</div>`;
+}
+
+async function refresh() {
+  const res = await fetch("/dashboard/api/summary", {cache: "no-store"});
+  if (!res.ok) { document.getElementById("updated").textContent = `error ${res.status}`; return; }
+  const {stats, live, requests} = await res.json();
+  const cache = live.cache || {};
+  const served = (cache.hit || 0) + (cache.shared || 0), all = served + (cache.miss || 0);
+  document.getElementById("cards").innerHTML = [
+    card("requests", stats.requests, `${stats.errors} errors`),
+    card("total p50 / p95", `${ms(stats.total_ms.p50)}`, `p95 ${ms(stats.total_ms.p95)}`),
+    card("queued p95", ms(stats.queued_ms.p95), "waiting for a GPU slot"),
+    ...STAGES.filter(s => stats.stages_ms[s].p50 != null)
+      .map(s => card(`${s} p50`, ms(stats.stages_ms[s].p50), `p95 ${ms(stats.stages_ms[s].p95)}`)),
+    card("GPU gate", `${live.gate_in_use ?? "–"} / ${live.gate_slots ?? "–"}`, "slots in use"),
+    card("answer cache", all ? `${Math.round(100 * served / all)}%` : "–",
+         `hit ${cache.hit || 0} · shared ${cache.shared || 0} · miss ${cache.miss || 0}`),
+  ].join("");
+  document.getElementById("rows").innerHTML = requests.map(r => `
+    <tr data-trace="${esc(r.trace_id)}" class="${r.trace_id === selected ? "sel" : ""}">
+      <td>${new Date(r.started_ns / 1e6).toLocaleTimeString()}</td><td>${esc(r.name)}</td>
+      <td>${r.user_id ?? "–"}</td><td>${ms(r.duration_ms)}</td><td>${ms(r.queued_ms)}</td>
+      <td>${stageBar(r)}</td>
+      <td class="${r.status === "error" ? "err" : ""}">${esc(r.status)}${r.error ? " · " + esc(r.error) : ""}</td>
+    </tr>`).join("");
+  document.getElementById("updated").textContent = `updated ${new Date().toLocaleTimeString()} · refreshes every 5 s`;
+}
+
+async function showTrace(traceId) {
+  selected = traceId;
+  const spans = await (await fetch(`/dashboard/api/traces/${traceId}`, {cache: "no-store"})).json();
+  const start = Math.min(...spans.map(s => s.started_at_ns));
+  const end = Math.max(...spans.map(s => s.started_at_ns + (s.duration_ms || 0) * 1e6));
+  const span = Math.max(end - start, 1);
+  const depth = {}, byId = Object.fromEntries(spans.map(s => [s.span_id, s]));
+  const level = s => depth[s.span_id] ??= s.parent_span_id && byId[s.parent_span_id] ? level(byId[s.parent_span_id]) + 1 : 0;
+  document.getElementById("detail").hidden = false;
+  document.getElementById("detail-title").textContent = `trace ${traceId} · ${ms(span / 1e6)}`;
+  document.getElementById("waterfall").innerHTML = spans.map(s => {
+    const left = 100 * (s.started_at_ns - start) / span, width = Math.max(0.4, 100 * (s.duration_ms || 0) * 1e6 / span);
+    const attrs = Object.entries(s.attrs).map(([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : v}`).join("  ");
+    const fill = SPAN_STAGE[s.name] ? color(SPAN_STAGE[s.name]) : "var(--accent)";
+    return `<div style="padding-left:${level(s) * 14}px" class="${s.status === "error" ? "err" : ""}">${esc(s.kind)} · ${esc(s.name)}</div>
+      <div class="track"><span style="left:${left}%;width:${width}%;background:${fill}"></span></div>
+      <div>${ms(s.duration_ms)}</div>
+      ${attrs ? `<div class="attrs">${esc(attrs)}</div>` : ""}`;
+  }).join("");
+  refresh();
+}
+
+document.getElementById("rows").addEventListener("click", e => {
+  const row = e.target.closest("tr[data-trace]");
+  if (row) showTrace(row.dataset.trace);
+});
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

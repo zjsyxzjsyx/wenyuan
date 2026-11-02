@@ -21,6 +21,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "fakeredis[lua]>=2.26",
     "pytest>=8.3",
 ]
 

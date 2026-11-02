@@ -1,0 +1,854 @@
+{
+ "label": "gate2-admission",
+ "timeout_s": 30,
+ "per_user": 3,
+ "rounds": [
+  {
+   "users": 1,
+   "requests": 3,
+   "outcomes": {
+    "ok": 2,
+    "busy": 0,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 1
+   },
+   "wall_s": 19.0,
+   "ok_p50_s": 2.59,
+   "ok_p95_s": 9.28,
+   "first_event_p95_s": 6.28,
+   "goodput_per_min": 6.3,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 1.9102934000547975,
+     "total_s": 7.125884200213477
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 6.28355920012109,
+     "total_s": 9.275968100177124
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 0.7828412998933345,
+     "total_s": 2.590313599910587
+    }
+   ]
+  },
+  {
+   "users": 5,
+   "requests": 15,
+   "outcomes": {
+    "ok": 15,
+    "busy": 0,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 0
+   },
+   "wall_s": 52.0,
+   "ok_p50_s": 15.44,
+   "ok_p95_s": 20.89,
+   "first_event_p95_s": 1.94,
+   "goodput_per_min": 17.3,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.11989179998636246,
+     "total_s": 17.160158100072294
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.01006399979814887,
+     "total_s": 20.264143500011414
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.010796000016853213,
+     "total_s": 14.264798100106418
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.11285789986141026,
+     "total_s": 14.376398799940944
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.011182399932295084,
+     "total_s": 16.723266300046816
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.014419000130146742,
+     "total_s": 20.893391699995846
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.16316180001013,
+     "total_s": 7.774926699930802
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.010227099992334843,
+     "total_s": 15.442436899989843
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.009512600023299456,
+     "total_s": 14.03822430013679
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.9446744001470506,
+     "total_s": 5.298465500120074
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.009759100154042244,
+     "total_s": 18.26211900007911
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.009697699919342995,
+     "total_s": 21.498969400068745
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.10645120008848608,
+     "total_s": 11.90060789999552
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 0.009799699997529387,
+     "total_s": 17.55287120002322
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.009404700016602874,
+     "total_s": 15.42040319996886
+    }
+   ]
+  },
+  {
+   "users": 10,
+   "requests": 30,
+   "outcomes": {
+    "ok": 4,
+    "busy": 24,
+    "rate_limited": 0,
+    "timeout": 2,
+    "error": 0
+   },
+   "wall_s": 58.1,
+   "ok_p50_s": 12.74,
+   "ok_p95_s": 13.91,
+   "first_event_p95_s": 2.07,
+   "goodput_per_min": 4.1,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.11251740017905831,
+     "total_s": 13.905474800150841
+    },
+    {
+     "user": 0,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.024826700100675225,
+     "total_s": 17.505607300205156
+    },
+    {
+     "user": 0,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.193997299997136,
+     "total_s": 16.802463399944827
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.11515389988198876,
+     "total_s": 0.12248479994013906
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.017275199992582202,
+     "total_s": 0.020511900074779987
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.018135399790480733,
+     "total_s": 0.01999369985423982
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.10585510008968413,
+     "total_s": 12.73731300001964
+    },
+    {
+     "user": 2,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.01673169992864132,
+     "total_s": 18.679974999977276
+    },
+    {
+     "user": 2,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.1828189000952989,
+     "total_s": 13.42387540009804
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.11158120003528893,
+     "total_s": 0.11624130001291633
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.015712899854406714,
+     "total_s": 0.017691999906674027
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.02049380005337298,
+     "total_s": 0.02341539994813502
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 2.3422091000247747,
+     "total_s": 5.734643099829555
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.010815400164574385,
+     "total_s": 0.013159200083464384
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.00958610000088811,
+     "total_s": 6.6351608000695705
+    },
+    {
+     "user": 5,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.0736652000341564,
+     "total_s": 6.7375155000481755
+    },
+    {
+     "user": 5,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011298400117084384,
+     "total_s": 0.013221499975770712
+    },
+    {
+     "user": 5,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011118999915197492,
+     "total_s": 0.013108900049701333
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.10134030017070472,
+     "total_s": 2.5984879001043737
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011130400002002716,
+     "total_s": 2.522146600065753
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.013974000001326203,
+     "total_s": 20.106350800022483
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.1041363999247551,
+     "total_s": 0.10608529997989535
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.023928500013425946,
+     "total_s": 0.027656200109049678
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.016325100092217326,
+     "total_s": 0.019859899999573827
+    },
+    {
+     "user": 8,
+     "status": "timeout",
+     "first_event_s": 0.09742629993706942,
+     "total_s": 30.059690200025216
+    },
+    {
+     "user": 8,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 1.5915950001217425,
+     "total_s": 11.40934310015291
+    },
+    {
+     "user": 8,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011591200018301606,
+     "total_s": 16.622640799963847
+    },
+    {
+     "user": 9,
+     "status": "timeout",
+     "first_event_s": 0.09607789991423488,
+     "total_s": 30.11115609994158
+    },
+    {
+     "user": 9,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 1.5386695000343025,
+     "total_s": 7.901046699844301
+    },
+    {
+     "user": 9,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.01154630002565682,
+     "total_s": 16.602919799974188
+    }
+   ]
+  },
+  {
+   "users": 20,
+   "requests": 60,
+   "outcomes": {
+    "ok": 0,
+    "busy": 60,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 0
+   },
+   "wall_s": 26.2,
+   "ok_p50_s": null,
+   "ok_p95_s": null,
+   "first_event_p95_s": 0.2,
+   "goodput_per_min": 0.0,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14700889983214438,
+     "total_s": 16.75184619985521
+    },
+    {
+     "user": 0,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.01051909988746047,
+     "total_s": 2.9936005999334157
+    },
+    {
+     "user": 0,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011555499862879515,
+     "total_s": 6.4139761000406
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14598769997246563,
+     "total_s": 0.25887349992990494
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.02653699996881187,
+     "total_s": 0.03125280002132058
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.024613100104033947,
+     "total_s": 0.025716800009831786
+    },
+    {
+     "user": 2,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.1442384000401944,
+     "total_s": 3.0721051001455635
+    },
+    {
+     "user": 2,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011001000180840492,
+     "total_s": 2.935529400128871
+    },
+    {
+     "user": 2,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.009761600056663156,
+     "total_s": 16.61583640007302
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14264369988813996,
+     "total_s": 13.318365699844435
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011370299849659204,
+     "total_s": 2.978480299934745
+    },
+    {
+     "user": 3,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.010664900066331029,
+     "total_s": 9.860358000034466
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14122210000641644,
+     "total_s": 9.93530759983696
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.010832299944013357,
+     "total_s": 2.9505054999608546
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011643399950116873,
+     "total_s": 13.271055199904367
+    },
+    {
+     "user": 5,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.1426667000632733,
+     "total_s": 0.1527635999955237
+    },
+    {
+     "user": 5,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.05115219997242093,
+     "total_s": 0.05508129997178912
+    },
+    {
+     "user": 5,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.03518819995224476,
+     "total_s": 0.038744699908420444
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.21208759979344904,
+     "total_s": 0.22655569994822145
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04168129991739988,
+     "total_s": 0.045871099922806025
+    },
+    {
+     "user": 6,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.02475660014897585,
+     "total_s": 0.027557600056752563
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.15471779997460544,
+     "total_s": 0.15987830003723502
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.05284749995917082,
+     "total_s": 0.0625809000339359
+    },
+    {
+     "user": 7,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04206439992412925,
+     "total_s": 0.046347999945282936
+    },
+    {
+     "user": 8,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.13525060005486012,
+     "total_s": 6.519092699978501
+    },
+    {
+     "user": 8,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.010048700030893087,
+     "total_s": 2.9615905000828207
+    },
+    {
+     "user": 8,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.01113849994726479,
+     "total_s": 16.669707299908623
+    },
+    {
+     "user": 9,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.1519077999982983,
+     "total_s": 0.15903980005532503
+    },
+    {
+     "user": 9,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.058737500105053186,
+     "total_s": 0.07199939992278814
+    },
+    {
+     "user": 9,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.07629080000333488,
+     "total_s": 0.08073970000259578
+    },
+    {
+     "user": 10,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14744430012069643,
+     "total_s": 0.15127720008604228
+    },
+    {
+     "user": 10,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.051851899828761816,
+     "total_s": 0.05398930003866553
+    },
+    {
+     "user": 10,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.035855800146237016,
+     "total_s": 0.03852880001068115
+    },
+    {
+     "user": 11,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.13367230002768338,
+     "total_s": 0.1373606000561267
+    },
+    {
+     "user": 11,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.025263500167056918,
+     "total_s": 0.030783900059759617
+    },
+    {
+     "user": 11,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.047857699915766716,
+     "total_s": 0.06206719996407628
+    },
+    {
+     "user": 12,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.20366139989346266,
+     "total_s": 0.210648899897933
+    },
+    {
+     "user": 12,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.038378699915483594,
+     "total_s": 0.04557429999113083
+    },
+    {
+     "user": 12,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.030735299922525883,
+     "total_s": 0.0347180999815464
+    },
+    {
+     "user": 13,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.2024739000480622,
+     "total_s": 0.21083349990658462
+    },
+    {
+     "user": 13,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.08982999995350838,
+     "total_s": 0.09227499994449317
+    },
+    {
+     "user": 13,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.011848099995404482,
+     "total_s": 0.013670000014826655
+    },
+    {
+     "user": 14,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.20115639991126955,
+     "total_s": 0.20432060002349317
+    },
+    {
+     "user": 14,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04223709995858371,
+     "total_s": 0.04776409990154207
+    },
+    {
+     "user": 14,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.029034500010311604,
+     "total_s": 0.03240410005673766
+    },
+    {
+     "user": 15,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.19946769997477531,
+     "total_s": 0.204486999893561
+    },
+    {
+     "user": 15,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.06852460000663996,
+     "total_s": 0.07323830015957355
+    },
+    {
+     "user": 15,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.020779900019988418,
+     "total_s": 0.02466859994456172
+    },
+    {
+     "user": 16,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.19802610017359257,
+     "total_s": 0.21386330015957355
+    },
+    {
+     "user": 16,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04231490008533001,
+     "total_s": 0.048265600111335516
+    },
+    {
+     "user": 16,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.02367269992828369,
+     "total_s": 0.025403999956324697
+    },
+    {
+     "user": 17,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.14081989997066557,
+     "total_s": 0.14939730009064078
+    },
+    {
+     "user": 17,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.05722639989107847,
+     "total_s": 0.06807199981994927
+    },
+    {
+     "user": 17,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.07118170009925961,
+     "total_s": 0.07446880009956658
+    },
+    {
+     "user": 18,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.12558309989981353,
+     "total_s": 0.1376382999587804
+    },
+    {
+     "user": 18,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.0676142000593245,
+     "total_s": 0.07708229986019433
+    },
+    {
+     "user": 18,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04212510003708303,
+     "total_s": 0.049283399945124984
+    },
+    {
+     "user": 19,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.12379069998860359,
+     "total_s": 0.13188669993542135
+    },
+    {
+     "user": 19,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04657729994505644,
+     "total_s": 0.05094879982061684
+    },
+    {
+     "user": 19,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.04047330003231764,
+     "total_s": 0.04404529999010265
+    }
+   ]
+  }
+ ]
+}

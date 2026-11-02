@@ -1,10 +1,11 @@
-"""MySQL tables for documents and their section trees (what `outline` and small-to-big read)."""
+"""MySQL tables: users, and documents with their section trees (what `outline` and small-to-big read)."""
 from __future__ import annotations
 
 from datetime import datetime
 from functools import lru_cache
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, func
+from sqlalchemy import (JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, create_engine, func,
+                        inspect, text)
 from sqlalchemy.dialects.mysql import MEDIUMTEXT
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -18,6 +19,16 @@ class Base(DeclarativeBase):
     pass
 
 
+class User(Base):
+    """An API caller. Only a hash of the key is stored; the key itself is shown once at creation."""
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(64), unique=True)
+    key_hash: Mapped[str] = mapped_column(String(64), unique=True)   # sha256 hex of the API key
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+
 class Document(Base):
     __tablename__ = "documents"
 
@@ -26,6 +37,7 @@ class Document(Base):
     url: Mapped[str] = mapped_column(String(768), unique=True)
     title: Mapped[str] = mapped_column(String(512))
     content_hash: Mapped[str] = mapped_column(String(64))
+    owner_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)   # set for private notes
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
@@ -50,3 +62,13 @@ def engine() -> Engine:
 
 def create_tables() -> None:
     Base.metadata.create_all(engine())
+    _add_missing_columns()
+
+
+def _add_missing_columns() -> None:
+    """Columns added after a table was first created (create_all never alters a table)."""
+    columns = {c["name"] for c in inspect(engine()).get_columns("documents")}
+    if "owner_id" not in columns:
+        with engine().begin() as conn:
+            conn.execute(text("ALTER TABLE documents ADD COLUMN owner_id INT NULL"))
+            conn.execute(text("CREATE INDEX ix_documents_owner_id ON documents (owner_id)"))

@@ -1,0 +1,866 @@
+{
+ "label": "nogate",
+ "timeout_s": 30,
+ "per_user": 3,
+ "rounds": [
+  {
+   "users": 1,
+   "requests": 3,
+   "outcomes": {
+    "ok": 3,
+    "busy": 0,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 0
+   },
+   "wall_s": 13.2,
+   "ok_p50_s": 3.85,
+   "ok_p95_s": 5.53,
+   "first_event_p95_s": 2.05,
+   "goodput_per_min": 13.6,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.048621099907905,
+     "total_s": 5.528010899899527
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 0.9898739999625832,
+     "total_s": 3.817098699975759
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.0236083001364022,
+     "total_s": 3.8492380001116544
+    }
+   ]
+  },
+  {
+   "users": 5,
+   "requests": 15,
+   "outcomes": {
+    "ok": 11,
+    "busy": 0,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 4
+   },
+   "wall_s": 43.9,
+   "ok_p50_s": 9.99,
+   "ok_p95_s": 25.26,
+   "first_event_p95_s": 11.51,
+   "goodput_per_min": 15.0,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.5493294999469072,
+     "total_s": 7.4533259000163525
+    },
+    {
+     "user": 0,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 5.556447000009939,
+     "total_s": 21.071117600193247
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.729770899983123,
+     "total_s": 14.160905600059777
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.6536025002133101,
+     "total_s": 9.988650100072846
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 3.389721400104463,
+     "total_s": 7.010033700149506
+    },
+    {
+     "user": 1,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 11.509469899814576,
+     "total_s": 11.529970899922773
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.7395073999650776,
+     "total_s": 11.441416000016034
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.860629099886864,
+     "total_s": 25.258727999869734
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 4.354033499956131,
+     "total_s": 7.207378000020981
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.3964990000240505,
+     "total_s": 7.451312199933454
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 3.0066219000145793,
+     "total_s": 6.2261820998974144
+    },
+    {
+     "user": 3,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.827926099998876,
+     "total_s": 14.849643800174817
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 5.775485299993306,
+     "total_s": 10.743950299918652
+    },
+    {
+     "user": 4,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 2.8772460999898612,
+     "total_s": 17.778872800059617
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.791897299932316,
+     "total_s": 13.304588799830526
+    }
+   ]
+  },
+  {
+   "users": 10,
+   "requests": 30,
+   "outcomes": {
+    "ok": 22,
+    "busy": 0,
+    "rate_limited": 0,
+    "timeout": 0,
+    "error": 8
+   },
+   "wall_s": 62.7,
+   "ok_p50_s": 18.22,
+   "ok_p95_s": 24.33,
+   "first_event_p95_s": 11.32,
+   "goodput_per_min": 21.1,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.5939273000694811,
+     "total_s": 8.684637299971655
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 11.323977299965918,
+     "total_s": 20.102064199978486
+    },
+    {
+     "user": 0,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 10.204254399985075,
+     "total_s": 25.26511689997278
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.7361816000193357,
+     "total_s": 12.797772400081158
+    },
+    {
+     "user": 1,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.634438300039619,
+     "total_s": 23.004944800166413
+    },
+    {
+     "user": 1,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 6.002565799979493,
+     "total_s": 18.242227700073272
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 5.927562499884516,
+     "total_s": 18.618027799995616
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.363893600180745,
+     "total_s": 21.00264700013213
+    },
+    {
+     "user": 2,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.342854099813849,
+     "total_s": 14.41624979977496
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 4.115873399889097,
+     "total_s": 18.622710299910977
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 5.950593600049615,
+     "total_s": 20.0413005000446
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 6.944194199983031,
+     "total_s": 23.996726300101727
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 7.383926500100642,
+     "total_s": 17.953017400112003
+    },
+    {
+     "user": 4,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 3.601219000061974,
+     "total_s": 14.56176820001565
+    },
+    {
+     "user": 4,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 9.06379869999364,
+     "total_s": 21.523342499975115
+    },
+    {
+     "user": 5,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.3255062000826001,
+     "total_s": 10.078554000006989
+    },
+    {
+     "user": 5,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 10.050219100201502,
+     "total_s": 21.17005700012669
+    },
+    {
+     "user": 5,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 9.09484489983879,
+     "total_s": 23.00850859982893
+    },
+    {
+     "user": 6,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 2.506703600054607,
+     "total_s": 11.46570870000869
+    },
+    {
+     "user": 6,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 8.889361799927428,
+     "total_s": 15.727473699953407
+    },
+    {
+     "user": 6,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 11.049935199785978,
+     "total_s": 27.063469599932432
+    },
+    {
+     "user": 7,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.655523199820891,
+     "total_s": 13.284495999803767
+    },
+    {
+     "user": 7,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.985076599987224,
+     "total_s": 24.330317799933255
+    },
+    {
+     "user": 7,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 7.644932099850848,
+     "total_s": 24.780102799879387
+    },
+    {
+     "user": 8,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.7356491000391543,
+     "total_s": 18.224016100168228
+    },
+    {
+     "user": 8,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 3.3234916001092643,
+     "total_s": 18.56917450018227
+    },
+    {
+     "user": 8,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 6.325740200001746,
+     "total_s": 17.44903190014884
+    },
+    {
+     "user": 9,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.921636800048873,
+     "total_s": 16.169846300035715
+    },
+    {
+     "user": 9,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 5.215735299978405,
+     "total_s": 18.02810180000961
+    },
+    {
+     "user": 9,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 6.984029199928045,
+     "total_s": 19.84238520008512
+    }
+   ]
+  },
+  {
+   "users": 20,
+   "requests": 60,
+   "outcomes": {
+    "ok": 19,
+    "busy": 2,
+    "rate_limited": 0,
+    "timeout": 24,
+    "error": 15
+   },
+   "wall_s": 80.1,
+   "ok_p50_s": 23.08,
+   "ok_p95_s": 28.93,
+   "first_event_p95_s": 23.05,
+   "goodput_per_min": 14.2,
+   "requests_detail": [
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.648935299832374,
+     "total_s": 19.82707059988752
+    },
+    {
+     "user": 0,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 24.912196799879894,
+     "total_s": 24.91996069997549
+    },
+    {
+     "user": 0,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 8.284348899964243,
+     "total_s": 27.183548899833113
+    },
+    {
+     "user": 1,
+     "status": "timeout",
+     "first_event_s": 7.026355100097135,
+     "total_s": 30.020391500089318
+    },
+    {
+     "user": 1,
+     "status": "timeout",
+     "first_event_s": 21.354920000070706,
+     "total_s": 30.011006799992174
+    },
+    {
+     "user": 1,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.0176876001060009,
+     "total_s": 20.08954120008275
+    },
+    {
+     "user": 2,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.542215600144118,
+     "total_s": 16.522556700045243
+    },
+    {
+     "user": 2,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 28.27567689982243,
+     "total_s": 28.294741099933162
+    },
+    {
+     "user": 2,
+     "status": "timeout",
+     "first_event_s": 9.344603799981996,
+     "total_s": 30.003641300136223
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.4122061000671238,
+     "total_s": 11.551109499996528
+    },
+    {
+     "user": 3,
+     "status": "timeout",
+     "first_event_s": null,
+     "total_s": 30.025105600012466
+    },
+    {
+     "user": 3,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 9.925896799890324,
+     "total_s": 23.26132239983417
+    },
+    {
+     "user": 4,
+     "status": "timeout",
+     "first_event_s": 8.694889300037175,
+     "total_s": 30.023165200138465
+    },
+    {
+     "user": 4,
+     "status": "timeout",
+     "first_event_s": 21.633059300016612,
+     "total_s": 30.00648030010052
+    },
+    {
+     "user": 4,
+     "status": "busy",
+     "error": "busy",
+     "first_event_s": 0.017943400191143155,
+     "total_s": 20.08648220007308
+    },
+    {
+     "user": 5,
+     "status": "timeout",
+     "first_event_s": 8.50985709996894,
+     "total_s": 30.03224019985646
+    },
+    {
+     "user": 5,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.856651399983093,
+     "total_s": 14.898572500096634
+    },
+    {
+     "user": 5,
+     "status": "timeout",
+     "first_event_s": 12.94960719998926,
+     "total_s": 30.003148999996483
+    },
+    {
+     "user": 6,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 5.149342200020328,
+     "total_s": 29.426769000012428
+    },
+    {
+     "user": 6,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 15.327510599978268,
+     "total_s": 15.34296300006099
+    },
+    {
+     "user": 6,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.893992600031197,
+     "total_s": 28.93288920004852
+    },
+    {
+     "user": 7,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 3.6578456999268383,
+     "total_s": 23.081646699924022
+    },
+    {
+     "user": 7,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 21.66489339992404,
+     "total_s": 21.700102500151843
+    },
+    {
+     "user": 7,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.5220788000151515,
+     "total_s": 21.247571700019762
+    },
+    {
+     "user": 8,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.9773411999922246,
+     "total_s": 27.43182329996489
+    },
+    {
+     "user": 8,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 17.454246199922636,
+     "total_s": 17.484778499929234
+    },
+    {
+     "user": 8,
+     "status": "timeout",
+     "first_event_s": 12.100626499857754,
+     "total_s": 30.00896880007349
+    },
+    {
+     "user": 9,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 1.6514755000825971,
+     "total_s": 14.607673000078648
+    },
+    {
+     "user": 9,
+     "status": "timeout",
+     "first_event_s": null,
+     "total_s": 30.008366300025955
+    },
+    {
+     "user": 9,
+     "status": "timeout",
+     "first_event_s": 9.17963399994187,
+     "total_s": 30.005210800096393
+    },
+    {
+     "user": 10,
+     "status": "timeout",
+     "first_event_s": 5.288710599998012,
+     "total_s": 30.042949200142175
+    },
+    {
+     "user": 10,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.735408799955621,
+     "total_s": 14.75175300007686
+    },
+    {
+     "user": 10,
+     "status": "timeout",
+     "first_event_s": 9.213243999984115,
+     "total_s": 30.011184599949047
+    },
+    {
+     "user": 11,
+     "status": "timeout",
+     "first_event_s": 5.022826400119811,
+     "total_s": 30.050093200057745
+    },
+    {
+     "user": 11,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.68287149979733,
+     "total_s": 14.70157829998061
+    },
+    {
+     "user": 11,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 7.823309399886057,
+     "total_s": 24.922925099963322
+    },
+    {
+     "user": 12,
+     "status": "timeout",
+     "first_event_s": 4.814585600048304,
+     "total_s": 30.052928799996153
+    },
+    {
+     "user": 12,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.823376799933612,
+     "total_s": 14.847961399937049
+    },
+    {
+     "user": 12,
+     "status": "timeout",
+     "first_event_s": 10.572014200035483,
+     "total_s": 30.0149562000297
+    },
+    {
+     "user": 13,
+     "status": "timeout",
+     "first_event_s": 3.9019545998889953,
+     "total_s": 30.05611320002936
+    },
+    {
+     "user": 13,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.819086199859157,
+     "total_s": 14.838548599975184
+    },
+    {
+     "user": 13,
+     "status": "timeout",
+     "first_event_s": 10.355325100012124,
+     "total_s": 30.003215899923816
+    },
+    {
+     "user": 14,
+     "status": "timeout",
+     "first_event_s": 5.731321000028402,
+     "total_s": 30.058835400035605
+    },
+    {
+     "user": 14,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 14.81699029984884,
+     "total_s": 14.843406999949366
+    },
+    {
+     "user": 14,
+     "status": "timeout",
+     "first_event_s": 10.10774639993906,
+     "total_s": 30.012287399964407
+    },
+    {
+     "user": 15,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 3.9002001001499593,
+     "total_s": 24.695781199960038
+    },
+    {
+     "user": 15,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 20.154189799912274,
+     "total_s": 20.180097999982536
+    },
+    {
+     "user": 15,
+     "status": "timeout",
+     "first_event_s": 9.944244700018317,
+     "total_s": 30.009051600005478
+    },
+    {
+     "user": 16,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 4.048185599967837,
+     "total_s": 26.11811379995197
+    },
+    {
+     "user": 16,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 18.73180519999005,
+     "total_s": 18.748649899847806
+    },
+    {
+     "user": 16,
+     "status": "timeout",
+     "first_event_s": 9.075394100043923,
+     "total_s": 30.016141999978572
+    },
+    {
+     "user": 17,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.8636400001123548,
+     "total_s": 21.685276500182226
+    },
+    {
+     "user": 17,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 23.051331300055608,
+     "total_s": 23.071439099963754
+    },
+    {
+     "user": 17,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 8.469655400142074,
+     "total_s": 26.655889000045136
+    },
+    {
+     "user": 18,
+     "status": "ok",
+     "found": false,
+     "cached": "miss",
+     "first_event_s": 1.7950317999348044,
+     "total_s": 13.297869100002572
+    },
+    {
+     "user": 18,
+     "status": "timeout",
+     "first_event_s": null,
+     "total_s": 30.00980420014821
+    },
+    {
+     "user": 18,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 8.513566999929026,
+     "total_s": 23.04506119992584
+    },
+    {
+     "user": 19,
+     "status": "ok",
+     "found": true,
+     "cached": "miss",
+     "first_event_s": 2.635915399994701,
+     "total_s": 18.466599899809808
+    },
+    {
+     "user": 19,
+     "status": "error",
+     "error": "upstream_unavailable",
+     "first_event_s": 26.40050210012123,
+     "total_s": 26.437810800038278
+    },
+    {
+     "user": 19,
+     "status": "timeout",
+     "first_event_s": 12.953024899819866,
+     "total_s": 30.0066921999678
+    }
+   ]
+  }
+ ]
+}

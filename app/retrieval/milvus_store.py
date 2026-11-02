@@ -4,9 +4,14 @@ Every collection carries both a dense vector and a BM25 sparse field generated b
 Milvus from `text`, so the hybrid experiments (E2+) reuse the same index instead
 of re-embedding. Searches use Strong consistency: right after an ingest the
 default Bounded level can return nothing, which would silently skew evaluation.
+
+Private notes live in the same collection as library "private" with an `owner_id`;
+every search builds its filter with `scope_filter`, which only ever admits private
+rows of the caller.
 """
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Any
 
 from pymilvus import AnnSearchRequest, DataType, Function, FunctionType, MilvusClient, RRFRanker
@@ -16,10 +21,14 @@ from app.config import get_settings
 DIM = 1024
 OUTPUT_FIELDS = ["chunk_id", "library", "doc_id", "doc_type", "url", "section_index", "parent_index",
                  "heading_path", "text"]
-FIELDS = set(OUTPUT_FIELDS) | {"dense"}
+FIELDS = set(OUTPUT_FIELDS) | {"dense", "owner_id"}
+PRIVATE = "private"     # library id of users' own notes
 
 
+@lru_cache
 def client() -> MilvusClient:
+    """One client per process. Its gRPC channel is thread-safe and pooled; opening one per
+    request made concurrent load fail with refused connections (W3 load test)."""
     return MilvusClient(uri=get_settings().milvus_uri)
 
 
@@ -38,6 +47,7 @@ def create_collection(mc: MilvusClient, name: str, dim: int = DIM, drop: bool = 
     schema.add_field("parent_index", DataType.INT64)
     schema.add_field("heading_path", DataType.VARCHAR, max_length=2048)
     schema.add_field("text", DataType.VARCHAR, max_length=16384, enable_analyzer=True)
+    schema.add_field("owner_id", DataType.INT64, nullable=True, default_value=0)   # 0: public
     schema.add_field("dense", DataType.FLOAT_VECTOR, dim=dim)
     schema.add_field("sparse", DataType.SPARSE_FLOAT_VECTOR)
     schema.add_function(Function(name="bm25", function_type=FunctionType.BM25,
@@ -50,14 +60,38 @@ def create_collection(mc: MilvusClient, name: str, dim: int = DIM, drop: bool = 
     mc.create_collection(name, schema=schema, index_params=index, consistency_level="Strong")
 
 
+def ensure_owner_field(mc: MilvusClient, name: str) -> bool:
+    """Add `owner_id` to a collection built before private notes existed (no re-indexing:
+    Milvus adds a nullable field in place). Returns whether it was added."""
+    if any(f["name"] == "owner_id" for f in mc.describe_collection(name)["fields"]):
+        return False
+    mc.add_collection_field(name, field_name="owner_id", data_type=DataType.INT64, nullable=True, default_value=0)
+    return True
+
+
 def insert_rows(mc: MilvusClient, name: str, rows: list[dict[str, Any]]) -> None:
     """Insert chunk rows, keeping only schema fields (callers may carry extras such as token counts)."""
     if rows:
         mc.insert(name, [{k: v for k, v in row.items() if k in FIELDS} for row in rows])
 
 
-def _filter(libraries: list[str] | None) -> str:
-    return f"library in {libraries!r}" if libraries else ""
+def scope_filter(libraries: list[str] | None, owner_id: int | None = None) -> str:
+    """Public chunks of `libraries` (all public ones if None), plus the caller's own notes.
+
+    Private rows are matched only by the owner clause: "private" is removed from the
+    public list, so no list a client sends can reach another user's notes. Public rows
+    are selected by library alone, so the filter does not depend on how rows indexed
+    before `owner_id` existed read that field.
+    """
+    public = [lib for lib in libraries or [] if lib != PRIVATE]
+    expr = f"library in {public!r}" if public else f'library != "{PRIVATE}"'
+    if owner_id is not None:
+        expr = f'({expr}) or (library == "{PRIVATE}" and owner_id == {int(owner_id)})'
+    return expr
+
+
+def _filter(libraries: list[str] | None, owner_id: int | None = None) -> str:
+    return scope_filter(libraries, owner_id)
 
 
 DENSE_PARAMS = {"metric_type": "COSINE", "params": {"ef": 128}}
@@ -69,26 +103,27 @@ def _hits(results) -> list[dict[str, Any]]:
 
 
 def dense_search(mc: MilvusClient, name: str, vector: list[float], top_k: int = 10,
-                 libraries: list[str] | None = None) -> list[dict[str, Any]]:
-    return _hits(mc.search(name, data=[vector], anns_field="dense", limit=top_k, filter=_filter(libraries),
+                 libraries: list[str] | None = None, owner_id: int | None = None) -> list[dict[str, Any]]:
+    return _hits(mc.search(name, data=[vector], anns_field="dense", limit=top_k, filter=_filter(libraries, owner_id),
                            output_fields=OUTPUT_FIELDS, search_params=DENSE_PARAMS, consistency_level="Strong"))
 
 
 def bm25_search(mc: MilvusClient, name: str, text: str, top_k: int = 10,
-                libraries: list[str] | None = None) -> list[dict[str, Any]]:
+                libraries: list[str] | None = None, owner_id: int | None = None) -> list[dict[str, Any]]:
     """Full-text search: Milvus tokenizes `text` with the collection's analyzer and scores with BM25."""
-    return _hits(mc.search(name, data=[text], anns_field="sparse", limit=top_k, filter=_filter(libraries),
+    return _hits(mc.search(name, data=[text], anns_field="sparse", limit=top_k, filter=_filter(libraries, owner_id),
                            output_fields=OUTPUT_FIELDS, search_params=SPARSE_PARAMS, consistency_level="Strong"))
 
 
 def hybrid_search(mc: MilvusClient, name: str, vector: list[float], text: str, top_k: int = 10,
-                  libraries: list[str] | None = None, candidates: int = 50, rrf_k: int = 60) -> list[dict[str, Any]]:
+                  libraries: list[str] | None = None, candidates: int = 50, rrf_k: int = 60,
+                  owner_id: int | None = None) -> list[dict[str, Any]]:
     """Dense + BM25 fused by reciprocal rank: score = sum over lists of 1 / (rrf_k + rank).
 
     RRF only looks at ranks, so the two lists' incomparable scores (cosine vs BM25)
     never have to be normalized; rrf_k damps how much the very top ranks dominate.
     """
-    expr = _filter(libraries)
+    expr = _filter(libraries, owner_id)
     requests = [
         AnnSearchRequest(data=[vector], anns_field="dense", param=DENSE_PARAMS, limit=candidates, expr=expr),
         AnnSearchRequest(data=[text], anns_field="sparse", param=SPARSE_PARAMS, limit=candidates, expr=expr),

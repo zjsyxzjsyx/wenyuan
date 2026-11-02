@@ -90,7 +90,8 @@ def chunk_page(tokenizer: Tokenizer, page: Page, sections, variant: str) -> list
     doc_id = doc_id_for(page.url)
     if variant == "fixed":
         return chunk_fixed(tokenizer, page.markdown, library=page.library, url=page.url, doc_id=doc_id)
-    return chunk_sections(tokenizer, sections, library=page.library, site_name=SITES[page.library].name,
+    site_name = SITES[page.library].name if page.library in SITES else "My notes"   # private notes
+    return chunk_sections(tokenizer, sections, library=page.library, site_name=site_name,
                           url=page.url, doc_id=doc_id, context_header=variant != "struct_nohdr",
                           merge_sections=variant == "struct_merge")
 

@@ -12,6 +12,7 @@ import time
 
 from sqlalchemy.orm import Session as DBSession
 
+from app.cache.answers import invalidate_now
 from app.db.models import create_tables, engine
 from app.ingest import pipeline
 from app.ingest.sites import SITES
@@ -40,6 +41,7 @@ def build(libraries: list[str], variant: str) -> dict[str, int]:
                 stats["pages"] += 1
                 stats["chunks"] += len(rows)
             db.commit()
+            invalidate_now(library)
     stats["seconds"] = round(time.perf_counter() - began)
     return stats
 

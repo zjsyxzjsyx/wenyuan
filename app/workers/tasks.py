@@ -11,6 +11,7 @@ from functools import lru_cache
 from celery import chain, group
 from sqlalchemy.orm import Session as DBSession
 
+from app.cache.answers import invalidate_now
 from app.db.models import create_tables, engine
 from app.ingest import pipeline
 from app.ingest.extract import Page
@@ -67,7 +68,7 @@ def process_page(page: dict, variant: str, trace: dict | None = None) -> dict:
             doc_id, rows = pipeline.process_page(db, _tokenizer(), Page(**page), variant)
             db.commit()
         s.set(chunks=len(rows))
-        return {"doc_id": doc_id, "rows": rows}
+        return {"doc_id": doc_id, "library": page["library"], "rows": rows}
 
 
 @app.task(**RETRY)
@@ -76,5 +77,6 @@ def embed_and_index(result: dict, collection: str, trace: dict | None = None) ->
         rows = result["rows"]
         vectors = _models().embed([r["text"] for r in rows]) if rows else []
         pipeline.index_chunks(_milvus(), collection, result["doc_id"], rows, vectors)
+        invalidate_now(result["library"])   # cached answers about this library may now be stale
         s.set(chunks=len(rows))
         return len(rows)

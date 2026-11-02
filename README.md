@@ -22,7 +22,11 @@
 | 全链路 trace（span 树写入 MySQL，可跨 Celery 进程传递） | ✅ |
 | 查询理解（本地 Qwen3-8B）、small-to-big 上下文、带引用校验的回答（`python -m app.query.ask`） | ✅ |
 | 章节摘要 / “学习者会怎么问”索引（E5） | ✅ 已生成；检索上是负结果，默认关闭（见设计文档 11.2） |
-| HTTP API、MCP 工具、私有库、排队限流、trace 看板 | ⏳ 计划中 |
+| HTTP API（SSE）、API key 认证 | ✅ `uvicorn app.api.main:app` |
+| Redis：按用户限流、GPU 闸门（公平排队 + 准入控制）、问答缓存 + 防击穿 | ✅ 压测验证 |
+| 私有笔记库（按用户隔离检索和缓存，私有内容只走本地模型） | ✅ |
+| 本地 trace 看板（`/dashboard`） | ✅ |
+| MCP 工具、知秋接入、论断级引用校验、多跳检索 | ⏳ 计划中 |
 
 ## 评测结果
 
@@ -50,6 +54,19 @@
 - **reranker 偏爱 API 参考页**：参数名密集的自动生成参考页，会压过答案真正引用的教程页；加了查询理解后 FastAPI 的 Recall@5 从 0.40 跌到 0.30。
 - **端到端才暴露的问题**：只有一个 H1 的页面，整页就是一个父块，最长 11 万字符，会独占上下文预算，导致错误拒答；小模型用中文回答时只在 JSON 字段里给引用。两处都已修复，见设计文档 11.2。
 
+## 共享部署：一块 GPU，20 人同时提问
+
+`python -m eval.loadtest`：20 个用户，每人连续问 3 个不同的真实问题，客户端等待 30 秒后放弃。
+
+| | 不加闸门 | GPU 闸门（2 槽）+ 准入控制 |
+|---|---|---|
+| 成功 / 超时 | 13 / **47** | 19 / **0** |
+| 有效吞吐（30 s 内完成的答案） | 8.7 个/分钟 | **21.9 个/分钟** |
+| 首个事件 p95 | 27.9 s | 0.21 s |
+| GPU 显存不足（OOM） | 2 次，Ollama 崩溃 | 0 |
+
+不加闸门时会出现拥塞崩溃：客户端已经放弃的请求还在占用 GPU。加上闸门后，超出能力的请求在 0.1 秒内得到 `busy` 和建议的重试时间。槽位数是按实测定的：4 路并发生成会让 16GB 显卡 OOM。压测还抓出 4 个单用户测不出的 bug（连接复用、连接池、取消时槽位泄漏、评测缓存混进线上服务），见设计文档 11.3。
+
 ## 架构
 
 ```
@@ -57,7 +74,7 @@
                           ├──▶ 本地模型服务（bge-m3 / bge-reranker-v2-m3，GPU）
                           └──▶ LLM（默认本地 Ollama，可选 OpenAI 兼容 API）
 Celery：orchestrate 队列（提取、去重）→ cpu 队列（分节、切块、写 MySQL）→ gpu 队列（向量化、写 Milvus）
-MySQL：文档、章节树、trace span    Redis：Celery broker（之后加排队限流、缓存）
+MySQL：用户、文档、章节树、trace span    Redis：Celery broker、按用户限流、GPU 闸门、问答缓存
 ```
 
 后端部分针对的是 LLM 应用的真实约束：**单个请求重、GPU 稀缺、多用户、数据一致性**，不是传统意义上的高并发。理由见 [docs/design.md](docs/design.md) 1.3 节。
@@ -88,8 +105,16 @@ uv run python -m app.workers.submit python django redis --variant struct_merge -
 uv run python -m eval.build_so --tags python django --pages 3 --merge
 uv run python -m eval.run --exp demo --collection chunks_struct_merge --mode hybrid --understand --dense-query raw
 
-# 问答（需要 Ollama：ollama pull qwen3:8b）
+# 问答（需要 Ollama：ollama pull qwen3:8b；并行槽位与 GPU 闸门保持一致）
+OLLAMA_NUM_PARALLEL=2 OLLAMA_CONTEXT_LENGTH=8192 ollama serve
 uv run python -m app.query.ask "How do I delete everything in Redis?" --library redis
+
+# HTTP 服务
+uv run python -m app.api.auth create alice             # 打印一次 API key
+uv run uvicorn app.api.main:app --port 8000            # 看板：http://127.0.0.1:8000/dashboard
+curl -N localhost:8000/v1/ask -H "Authorization: Bearer <key>" -H "Content-Type: application/json" \
+     -d '{"question": "How do I make a key expire in Redis?", "libraries": ["redis"]}'
+uv run python -m eval.loadtest --label demo --users 1 5 10 20   # 压测
 ```
 
 ## 与知秋（Koyo）的关系
