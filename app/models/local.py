@@ -10,12 +10,16 @@ class ModelServer:
     def __init__(self, base_url: str | None = None, timeout: float = 600) -> None:
         self._http = httpx.Client(base_url=base_url or get_settings().model_server_url, timeout=timeout)
 
-    def embed(self, texts: list[str], model: str | None = None, batch: int = 64) -> list[list[float]]:
+    def embed(self, texts: list[str], model: str | None = None, batch: int = 64,
+              prompt_name: str | None = None) -> list[list[float]]:
+        """`prompt_name`: the model's own prompt, e.g. "query" for Qwen3-Embedding queries."""
         vectors: list[list[float]] = []
         for start in range(0, len(texts), batch):
             body = {"texts": texts[start:start + batch]}
             if model:
                 body["model"] = model
+            if prompt_name:
+                body["prompt_name"] = prompt_name
             response = self._http.post("/embed", json=body)
             response.raise_for_status()
             vectors.extend(response.json()["vectors"])

@@ -4,7 +4,8 @@ Run from this directory: `uv run uvicorn server:app --port 8001`.
 Models load lazily on first use and stay resident; GPU calls are serialized by a
 lock because one process owns the card and batches are already parallel inside.
 Model names are Hugging Face ids, so the Qwen3 comparison (E7) only needs a
-different `model` in the request.
+different `model` in the request; `prompt_name` selects a model's own prompt
+(Qwen3-Embedding wants its "query" instruction on queries and none on documents).
 """
 from __future__ import annotations
 
@@ -20,6 +21,9 @@ from sentence_transformers import CrossEncoder, SentenceTransformer
 DEFAULT_EMBED = os.getenv("EMBED_MODEL", "BAAI/bge-m3")
 DEFAULT_RERANK = os.getenv("RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+# Chunks are ~300 tokens; capping the sequence length keeps a model with a 32k default (Qwen3) from
+# sizing its batches for texts we never send.
+MAX_SEQ = int(os.getenv("MAX_SEQ_LENGTH", "2048"))
 
 app = FastAPI(title="wenyuan-model-server")
 _lock = threading.Lock()
@@ -30,6 +34,7 @@ _rerankers: dict[str, CrossEncoder] = {}
 def _embedder(name: str) -> SentenceTransformer:
     if name not in _embedders:
         model = SentenceTransformer(name, device=DEVICE)
+        model.max_seq_length = min(model.max_seq_length or MAX_SEQ, MAX_SEQ)
         if DEVICE == "cuda":
             model.half()
         _embedders[name] = model
@@ -49,6 +54,7 @@ class EmbedRequest(BaseModel):
     texts: list[str] = Field(min_length=1, max_length=512)
     model: str = DEFAULT_EMBED
     batch_size: int = 32
+    prompt_name: str | None = None
 
 
 class RerankRequest(BaseModel):
@@ -72,9 +78,11 @@ def embed(req: EmbedRequest) -> dict:
     began = time.perf_counter()
     try:
         with _lock:
-            vectors = _embedder(req.model).encode(
-                req.texts, batch_size=req.batch_size, normalize_embeddings=True, convert_to_numpy=True
-            )
+            model = _embedder(req.model)
+            if req.prompt_name and req.prompt_name not in (model.prompts or {}):
+                raise HTTPException(400, f"{req.model} has no prompt {req.prompt_name!r}")
+            vectors = model.encode(req.texts, batch_size=req.batch_size, normalize_embeddings=True,
+                                   convert_to_numpy=True, prompt_name=req.prompt_name)
     except OSError as exc:  # unknown model id or download failure
         raise HTTPException(400, str(exc)) from exc
     return {

@@ -1,0 +1,20 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: uv sync --frozen
+      # Unit tests use fakes (fakeredis, mock transports); the one test that needs Milvus skips here.
+      # The retrieval and answer evals need a GPU, the corpus and the local models, so they run before
+      # a release instead: python -m eval.gate <new run> (see eval/gate.py).
+      - name: Test
+        run: uv run pytest -q

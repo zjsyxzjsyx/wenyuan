@@ -28,7 +28,8 @@
 | 本地 trace 看板（`/dashboard`） | ✅ |
 | MCP 服务（7 个工具，已用知秋的 MCP 客户端验证） | ✅ `wenyuan-mcp` |
 | 论断级引用校验：逐句核对引用的原文是否支持，不支持就删掉 | ✅ 默认开启 |
-| 多跳检索、BGE 对比 Qwen3、CI 评测门禁 | ⏳ 计划中 |
+| 多跳检索：跨库问题按需拆成子查询，结果交错合并 | ✅ 默认开启 |
+| CI（单元测试）+ 发版前的评测回归门禁（`eval.gate`） | ✅ |
 
 ## 评测结果
 
@@ -79,6 +80,30 @@
 | 追问 + 对话历史 | **0.488** |
 
 不带历史时召回率不到一半；带上历史后收回了 83% 的损失（显著）。
+
+## 跨库问题：多跳检索
+
+66 道需要同时查两个库的问题（例如"FastAPI 里用 Redis 做缓存"），评测集由 DeepSeek 生成：
+
+| | 两个页面都在前 10 |
+|---|---|
+| 单次检索 | 0.303 |
+| 拆成子查询，按 RRF 合并 | 0.288 |
+| **拆成子查询，按页面轮流交错** | **0.455**（显著） |
+
+只在问题能拆出 2 个以上子查询时才拆。如果对所有问题都拆，回归门禁会发现单库问题的 Recall@5 显著下降 2 个点。
+
+## 换向量模型：一个评测集会骗人
+
+把 BGE-m3 换成 Qwen3-Embedding-0.6B（只换向量，其余不变）：
+
+| 评测集 | Qwen3 相对 BGE |
+|---|---|
+| Stack Overflow 真实问题 | Recall@5 **+11.8**（显著） |
+| DeepSeek 写的多轮题 | +2.5（不显著） |
+| DeepSeek 写的跨库题 | Recall@10 **−6.8**（显著） |
+
+在独立生成的题目上，Qwen3 没有显示出优势，SO 上的领先很可能来自训练数据见过 Stack Overflow。所以默认仍用 BGE-m3，见设计文档 11.4。
 
 ## 共享部署：一块 GPU，20 人同时提问
 
@@ -142,6 +167,8 @@ curl -N localhost:8000/v1/ask -H "Authorization: Bearer <key>" -H "Content-Type:
      -d '{"question": "How do I make a key expire in Redis?", "libraries": ["redis"]}'
 uv run python -m eval.loadtest --label demo --users 1 5 10 20   # 压测
 uv run python -m eval.answers --exp demo --n 100                 # 答案层评测（裁判见 .env.example 的 JUDGE_*）
+uv run python -m eval.multihop --exp demo                        # 跨库多跳评测
+uv run python -m eval.gate experiments/<新一轮>.json               # 发版前回归门禁：显著变差则退出码 1
 ```
 
 ### 接入 Agent（MCP）

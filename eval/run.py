@@ -22,6 +22,7 @@ from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
 from app.ingest.summarize import COLLECTION as SUMMARIES
+from app.query import multihop
 from app.query.understand import understand
 from app.retrieval import milvus_store
 from app.retrieval.fusion import best_per_block, rrf
@@ -52,6 +53,9 @@ class Config:
     dense_query: str = "rewritten"      # with --understand: embed the LLM rewrite or the raw question
     history: bool = True                # multi-turn rows: give the conversation so far to understanding
     question_field: str = "question"    # e.g. "original_question" for the multi-turn upper bound
+    multihop: str = ""                  # "decompose" | "iterative": app.query.multihop instead of one search (E9)
+    embed_model: str = "BAAI/bge-m3"    # must match the collection's vectors (E7: Qwen/Qwen3-Embedding-0.6B)
+    query_prompt: str | None = None     # the embedding model's query prompt name, e.g. "query" for Qwen3
     llm_workers: int = 4                # parallel LLM calls (match the server's parallel slots)
     dataset: Path = DATASET
     exclude_labels: frozenset[str] = field(default_factory=lambda: frozenset({"not_applicable"}))
@@ -61,7 +65,8 @@ def query_text(row: dict, body_chars: int, field: str = "question") -> str:
     return f"{row[field]}\n\n{row.get('body', '')[:body_chars]}".strip()
 
 
-def embed_queries(models: ModelServer, texts: list[str], model: str = "BAAI/bge-m3") -> list[list[float]]:
+def embed_queries(models: ModelServer, texts: list[str], model: str = "BAAI/bge-m3",
+                  prompt_name: str | None = None) -> list[list[float]]:
     """Query vectors, computed once per (model, text) and reused by every experiment.
 
     fp16 inference pads each batch to its longest text, so the same query embeds
@@ -75,12 +80,13 @@ def embed_queries(models: ModelServer, texts: list[str], model: str = "BAAI/bge-
         for line in QUERY_CACHE.read_text(encoding="utf-8").splitlines():
             row = json.loads(line)
             cache[row["key"]] = row["vector"]
-    key = lambda text: hashlib.sha1(f"{model}\n{text}".encode()).hexdigest()
+    tag = f"{model}|{prompt_name}" if prompt_name else model
+    key = lambda text: hashlib.sha1(f"{tag}\n{text}".encode()).hexdigest()
     missing = [t for t in dict.fromkeys(texts) if key(t) not in cache]
     if missing:
         QUERY_CACHE.parent.mkdir(exist_ok=True)
         with QUERY_CACHE.open("a", encoding="utf-8") as f:
-            for text, vector in zip(missing, models.embed(missing, model=model)):
+            for text, vector in zip(missing, models.embed(missing, model=model, prompt_name=prompt_name)):
                 cache[key(text)] = vector
                 f.write(json.dumps({"key": key(text), "vector": vector}) + "\n")
     return [cache[key(t)] for t in texts]
@@ -113,7 +119,8 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
     bm25_chars = cfg.body_chars if cfg.bm25_body_chars is None else cfg.bm25_body_chars
     if not cfg.understand:
         with spans.span("stage", "embed_queries", n=len(rows)):
-            return (embed_queries(models, [query_text(r, cfg.body_chars, cfg.question_field) for r in rows]),
+            return (embed_queries(models, [query_text(r, cfg.body_chars, cfg.question_field) for r in rows],
+                                  cfg.embed_model, cfg.query_prompt),
                     [query_text(r, bm25_chars, cfg.question_field) for r in rows])
     llm = LLM()
     with spans.span("stage", "understand_queries", n=len(rows), workers=cfg.llm_workers):
@@ -131,7 +138,7 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
     dense_texts = ([query_text(r, cfg.body_chars, cfg.question_field) for r in rows] if cfg.dense_query == "raw"
                    else [u.search_query_en for u in parsed])
     with spans.span("stage", "embed_queries", n=len(rows)):
-        vectors = embed_queries(models, dense_texts)
+        vectors = embed_queries(models, dense_texts, cfg.embed_model, cfg.query_prompt)
     return vectors, [u.bm25_text() for u in parsed]
 
 
@@ -152,13 +159,31 @@ def _run(cfg: Config) -> dict:
     excluded = sum(row["label"] in cfg.exclude_labels for row in rows)
     rows = [row for row in rows if row["label"] not in cfg.exclude_labels and row["library"] in SITES]
     models, mc, tokenizer = ModelServer(), milvus_store.client(), TiktokenTokenizer()
-    vectors, texts = prepare_queries(cfg, rows, models)
+    if cfg.multihop:
+        # The whole multi-hop chain (understanding, sub-queries, searches) per question, timed end to end.
+        llm = LLM()
+
+        def hop(row: dict):
+            began = time.perf_counter()
+            r = multihop.retrieve(query_text(row, cfg.body_chars, cfg.question_field), llm, models, cfg.collection,
+                                  libraries=[row["library"]], history=row.get("history") if cfg.history else None,
+                                  mode=cfg.multihop, top_k=cfg.top_k, mc=mc)
+            return r.hits, (time.perf_counter() - began) * 1000
+        with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
+            hopped = list(pool.map(lambda row: contextvars.copy_context().run(hop, row), rows))
+        vectors, texts = [None] * len(rows), [None] * len(rows)
+    else:
+        vectors, texts = prepare_queries(cfg, rows, models)
     per_question, latencies = [], []
-    for row, vector, text in zip(rows, vectors, texts):
+    for i, (row, vector, text) in enumerate(zip(rows, vectors, texts)):
         with spans.span("retrieval", f"{cfg.mode}_search", question=row["id"]) as s:
             began = time.perf_counter()  # timed inside the span so the trace writes are not counted
-            hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]], cfg.summaries,
-                            cfg.summary_weight)
+            if cfg.multihop:
+                hits, elapsed = hopped[i]
+                began -= elapsed / 1000
+            else:
+                hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]],
+                                cfg.summaries, cfg.summary_weight)
             if cfg.rerank_top:
                 with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
                     head = hits[:cfg.rerank_top]
@@ -212,6 +237,9 @@ def main() -> None:
     parser.add_argument("--llm-workers", type=int, default=4)
     parser.add_argument("--summaries", action="store_true", help="fuse in section summary/question hits (E5)")
     parser.add_argument("--summary-weight", type=float, default=1.0)
+    parser.add_argument("--multihop", choices=("decompose", "iterative"), help="multi-hop retrieval (E9)")
+    parser.add_argument("--embed-model", default="BAAI/bge-m3", help="query embedding model (match the collection)")
+    parser.add_argument("--query-prompt", help="the embedding model's query prompt name (Qwen3: query)")
     parser.add_argument("--no-history", action="store_true", help="multi-turn rows: drop the conversation so far")
     parser.add_argument("--question-field", default="question",
                         help="row field to ask (multi-turn upper bound: original_question)")
@@ -227,7 +255,8 @@ def main() -> None:
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
         rerank_body_chars=args.rerank_body_chars, understand=args.understand, llm_workers=args.llm_workers,
         summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
-        history=not args.no_history, question_field=args.question_field,
+        history=not args.no_history, question_field=args.question_field, multihop=args.multihop or "",
+        embed_model=args.embed_model, query_prompt=args.query_prompt,
         dataset=args.dataset,
         exclude_labels=frozenset(args.exclude_labels)))
     print(json.dumps({k: result[k] for k in ("exp", "collection", "excluded", "overall", "by_library", "by_label",

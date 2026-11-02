@@ -26,6 +26,7 @@ from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
+from app.query import multihop
 from app.query.understand import Understanding, understand
 from app.retrieval import milvus_store
 from app.retrieval.context import Source, build_sources, parent_blocks
@@ -53,6 +54,10 @@ class AskConfig:
     # with an unsupported claim 47.8% -> 23.0% (significant), fully correct answers unchanged,
     # 5 more refusals (none of them correct before), about +0.85 s per answer.
     verify: bool = True
+    # Multi-hop (E9): split a question that needs several lookups into sub-queries, searched in turn
+    # and interleaved. Cross-library questions: both pages in the top 10, 0.30 -> 0.45 (significant);
+    # single-hop SO questions unchanged (gate passed), as one sub-query keeps the first search. "" = off.
+    multihop: str = "decompose"
 
 
 @dataclass
@@ -87,7 +92,8 @@ def _noop(name: str, data: dict) -> None:
 
 
 def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, models: ModelServer,
-              tokenizer: TiktokenTokenizer, owner_id: int | None) -> tuple[list[dict], list[Source]]:
+              tokenizer: TiktokenTokenizer, owner_id: int | None,
+              llm: LLM | None = None) -> tuple[list[dict], list[Source]]:
     # The router may narrow the libraries; an empty answer means "could be any" of those offered.
     scope = u.libraries or libraries or None
     with spans.span("retrieval", f"{cfg.mode}_search", libraries=scope) as s:
@@ -105,6 +111,9 @@ def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, mod
             extra = milvus_store.dense_search(mc, SUMMARIES, vector, top_k=cfg.top_k, libraries=scope)
             hits = rrf([hits, best_per_block(extra)], limit=cfg.top_k)
         s.set(hits=len(hits), private_hits=sum(h["library"] == milvus_store.PRIVATE for h in hits))
+    if cfg.multihop and llm is not None:
+        hits = multihop.expand(u, hits, llm, models, cfg.collection, libraries or sorted(SITES), scope,
+                               mode=cfg.multihop, top_k=cfg.top_k, owner_id=owner_id, mc=mc).hits
     if cfg.rerank_top and hits:
         with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
             head = hits[:cfg.rerank_top]
@@ -124,7 +133,7 @@ def _search(question: str, history: list[dict] | None, libraries: list[str] | No
     on_event("understanding", asdict(u))
     if not u.needs_retrieval:
         return SearchResult(u)
-    hits, sources = _retrieve(u, libraries, cfg, models, TiktokenTokenizer(), owner_id)
+    hits, sources = _retrieve(u, libraries, cfg, models, TiktokenTokenizer(), owner_id, llm)
     on_event("sources", {"sources": [source_view(s) for s in sources]})
     retrieved = [{"url": h["url"], "heading_path": h.get("heading_path", ""), "score": round(h["score"], 4)}
                  for h in hits[:10]]
