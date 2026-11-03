@@ -1,13 +1,17 @@
 ﻿<#
 一键启动文渊并打开工作台：http://127.0.0.1:8000/ui
   scripts\wenyuan.cmd          启动（已在运行的部分会跳过）
-  scripts\wenyuan.cmd -Stop    停止 API、模型服务和专用 Ollama，并停掉 Docker 容器
+  scripts\wenyuan.cmd -Stop    停止 API、模型服务、专用 Ollama 和残留的评测 / 入库进程，并停掉 Docker 容器
+  scripts\wenyuan.cmd -Force   内存不够时也照样启动（不建议）
 依次确保：Docker Desktop -> docker compose（Milvus、MySQL、Redis）-> GPU 模型服务（8001）
 -> 专用 Ollama（11435，并行 1、8k 上下文，和 GPU 闸门的 1 个槽位一致；Ollama 把上下文长度平分给各并行槽位，
 并行 2 时每个请求只有 4096 token，长 prompt 会被截掉开头）-> API（8000）。
+启动 Docker 和模型服务前先看可用内存：16 GB 内存的笔记本上，Docker（约 5 GB）加上 Qwen3
+（Windows 记约 15 GB 提交内存）会让系统频繁换页，甚至卡死重启（2026-11-03 发生过）。
 日志在 .cache\ 和 model_server\ 下。
 #>
-param([switch]$Stop, [switch]$NoBrowser, [int]$ApiPort = 8000, [int]$ModelPort = 8001, [int]$OllamaPort = 11435)
+param([switch]$Stop, [switch]$NoBrowser, [switch]$Force, [int]$ApiPort = 8000, [int]$ModelPort = 8001,
+      [int]$OllamaPort = 11435)
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $root = Split-Path $PSScriptRoot
@@ -44,18 +48,38 @@ function Stop-Port([int]$port, [string]$what) {
     if ($pids) { Write-Host "已停止 $what" } else { Write-Host "$what 没有在运行" }
 }
 
+function Get-FreeRamGB { [math]::Round((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory / 1MB, 1) }
+function Assert-Ram([double]$needGB, [string]$what) {
+    $free = Get-FreeRamGB
+    if ($free -ge $needGB) { return }
+    $message = "可用内存只有 $free GB，启动$what至少要约 $needGB GB。请先关掉不用的程序（游戏、浏览器标签、动态壁纸等）再试"
+    if ($Force) { Write-Warning "$message；因为加了 -Force，照样启动" } else { throw "$message；确实要启动请加 -Force" }
+}
+# 评测、入库脚本不随会话退出，残留下来会继续调用模型、占内存
+function Get-Leftovers {
+    @(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'eval\.(run|judge_retrieval|answers|loadtest|build_\w+)|app\.ingest\.' })
+}
+
 if ($Stop) {
     Stop-Port $ApiPort "API"
     Stop-Port $ModelPort "模型服务"
     Stop-Port $OllamaPort "专用 Ollama"
-    Invoke-Compose "stop"
+    $left = Get-Leftovers
+    foreach ($p in $left) { Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue }
+    Write-Host "已结束残留的评测 / 入库进程：$($left.Count) 个"
+    if (Test-Docker) { Invoke-Compose "stop" } else { Write-Host "Docker 没有在运行" }
+    Write-Host "可用内存：$(Get-FreeRamGB) GB"
     return
 }
+
+$left = Get-Leftovers
+if ($left.Count) { Write-Warning "有 $($left.Count) 个评测 / 入库进程还在运行，会继续占用内存和模型；需要的话先运行 scripts\wenyuan.cmd -Stop" }
 
 $uv = Find-Exe "uv" @("$env:USERPROFILE\.local\bin\uv.exe", "$env:USERPROFILE\.cargo\bin\uv.exe")
 
 # 1. Docker
 if (-not (Test-Docker)) {
+    Assert-Ram 5 " Docker（Milvus、MySQL、Redis）"
     Write-Host "启动 Docker Desktop…"
     $desktop = @("$env:ProgramFiles\Docker\Docker\Docker Desktop.exe",
                  "$env:LOCALAPPDATA\Programs\DockerDesktop\Docker Desktop.exe") | Where-Object { Test-Path $_ } |
@@ -69,6 +93,7 @@ Invoke-Compose "up -d"
 
 # 2. GPU 模型服务
 if (-not (Test-Port $ModelPort)) {
+    Assert-Ram 3 "模型服务（bge-m3）"
     Write-Host "启动模型服务（$ModelPort）…"
     Start-Process -ErrorAction Stop $uv -ArgumentList "run", "uvicorn", "server:app", "--host", "127.0.0.1", "--port", $ModelPort `
         -WorkingDirectory (Join-Path $root "model_server") -WindowStyle Hidden `
@@ -105,5 +130,6 @@ Wait-Until {
     catch { $false }
 } 180 "API"
 
-Write-Host "文渊已就绪：http://127.0.0.1:$ApiPort/ui"
+Write-Host "文渊已就绪：http://127.0.0.1:$ApiPort/ui（可用内存 $(Get-FreeRamGB) GB）"
+Write-Host "第一次提问时会加载 Qwen3，内存会明显上升；不用时运行 scripts\wenyuan.cmd -Stop 释放"
 if (-not $NoBrowser) { Start-Process "http://127.0.0.1:$ApiPort/ui" }

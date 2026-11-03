@@ -1,4 +1,12 @@
 {
-  "retrieval": "experiments/W2-E6-hybrid-understand-rawdense-20261101-220822.json",
-  "multiturn": "experiments/W4-E6mt-followup-history-20261102-101948.json"
+  "course": {"run": "experiments/M2-cs50gen-U-raw-20261103-082600.json",
+             "metrics": ["ev_hit@5", "ev_recall@10", "ev_mrr"]},
+  "notes": {"run": "experiments/M2-notes-U-raw-20261103-082655.json",
+            "metrics": ["ev_hit@5", "ev_recall@10", "ev_mrr"]},
+  "cs50own": {"run": "experiments/M2-cs50own-U-raw-20261103-082733.json",
+              "metrics": ["ev_hit@5", "hit@5", "mrr"]},
+  "v07-retrieval": {"run": "experiments/W2-E6-hybrid-understand-rawdense-20261101-220822.json",
+                    "metrics": ["recall@5", "recall@10", "mrr"]},
+  "v07-multiturn": {"run": "experiments/W4-E6mt-followup-history-20261102-101948.json",
+                    "metrics": ["recall@5", "recall@10", "mrr"]}
 }

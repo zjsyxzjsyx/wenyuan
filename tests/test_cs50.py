@@ -58,3 +58,16 @@ def test_transcripts_lose_timestamp_lines_and_the_timestamp_index():
 def test_a_file_without_front_matter_is_rejected():
     with pytest.raises(ValueError):
         load("# no front matter\n")
+
+
+def test_each_section_keeps_its_link_paired_in_order():
+    from types import SimpleNamespace
+
+    from app.ingest.cs50 import heading_links, section_links
+    raw = TRANSCRIPT + "\n## [Overview](https://youtu.be/jZzyERW7h1A?t=900)\n\nAgain.\n"
+    links = heading_links(raw)
+    assert links[1:] == [("Overview", "https://youtu.be/jZzyERW7h1A?t=61"), ("Overview", "https://youtu.be/jZzyERW7h1A?t=900")]
+    sections = [SimpleNamespace(idx=i, heading=h) for i, h in enumerate(["Week 3 · x", "Lecture 3: Week 3 - Algorithms",
+                                                                         "Overview", "Overview", "No link here"])]
+    assert section_links(sections, links) == {1: "https://youtu.be/jZzyERW7h1A", 2: "https://youtu.be/jZzyERW7h1A?t=61",
+                                              3: "https://youtu.be/jZzyERW7h1A?t=900"}

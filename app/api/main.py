@@ -4,7 +4,8 @@ POST /v1/search  sources for a question, no generation (what a tutor agent quote
 POST /v1/ask     cited answer; server-sent events by default ("stream": false for one JSON body)
 GET  /v1/me, GET /v1/courses (also /v1/libraries)   the caller and the courses they are in
 POST /v1/courses, POST /v1/courses/join                  create a course (as its teacher), join with a code
-POST /v1/courses/{id}/invites; GET|POST /v1/courses/{id}/materials, DELETE .../materials/{doc_id}   teachers
+POST /v1/courses/{id}/invites; GET|POST /v1/courses/{id}/materials, DELETE .../materials/{doc_id};
+GET  /v1/courses/{id}/questions?days=   teachers: materials, invites, what the class keeps asking
 POST /v1/notes, GET /v1/notes, DELETE /v1/notes/{doc_id}   the caller's private notes
 GET  /v1/outline?library=&topic=, GET /v1/sections/{doc_id}:{idx}   for planning and teaching
 GET  /v1/traces, /v1/traces/{id}   the caller's own request traces
@@ -33,6 +34,7 @@ from pydantic import BaseModel, Field
 from redis.asyncio import BlockingConnectionPool, Redis
 
 from app import courses as courses_
+from app import insights
 from app.api import dashboard, sse, workbench
 from app.api.auth import Caller, current_user
 from app.cache.answers import AnswerCache, private_scope
@@ -161,6 +163,18 @@ def teaching(course_id: str, mine: list[dict]) -> dict:
     return found
 
 
+async def file_question(user: Caller, courses: list[dict], question: str) -> None:
+    """For the teacher's summary; best effort, so a failed write never fails the question."""
+    def run():
+        with _db() as db:
+            insights.file_question(db, user.id, courses, question)
+    try:
+        await run_in_threadpool(run)
+    except Exception as exc:          # noqa: BLE001 - logged in the trace, the answer goes on
+        with spans.span("http", "file_question", user_id=user.id) as s:
+            s.set(error=type(exc).__name__)
+
+
 def _history(req: QueryRequest) -> list[dict]:
     return [t.model_dump() for t in req.history]
 
@@ -268,6 +282,7 @@ async def search(req: QueryRequest, user: Caller = Depends(rate_limited("search"
 async def ask(req: QueryRequest, user: Caller = Depends(rate_limited("ask")), g: Guards = Depends(guards),
               c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
     scope = course_scope(req.libraries, mine)
+    await file_question(user, [c for c in mine if c["id"] in scope], req.question)
     ticket = g.gate.ticket(user.id)
 
     def run(emit):
@@ -462,3 +477,18 @@ async def delete_material(course_id: str, doc_id: str, user: Caller = Depends(cu
         raise HTTPException(404, {"type": "not_found"})
     await g.cache.invalidate(course_id)
     return {"deleted": doc_id}
+
+
+@app.get("/v1/courses/{course_id}/questions")
+async def frequent_questions(course_id: str, days: int = 14, user: Caller = Depends(current_user),
+                             c: dict = Depends(clients), mine: list[dict] = Depends(my_courses)):
+    """What the class keeps asking (app.insights): groups of similar questions that at least two
+    students asked, without who asked them."""
+    teaching(course_id, mine)
+
+    def run():
+        with spans.span("http", "GET /v1/courses/questions", user_id=user.id, course=course_id) as s, _db() as db:
+            groups = insights.frequent_questions(db, c["models"], course_id, days=min(max(days, 1), 90))
+            s.set(groups=len(groups))
+            return groups
+    return await run_in_threadpool(run)

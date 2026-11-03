@@ -62,6 +62,18 @@ class Invite(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
+class Question(Base):
+    """A student's question, filed under each course it was asked in, for the teacher's summary of what the
+    class asks (app.insights). Only the text and time are kept, never the answer."""
+    __tablename__ = "questions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    course_id: Mapped[str] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    text: Mapped[str] = mapped_column(Text)
+    asked_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), index=True)
+
+
 class Document(Base):
     __tablename__ = "documents"
 
@@ -86,6 +98,9 @@ class Section(Base):
     heading: Mapped[str] = mapped_column(String(512))
     path: Mapped[list] = mapped_column(JSON)
     text: Mapped[str] = mapped_column(LongText)
+    # Where this section lives in the original, when the source says so: an anchor on a course's
+    # notes page, or a timestamp in a lecture video. Citations prefer it to the page URL.
+    url: Mapped[str | None] = mapped_column(String(768), nullable=True)
 
 
 @lru_cache
@@ -105,3 +120,6 @@ def _add_missing_columns() -> None:
         with engine().begin() as conn:
             conn.execute(text("ALTER TABLE documents ADD COLUMN owner_id INT NULL"))
             conn.execute(text("CREATE INDEX ix_documents_owner_id ON documents (owner_id)"))
+    if "url" not in {c["name"] for c in inspect(engine()).get_columns("sections")}:
+        with engine().begin() as conn:
+            conn.execute(text("ALTER TABLE sections ADD COLUMN url VARCHAR(768) NULL"))

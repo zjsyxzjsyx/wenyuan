@@ -28,6 +28,7 @@ class Source:
     heading_path: str
     text: str
     tokens: int
+    section_id: str = ""     # "<doc_id>:<idx>" of the section the text comes from (GET /v1/sections/{id})
 
 
 def _subtree_text(sections: dict[int, Section], children: dict[int, list[int]], root: int) -> str:
@@ -78,11 +79,16 @@ def parent_blocks(db: DBSession, hits: list[dict], tokenizer: Tokenizer,
     children = {doc: _children(sections) for doc, sections in by_doc.items()}
     blocks, seen = [], set()
     for hit in hits:
-        key, text = expand(tokenizer, hit, by_doc.get(hit["doc_id"], {}), children.get(hit["doc_id"], {}),
-                           max_block_tokens)
+        sections = by_doc.get(hit["doc_id"], {})
+        key, text = expand(tokenizer, hit, sections, children.get(hit["doc_id"], {}), max_block_tokens)
         if key not in seen:
             seen.add(key)
-            blocks.append((hit, titles.get(hit["doc_id"], hit["url"]), text))
+            # The section the block stands for: its root, or the hit's own section when only the chunk fit.
+            idx = key[1] if key[1] != "chunk" else hit.get("section_index")
+            section = sections.get(idx)
+            blocks.append(({**hit, "url": (section.url if section is not None and section.url else hit["url"]),
+                            "section_id": f"{hit['doc_id']}:{idx}" if section is not None else ""},
+                           titles.get(hit["doc_id"], hit["url"]), text))
     return blocks
 
 
@@ -96,6 +102,7 @@ def build_sources(tokenizer: Tokenizer, blocks: list[tuple[dict, str, str]], bud
                 continue
             tokens = tokens[:budget]
             text = tokenizer.decode(tokens)
-        sources.append(Source(f"S{len(sources) + 1}", hit["url"], title, hit.get("heading_path", ""), text, len(tokens)))
+        sources.append(Source(f"S{len(sources) + 1}", hit["url"], title, hit.get("heading_path", ""), text, len(tokens),
+                              hit.get("section_id", "")))
         used += len(tokens)
     return sources

@@ -32,6 +32,7 @@ COURSES = [{"id": "redis", "name": "Redis course", "role": "student"},
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setattr(main, "_courses", lambda user_id: COURSES)
+    monkeypatch.setattr(main.insights, "file_question", lambda db, user_id, courses, text: None)
     monkeypatch.setattr(chain, "ask", fake_ask)
     monkeypatch.setattr(chain, "search", lambda q, h=None, l=None, on_event=chain._noop, **_:
                         chain.SearchResult(U, SRC, [], "t2"))
@@ -262,3 +263,24 @@ def test_joining_with_a_bad_code_is_a_clear_error(client, monkeypatch):
     monkeypatch.setattr(courses_, "join", refuse)
     r = client.post("/v1/courses/join", json={"code": "join-nope"})
     assert r.status_code == 422 and r.json()["detail"]["type"] == "bad_invite"
+
+
+def test_questions_are_filed_per_course_and_only_teachers_see_the_summary(client, monkeypatch):
+    filed = []
+    monkeypatch.setattr(main.insights, "file_question", lambda db, uid, courses, text: filed.append(([c["id"] for c in courses], text)))
+    monkeypatch.setattr(main, "_db", lambda: __import__("contextlib").nullcontext())
+    client.post("/v1/ask", json={"question": "malloc 失败怎么办", "libraries": ["redis"], "stream": False})
+    assert filed == [(["redis"], "malloc 失败怎么办")]
+    monkeypatch.setattr(main.insights, "frequent_questions", lambda db, models, cid, days: [{"question": "q", "asked": 3}])
+    monkeypatch.setattr(main.app.state, "clients", {"models": None}, raising=False)
+    assert client.get("/v1/courses/cs50/questions").json() == [{"question": "q", "asked": 3}]     # teacher of cs50
+    assert client.get("/v1/courses/redis/questions").status_code == 403                          # a student there
+
+
+def test_a_failed_question_log_never_fails_the_answer(client, monkeypatch):
+    def broken(db, uid, courses, text):
+        raise RuntimeError("database down")
+    monkeypatch.setattr(main.insights, "file_question", broken)
+    monkeypatch.setattr(main, "_db", lambda: __import__("contextlib").nullcontext())
+    r = client.post("/v1/ask", json={"question": "q", "stream": False})
+    assert r.status_code == 200 and r.json()["answer"]["found"]

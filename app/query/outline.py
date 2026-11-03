@@ -106,5 +106,6 @@ def get_section(db: DBSession, section_id: str, owner_id: int | None = None, max
         return None
     section = tree[int(idx)]
     text = _subtree_text(tree, _children(tree), section.idx)
-    return {"section_id": section_id, "title": doc.title, "url": doc.url, "heading_path": " > ".join(section.path),
+    return {"section_id": section_id, "title": doc.title, "url": section.url or doc.url,
+            "heading_path": " > ".join(section.path),
             "text": text[:max_chars], "truncated": len(text) > max_chars}

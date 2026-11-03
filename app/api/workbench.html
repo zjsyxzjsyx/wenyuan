@@ -65,6 +65,11 @@
   .tree .sec { cursor: pointer; padding: 1px 0; }
   .tree .sec:hover { color: var(--accent); }
   .tree .sum { color: var(--muted); font-size: 12px; margin: 0 0 4px; }
+  /* a cited section opened in place: notes and uploaded course files have no page on the web */
+  #viewer { position: fixed; inset: 6vh 8vw; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.25); padding: 16px 18px; z-index: 5; display: flex; flex-direction: column; }
+  #viewer[hidden] { display: none; }
+  #viewer pre.section { flex: 1; max-height: none; }
   pre.section { white-space: pre-wrap; font: 13px/1.55 ui-monospace, Consolas, "Microsoft YaHei", monospace;
                 max-height: 60vh; overflow: auto; background: var(--bg); padding: 10px; border-radius: 8px; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
@@ -194,6 +199,12 @@
     </div>
   </section>
 </main>
+
+<div id="viewer" hidden role="dialog" aria-label="引用原文">
+  <div class="row"><b id="viewer-title"></b><span class="spacer"></span><span id="viewer-link"></span>
+    <button class="btn" id="viewer-close">关闭</button></div>
+  <pre class="section" id="viewer-text"></pre>
+</div>
 
 <div id="composer" hidden>
   <div class="inner">
@@ -342,11 +353,28 @@ function renderCourses() {
         <input type="file" accept=".md,.markdown" multiple data-in="files">
         <button class="btn primary" data-act="upload">上传课程资料</button><span class="muted" data-out="upload"></span></div>
       <details style="margin-top:8px"><summary data-out="count">课程资料</summary>
-        <table><tbody data-out="materials"><tr><td class="muted">加载中…</td></tr></tbody></table></details>`}
+        <table><tbody data-out="materials"><tr><td class="muted">加载中…</td></tr></tbody></table></details>
+      <details style="margin-top:8px" data-questions><summary>全班高频问题（最近 14 天）</summary>
+        <p class="muted">只显示至少两位学生问过的问题，看不到是谁问的。</p>
+        <div data-out="questions"></div></details>`}
     </div>`).join("") : `<p class="muted">还没有加入任何课程。</p>`;
   for (const c of courses) if (c.role === "teacher") loadMaterials(c.id);
 }
 const part = (id, name) => document.querySelector(`[data-course="${CSS.escape(id)}"] [data-out="${name}"]`);
+// Loaded when opened: grouping embeds the questions, which costs the model server some work.
+$("course-list").addEventListener("toggle", async e => {
+  const box = e.target.closest("details[data-questions]");
+  if (!box || !box.open) return;
+  const id = box.closest("[data-course]").dataset.course, out = part(id, "questions");
+  out.innerHTML = `<p class="muted">正在汇总…</p>`;
+  try {
+    const groups = await (await api(`/v1/courses/${encodeURIComponent(id)}/questions?days=14`)).json();
+    out.innerHTML = groups.length ? `<table>${groups.map(g => `<tr><td>${esc(g.question)}${g.also.length
+        ? `<div class="muted">${g.also.map(esc).join("；")}</div>` : ""}</td>
+      <td class="muted">${g.students} 位学生 · ${g.asked} 次</td></tr>`).join("")}</table>`
+      : `<p class="muted">最近还没有两位以上学生问过的相似问题。</p>`;
+  } catch (err) { out.innerHTML = `<p class="err">${esc(err.message)}</p>`; }
+}, true);
 async function loadMaterials(id) {
   try {
     const docs = await (await api(`/v1/courses/${encodeURIComponent(id)}/materials`)).json();
@@ -435,17 +463,38 @@ function bubble(cls, html) {
   div.scrollIntoView({block: "end", behavior: "smooth"});
   return div;
 }
+// Where a citation leads: the exact place on the web (a notes anchor, a second of the lecture video)
+// when the original has one, else the cited section opened here (notes, uploaded course files).
+function citeLink(c, label, cls = "") {
+  const title = `${c.title} › ${c.heading_path}`;
+  if (/^https?:/.test(c.url || "")) return `<a class="${cls}" href="${esc(c.url)}" target="_blank" title="${esc(title)}">${label}</a>`;
+  if (c.section_id) return `<a class="${cls}" href="#" data-section="${esc(c.section_id)}" title="${esc(title)}">${label}</a>`;
+  return label;
+}
 function linkCitations(text, citations) {
   const by = Object.fromEntries((citations || []).map(c => [c.sid, c]));
-  return esc(text).replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\[(S\d+)\]/g, (m, sid) => by[sid]
-    ? `<a class="cite" href="${esc(by[sid].url)}" target="_blank" title="${esc(by[sid].title)} › ${esc(by[sid].heading_path)}">[${sid}]</a>` : m);
+  return esc(text).replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\[(S\d+)\]/g,
+    (m, sid) => by[sid] ? citeLink(by[sid], `[${sid}]`, "cite") : m);
 }
 function sourceList(sources) {
-  return sources.map(s => {
-    const link = s.private ? esc(s.title) : `<a href="${esc(s.url)}" target="_blank">${esc(s.title)}</a>`;
-    return `<div class="src">[${esc(s.sid)}] ${link} › ${esc(s.heading_path)}${s.private ? '<span class="badge">我的笔记</span>' : ""}</div>`;
-  }).join("");
+  return sources.map(s => `<div class="src">[${esc(s.sid)}] ${citeLink(s, esc(s.title))} › ${esc(s.heading_path)}${
+    s.private ? '<span class="badge">我的笔记</span>' : ""}</div>`).join("");
 }
+async function openSection(id) {
+  $("viewer").hidden = false; $("viewer-title").textContent = "正在加载…"; $("viewer-text").textContent = ""; $("viewer-link").innerHTML = "";
+  try {
+    const s = await (await api(`/v1/sections/${encodeURIComponent(id)}`)).json();
+    $("viewer-title").textContent = s.heading_path;
+    $("viewer-text").textContent = s.text + (s.truncated ? "\n\n……（太长，只显示了开头）" : "");
+    if (/^https?:/.test(s.url)) $("viewer-link").innerHTML = `<a href="${esc(s.url)}" target="_blank" class="muted">原文 ↗</a>`;
+  } catch (e) { $("viewer-title").textContent = e.message; }
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("a[data-section]");
+  if (a) { e.preventDefault(); openSection(a.dataset.section); }
+});
+$("viewer-close").onclick = () => { $("viewer").hidden = true; };
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("viewer").hidden = true; });
 
 async function ask() {
   const question = $("q").value.trim();

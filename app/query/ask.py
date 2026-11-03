@@ -84,7 +84,7 @@ def is_private(s: Source) -> bool:
 def source_view(s: Source) -> dict:
     """What a client sees of a source (the full text stays server-side for `ask`)."""
     return {"sid": s.sid, "url": s.url, "title": s.title, "heading_path": s.heading_path, "tokens": s.tokens,
-            "private": is_private(s)}
+            "private": is_private(s), "section_id": s.section_id}
 
 
 def _noop(name: str, data: dict) -> None:

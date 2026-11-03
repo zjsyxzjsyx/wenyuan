@@ -109,3 +109,30 @@ def test_answer_with_no_supported_claim_becomes_refusal_and_skipped_claims_are_k
     assert apply_verification(Answer(True, "瞎编的 [S1]。", [{"sid": "S1"}]), v).text == REFUSAL
     kept = verify(ScriptedLLM({"claims": []}), "没被判的一句 [S1]。", SOURCES)    # checker said nothing
     assert kept.removed == [] and kept.counts["supported"] == 1
+
+
+def test_a_source_links_to_its_own_section_when_the_original_says_where_it_is():
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import Session
+
+    from app.db.models import Base, Document, Section
+    from app.retrieval.context import parent_blocks
+    engine = create_engine("sqlite://")
+    Base.metadata.create_all(engine)
+    with Session(engine) as db:
+        db.add(Document(id="d", library="cs50", url="https://cs50/notes/3/", title="Lecture 3", content_hash="h"))
+        db.add_all([Section(doc_id="d", idx=0, parent_idx=None, level=1, heading="Lecture 3", path=["Lecture 3"],
+                            text="p" * 30, url="https://cs50/notes/3/"),
+                    Section(doc_id="d", idx=1, parent_idx=0, level=2, heading="Binary Search", path=["Lecture 3", "Binary Search"],
+                            text="b" * 20, url="https://cs50/notes/3/#binary-search"),
+                    Section(doc_id="d", idx=2, parent_idx=0, level=2, heading="Notes", path=["Lecture 3", "Notes"],
+                            text="n" * 50)])
+        db.commit()
+        hit = lambda sec, cid: {"doc_id": "d", "url": "https://cs50/notes/3/", "parent_index": 0, "section_index": sec,
+                                "chunk_id": cid, "text": "chunk", "heading_path": "Lecture 3"}
+        blocks = parent_blocks(db, [hit(1, "c1"), hit(2, "c2")], CharTokenizer(), max_block_tokens=40)
+    (first, _, text), (second, _, _) = blocks
+    assert text == "b" * 20 and first["url"].endswith("#binary-search") and first["section_id"] == "d:1"
+    assert second["url"] == "https://cs50/notes/3/" and second["section_id"] == "d:2"   # no anchor: the page
+    src = build_sources(CharTokenizer(), blocks)[0]
+    assert (src.url, src.section_id) == ("https://cs50/notes/3/#binary-search", "d:1")

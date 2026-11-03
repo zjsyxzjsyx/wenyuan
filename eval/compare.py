@@ -32,9 +32,13 @@ def compare(path_a: Path, path_b: Path, metrics=METRICS, n: int = 10000) -> dict
     shared = sorted(qa.keys() & qb.keys())
     out = {}
     for m in metrics:
-        delta, lo, hi = paired_bootstrap([qa[i][m] for i in shared], [qb[i][m] for i in shared], n=n)
-        out[m] = {"a": round(mean(qa[i][m] for i in shared), 4), "b": round(mean(qb[i][m] for i in shared), 4),
-                  "delta": round(delta, 4), "ci95": [round(lo, 4), round(hi, 4)], "significant": lo > 0 or hi < 0}
+        ids = [i for i in shared if m in qa[i] and m in qb[i]]     # e.g. evidence scores exist only where gold text does
+        if not ids:
+            continue
+        delta, lo, hi = paired_bootstrap([qa[i][m] for i in ids], [qb[i][m] for i in ids], n=n)
+        out[m] = {"a": round(mean(qa[i][m] for i in ids), 4), "b": round(mean(qb[i][m] for i in ids), 4),
+                  "delta": round(delta, 4), "ci95": [round(lo, 4), round(hi, 4)], "significant": lo > 0 or hi < 0,
+                  "n": len(ids)}
     return {"n": len(shared), "a": a["exp"], "b": b["exp"], "metrics": out}
 
 

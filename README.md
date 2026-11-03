@@ -28,7 +28,8 @@
 | Redis：按用户限流、GPU 闸门（公平排队 + 准入控制）、问答缓存 + 防击穿 | ✅ v0.7 压测验证，待用课程数据重测 |
 | 网页工作台（问答、我的笔记、学习目录、只看自己请求的 trace 看板）、MCP 服务（7 个工具） | ✅ |
 | 课程与角色：任何人可以开课并成为老师；老师上传资料、发邀请码（只存哈希），学生凭邀请码加入；检索只在自己的课程内，访问没加入的课程一律 403 | ✅ 工作台「课程」页、`python -m app.courses` |
-| 老师端：全班高频问题汇总（只看汇总，不看个人笔记） | ⏳ |
+| 老师端：全班高频问题汇总（相似问题归为一类；至少两位学生问过才显示，不显示是谁问的） | ✅ 代码与单元测试；待在真实服务上验证 |
+| 引用直达原处：CS50 讲义跳到段落锚点、讲课转写跳到视频时刻；笔记和老师上传的资料在页面里打开原文 | ✅ 同上 |
 
 ## 评测（v2）
 
@@ -134,7 +135,7 @@ Celery：课程资料入库（提取、切块、向量化）       检索范围 
 
 ### 网页工作台（不用命令行）
 
-Windows 上配好 `.env`、拉好 `qwen3:8b` 并完成入库后，双击 `scripts\wenyuan.cmd`：它会依次确认 Docker Desktop、`docker compose`、Milvus 就绪、GPU 模型服务（8001）、专用 Ollama（11435，并行 1、8k 上下文：Ollama 把上下文长度平分给并行槽位，并行 2 时每个请求只有 4096 token）和 API（8000），已在运行的部分直接跳过，然后在浏览器打开 `http://127.0.0.1:8000/ui`。`scripts\wenyuan.cmd -Stop` 全部停掉。
+Windows 上配好 `.env`、拉好 `qwen3:8b` 并完成入库后，双击 `scripts\wenyuan.cmd`：它会依次确认 Docker Desktop、`docker compose`、Milvus 就绪、GPU 模型服务（8001）、专用 Ollama（11435，并行 1、8k 上下文：Ollama 把上下文长度平分给并行槽位，并行 2 时每个请求只有 4096 token）和 API（8000），已在运行的部分直接跳过，然后在浏览器打开 `http://127.0.0.1:8000/ui`。启动 Docker 和模型服务前会先检查可用内存，不够就停下并提示（`-Force` 跳过）。`scripts\wenyuan.cmd -Stop` 全部停掉，包括残留的评测和入库进程。
 
 - **账号**：第一次打开时起个名字就会建号，API key 只存在这个浏览器里；可以记住多个账号，在右上角切换。只有在运行文渊的这台电脑上才能这样建号，别的机器需要粘贴管理员给的 key。
 - **问答**：每一步（理解问题 → 查找资料 → 生成并校验答案）实时显示；可以连续追问；`[S1]` 链接到原资料的对应位置；可以选择是否检索自己的笔记。
@@ -158,6 +159,7 @@ cd model_server && uv sync && uv run uvicorn server:app --port 8001
 # 课程资料：下载 CS50 数据集（CC BY-NC-SA 4.0，放在 data/ 下，不进仓库）并入库
 uvx --from huggingface_hub hf download dev-jonathanb/cs50-educational-rag --repo-type dataset --local-dir data/raw/cs50
 uv run python -m app.ingest.cs50
+uv run python -m app.ingest.cs50 --links-only           # 只补小节链接（锚点、视频时刻），只用 MySQL
 
 # 课程：开课（指定老师）、生成邀请码（只显示一次）；学生也可以在工作台里用邀请码加入
 uv run python -m app.api.auth create teacher           # 打印一次 API key
@@ -175,7 +177,8 @@ uv run python -m eval.build_notes_eval --user alice    # 笔记题
 uv run python -m eval.run --exp demo --collection chunks_v2 --mode hybrid --dataset data/eval/cs50_gen_v1.jsonl
 uv run python -m eval.run --exp demo-notes --collection chunks_v2 --mode hybrid --dataset data/eval/notes_alice_v1.jsonl --owner alice
 uv run python -m eval.judge_retrieval experiments/<一轮结果>.json   # 让独立裁判判断前 5 页是否够用
-uv run python -m eval.gate experiments/<新一轮>.json               # 发版前回归门禁：显著变差则退出码 1
+uv run python -m eval.gate experiments/<新一轮>.json               # 发版前回归门禁：按评测集自动选基线，显著变差则退出码 1
+uv run python -m app.maintenance cleanup                         # 列出 v0.7 遗留和测试数据；加 --yes 才真正删除
 
 # 问答（需要 Ollama：ollama pull qwen3:8b；并行数与 GPU 闸门槽位保持一致，都是 1）
 OLLAMA_NUM_PARALLEL=1 OLLAMA_CONTEXT_LENGTH=8192 ollama serve
