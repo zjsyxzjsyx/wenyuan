@@ -3,7 +3,8 @@
   scripts\wenyuan.cmd          启动（已在运行的部分会跳过）
   scripts\wenyuan.cmd -Stop    停止 API、模型服务和专用 Ollama，并停掉 Docker 容器
 依次确保：Docker Desktop -> docker compose（Milvus、MySQL、Redis）-> GPU 模型服务（8001）
--> 专用 Ollama（11435，并行 2、8k 上下文，和 GPU 闸门的 2 个槽位一致）-> API（8000）。
+-> 专用 Ollama（11435，并行 1、8k 上下文，和 GPU 闸门的 1 个槽位一致；Ollama 把上下文长度平分给各并行槽位，
+并行 2 时每个请求只有 4096 token，长 prompt 会被截掉开头）-> API（8000）。
 日志在 .cache\ 和 model_server\ 下。
 #>
 param([switch]$Stop, [switch]$NoBrowser, [int]$ApiPort = 8000, [int]$ModelPort = 8001, [int]$OllamaPort = 11435)
@@ -78,7 +79,7 @@ if (-not (Test-Port $ModelPort)) {
 if (-not (Test-Port $OllamaPort)) {
     Write-Host "启动 Ollama（$OllamaPort）…"
     $ollama = Find-Exe "ollama" @("$env:LOCALAPPDATA\Programs\Ollama\ollama.exe")
-    $env:OLLAMA_HOST = "127.0.0.1:$OllamaPort"; $env:OLLAMA_NUM_PARALLEL = "2"; $env:OLLAMA_CONTEXT_LENGTH = "8192"
+    $env:OLLAMA_HOST = "127.0.0.1:$OllamaPort"; $env:OLLAMA_NUM_PARALLEL = "1"; $env:OLLAMA_CONTEXT_LENGTH = "8192"
     $env:OLLAMA_FLASH_ATTENTION = "1"; $env:OLLAMA_KV_CACHE_TYPE = "q8_0"; $env:OLLAMA_KEEP_ALIVE = "30m"
     Start-Process -ErrorAction Stop $ollama -ArgumentList "serve" -WindowStyle Hidden `
         -RedirectStandardOutput (Join-Path $logs "ollama-serve.out.log") -RedirectStandardError (Join-Path $logs "ollama-serve.log")

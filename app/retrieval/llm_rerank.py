@@ -13,27 +13,47 @@ from __future__ import annotations
 from typing import Any
 
 from app.models.llm import LLM
+from app.tokenizer import TiktokenTokenizer
 
-PROMPT = """You are ranking documentation pages for a developer's question about {library}.
+# The question comes first and again last: if a server ever cuts a long prompt, it drops the
+# beginning (Ollama keeps the last tokens), and a model that never sees the question ranks blind.
+PROMPT = """You are ranking passages (course materials, documentation or a learner's own notes) for a
+question about {library}.
 
 Question:
 {question}
 
-Candidate pages, each as [id] page and section, then an excerpt:
+Candidates, each as [id] where it is, then an excerpt:
 {pages}
 
-Which pages would most help someone write the correct answer? The solution may rely on a
+Which candidates would most help someone write the correct answer? The solution may rely on a
 feature or command the question does not mention, so think about what the fix actually is
-before matching words. Return one JSON object: {{"ranking": [ids, most useful first]}} with
-the {keep} most useful ids."""
+before matching words.
+
+Question (again): {question}
+
+Return one JSON object: {{"ranking": [ids, most useful first]}} with the {keep} most useful ids."""
 
 
-def _pages(hits: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
-    """Hits grouped by page, pages in the order of their best hit."""
+def _pages(hits: list[dict[str, Any]], unit: str = "page") -> list[list[dict[str, Any]]]:
+    """Hits grouped by page, or by section ("section": the page title, its top heading and the one
+    below, so a course lecture of over 100,000 characters becomes its subsections; grouping by the
+    top heading alone did nothing, since every CS50 file has a single H1), in order of their best hit."""
     groups: dict[str, list[dict[str, Any]]] = {}
     for hit in hits:
-        groups.setdefault(hit["url"], []).append(hit)
+        key = hit["url"] if unit == "page" else f"{hit['url']}#{' > '.join(hit['heading_path'].split(' > ')[:3])}"
+        groups.setdefault(key, []).append(hit)
     return list(groups.values())
+
+
+_TOKENIZER: TiktokenTokenizer | None = None
+
+
+def _tokenizer() -> TiktokenTokenizer:
+    global _TOKENIZER
+    if _TOKENIZER is None:
+        _TOKENIZER = TiktokenTokenizer()
+    return _TOKENIZER
 
 
 def _describe(group: list[dict[str, Any]], excerpt_chars: int, second_chars: int, more_headings: int) -> str:
@@ -52,21 +72,29 @@ def _describe(group: list[dict[str, Any]], excerpt_chars: int, second_chars: int
 
 def rerank_pages(llm: LLM, question: str, hits: list[dict[str, Any]], library: str = "", top_pages: int = 20,
                  keep: int = 10, excerpt_chars: int = 300, second_chars: int = 150, more_headings: int = 3,
-                 max_chars: int = 24000) -> list[dict[str, Any]]:
-    """`hits` reordered so the pages the LLM ranks come first; pages it leaves out keep their order after them.
+                 max_tokens: int = 5000, unit: str = "page") -> list[dict[str, Any]]:
+    """`hits` reordered so the pages (or sections, `unit="section"`) the LLM ranks come first;
+    the ones it leaves out keep their order after them.
 
-    `max_chars` keeps the prompt inside a local model's context (8k tokens, about 4 characters
-    each for English docs): excerpts shrink until the listing fits."""
-    pages = _pages(hits)
+    `max_tokens` keeps the candidate listing inside a local model's context (8,192 tokens, which
+    the instructions, the question twice and the reply share). It is counted in tokens, not
+    characters: Chinese notes run 1-1.5 characters per token, so a character budget meant for
+    English let prompts reach three times the context (M2). Excerpts shrink first; if the
+    listing still does not fit, the last candidates are dropped."""
+    pages = _pages(hits, unit)
     head = pages[:top_pages]
     if len(head) < 2:
         return hits
+    tokens = _tokenizer()
     while True:
         listing = "\n\n".join(f"[{i + 1}] {_describe(group, excerpt_chars, second_chars, more_headings)}"
                               for i, group in enumerate(head))
-        if len(listing) <= max_chars or excerpt_chars <= 80:
+        if len(tokens.encode(listing)) <= max_tokens or len(head) <= 2:
             break
-        excerpt_chars, second_chars = int(excerpt_chars * 0.75), int(second_chars * 0.75)
+        if excerpt_chars > 80:
+            excerpt_chars, second_chars = int(excerpt_chars * 0.75), int(second_chars * 0.75)
+        else:
+            head = head[:-1]
     raw = llm.chat_json([{"role": "user", "content": PROMPT.format(
         library=library or "a software library", question=question, pages=listing, keep=min(keep, len(head)))}])
     order: list[int] = []
@@ -77,5 +105,5 @@ def rerank_pages(llm: LLM, question: str, hits: list[dict[str, Any]], library: s
             continue
         if 0 <= i < len(head) and i not in order:
             order.append(i)
-    ranked = [head[i] for i in order] + [g for i, g in enumerate(head) if i not in order] + pages[top_pages:]
+    ranked = [head[i] for i in order] + [g for i, g in enumerate(head) if i not in order] + pages[len(head):]
     return [hit for group in ranked for hit in group]

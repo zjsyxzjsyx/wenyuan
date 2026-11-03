@@ -30,9 +30,11 @@ class Settings(BaseSettings):
     # GPU gate: concurrent query requests, per-user cap, and how long a request may queue before
     # it gets a fast "busy" instead of a slow timeout. Set slots from measured capacity, not from
     # the LLM server's config: on a 16 GB card shared with the embedding model, 4 concurrent
-    # generations ran out of GPU memory and 2 did not (W3 load test).
-    gate_slots: int = 2
-    gate_per_user: int = 2
+    # generations ran out of GPU memory and 2 did not (W3 load test). Then 1: Ollama splits
+    # OLLAMA_CONTEXT_LENGTH across its parallel slots, and with 2 slots each request had 4,096
+    # tokens, so long prompts silently lost their beginning (M2). Keep equal to OLLAMA_NUM_PARALLEL.
+    gate_slots: int = 1
+    gate_per_user: int = 1
     gate_max_wait_s: float = 20
     # Per-user token bucket for /v1/search and /v1/ask.
     rate_burst: int = 10

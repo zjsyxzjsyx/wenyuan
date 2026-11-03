@@ -13,7 +13,7 @@ import hashlib
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from statistics import mean
 
@@ -31,6 +31,7 @@ from app.retrieval.llm_rerank import rerank_pages
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
+from eval.memory_guard import wait_for_memory
 from eval.metrics import evidence_ranks, hit_at, mrr, ndcg_at, percentile, recall_at, unique_in_order
 
 DATASET = Path("eval/datasets/so_v1.jsonl")
@@ -53,7 +54,9 @@ class Config:
     llm_rerank: int = 0                 # LLM reorders the first N pages (0: off)
     owner: str | None = None            # account whose notes are searched too (as a student's questions are)
     llm_rerank_plain: bool = False      # R1's page view: the best hit's first 400 characters only
+    llm_rerank_unit: str = "page"       # what the LLM ranks: "page" or "section" (top-level section of a page)
     hyde: str = ""                      # "dense" | "both": add an LLM-imagined answer passage to the query
+    hyde_scope: str = "all"             # "shared": HyDE on the course side only; notes are searched with the question
     generate_only: bool = False         # run (and cache) the query-side LLM calls, then stop
     understand: bool = False            # LLM query understanding before retrieval (E6)
     summaries: bool = False             # also search section summaries/questions, fuse by RRF (E5)
@@ -127,6 +130,7 @@ def hyde_passages(cfg: Config, rows: list[dict]) -> list[str]:
     llm = LLM()
     with spans.span("stage", "hyde_queries", n=len(rows), workers=cfg.llm_workers):
         def one(row: dict) -> str:
+            wait_for_memory()
             return contextvars.copy_context().run(
                 hypothetical_passage, llm, query_text(row, 1000, cfg.question_field), row["library"])
         with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
@@ -146,6 +150,7 @@ def prepare_queries(cfg: Config, rows: list[dict], models: ModelServer) -> tuple
             # Library routing is not scored here (each question's library is given), so offer only its own.
             # Each call runs in a copy of this context so its span stays under this stage in the trace.
             def one(row: dict):
+                wait_for_memory()
                 history = row.get("history") if cfg.history else None
                 return contextvars.copy_context().run(
                     understand, llm, query_text(row, cfg.body_chars, cfg.question_field), history,
@@ -240,6 +245,11 @@ def _run(cfg: Config) -> dict:
         if prepared is None:
             return {"exp": cfg.exp, "generated_only": len(rows)}
         vectors, texts = prepared
+    split = bool(cfg.hyde and cfg.hyde_scope == "shared" and owner_id is not None and not cfg.multihop)
+    if split:
+        # The HyDE passage is English: it helps a Chinese question find English course text and
+        # is noise for the student's Chinese notes (M2), so the two sides get different queries.
+        plain_vectors, plain_texts = prepare_queries(replace(cfg, hyde=""), rows, models)
     all_hits, latencies = [], []
     for i, (row, vector, text) in enumerate(zip(rows, vectors, texts)):
         with spans.span("retrieval", f"{cfg.mode}_search", question=row["id"]) as s:
@@ -249,7 +259,11 @@ def _run(cfg: Config) -> dict:
                 began -= elapsed / 1000
             else:
                 hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]],
-                                cfg.summaries, cfg.summary_weight, owner_id)
+                                cfg.summaries, cfg.summary_weight, None if split else owner_id)
+                if split:
+                    notes = retrieve(mc, cfg.collection, cfg.mode, plain_vectors[i], plain_texts[i], cfg.top_k, [],
+                                     owner_id=owner_id)
+                    hits = rrf([hits, notes], limit=cfg.top_k)
             if cfg.rerank_top:
                 with spans.span("retrieval", "rerank", n=min(cfg.rerank_top, len(hits))):
                     head = hits[:cfg.rerank_top]
@@ -263,11 +277,12 @@ def _run(cfg: Config) -> dict:
         llm = LLM()
 
         def reorder(row: dict, hits: list[dict]) -> list[dict]:
+            wait_for_memory()
             with spans.span("retrieval", "llm_rerank", question=row["id"], pages=cfg.llm_rerank):
                 began = time.perf_counter()
                 view = dict(excerpt_chars=400, second_chars=0, more_headings=0) if cfg.llm_rerank_plain else {}
                 out = rerank_pages(llm, query_text(row, 1000, cfg.question_field), hits, row["library"],
-                                   top_pages=cfg.llm_rerank, **view)
+                                   top_pages=cfg.llm_rerank, unit=cfg.llm_rerank_unit, **view)
                 rerank_ms.append((time.perf_counter() - began) * 1000)
                 return out
         with ThreadPoolExecutor(max_workers=cfg.llm_workers) as pool:
@@ -337,7 +352,10 @@ def main() -> None:
     parser.add_argument("--rerank-body-chars", type=int, default=500)
     parser.add_argument("--llm-rerank", type=int, default=0, metavar="N", help="LLM reorders the first N pages (0 = off)")
     parser.add_argument("--llm-rerank-plain", action="store_true", help="show the reranker only the best hit's opening")
+    parser.add_argument("--llm-rerank-unit", choices=("page", "section"), default="page")
     parser.add_argument("--hyde", choices=("dense", "both"), help="add a hypothetical answer passage to the dense (or both) queries")
+    parser.add_argument("--hyde-scope", choices=("all", "shared"), default="all",
+                        help="shared: HyDE only for the course side; with --owner, notes are searched with the plain query")
     parser.add_argument("--generate-only", action="store_true",
                         help="only run and cache the query-side LLM calls (no model server needed)")
     parser.add_argument("--understand", action="store_true", help="LLM query understanding first (needs LLM_API_KEY)")
@@ -361,7 +379,7 @@ def main() -> None:
     result = run(Config(
         exp=args.exp, collection=args.collection, top_k=args.top_k, body_chars=args.body_chars,
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
-        rerank_body_chars=args.rerank_body_chars, llm_rerank=args.llm_rerank, llm_rerank_plain=args.llm_rerank_plain, hyde=args.hyde or "",
+        rerank_body_chars=args.rerank_body_chars, llm_rerank=args.llm_rerank, llm_rerank_plain=args.llm_rerank_plain, llm_rerank_unit=args.llm_rerank_unit, hyde=args.hyde or "", hyde_scope=args.hyde_scope,
         generate_only=args.generate_only, understand=args.understand, llm_workers=args.llm_workers,
         summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
         history=not args.no_history, question_field=args.question_field, multihop=args.multihop or "",

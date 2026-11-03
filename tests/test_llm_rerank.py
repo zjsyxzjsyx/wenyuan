@@ -48,6 +48,24 @@ def test_a_page_shows_its_other_matching_sections_and_fits_the_budget():
     rerank_pages(llm, "q", pool)
     prompt = llm.prompts[0]
     assert "... Lifespan events: use lifespan" in prompt and "Also matched: Shutdown" in prompt
-    small = FakeLLM([1])
-    rerank_pages(small, "q", hits(*"abcdefghij"), max_chars=200)   # shrinks excerpts, still lists every page
-    assert "[10] Docs > j" in small.prompts[0]
+    assert prompt.count("q") >= 2 and prompt.rstrip().endswith("most useful ids.")   # the question comes twice
+
+
+def test_the_listing_is_counted_in_tokens_and_drops_the_last_candidates_to_fit():
+    chinese = [{"url": u, "heading_path": f"My notes > {u}", "text": "滑动窗口适合求最长无重复子串用哈希表记录位置" * 20}
+               for u in "abcdefghij"]
+    small = FakeLLM([2])
+    out = rerank_pages(small, "q", chinese, max_tokens=150)
+    assert "[1] My notes > a" in small.prompts[0] and "[10]" not in small.prompts[0]
+    assert order(out) == list("bacdefghij")         # candidates left out of the prompt keep their place after it
+
+
+def test_sections_of_one_page_can_be_ranked_separately():
+    pool = [{"url": "lecture", "heading_path": "Week 3 · Lecture 3 > Lecture 3 > Binary Search", "text": "halve"},
+            {"url": "lecture", "heading_path": "Week 3 · Lecture 3 > Lecture 3 > Merge Sort", "text": "merge"},
+            {"url": "lecture", "heading_path": "Week 3 · Lecture 3 > Lecture 3 > Merge Sort > Runtime", "text": "n log n"},
+            {"url": "notes", "heading_path": "My notes > sorting", "text": "mine"}]
+    llm = FakeLLM([2, 3, 1])
+    out = rerank_pages(llm, "q", pool, unit="section")
+    assert [h["text"] for h in out] == ["merge", "n log n", "mine", "halve"]   # a subsection stays with its section
+    assert "[3] My notes > sorting" in llm.prompts[0]
