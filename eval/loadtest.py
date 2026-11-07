@@ -1,8 +1,10 @@
 """Load test: N learners asking at once against one GPU.
 
 `python -m eval.loadtest --label gate --users 1 5 10 20 --per-user 3`
-Each virtual user has its own API key and asks `per-user` different real Stack
-Overflow questions back to back (no think time), streaming the answer. A client
+Each virtual user has its own API key, is a student of the dataset's courses, and asks
+`per-user` different course questions back to back (no think time), streaming the answer.
+v0.7 asked real Stack Overflow questions of the shared libraries; v2 scopes every question to
+the asker's courses, so the users are enrolled first (`--dataset` picks the questions). A client
 gives up after `--timeout` seconds, like a learner who stops waiting. The answer
 cache is invalidated before each round so every request reaches the GPU.
 
@@ -23,32 +25,40 @@ from pathlib import Path
 
 import httpx
 
-from app.api.auth import create_user
+from sqlalchemy.orm import Session as DBSession
+
+from app.api.auth import create_user, lookup
 from app.cache.answers import invalidate_now
-from app.db.models import create_tables
-from app.ingest.sites import SITES
+from app.courses import enroll
+from app.db.models import create_tables, engine
 from eval.metrics import percentile
 
-DATASET = Path("eval/datasets/so_v1.jsonl")
+DATASET = Path("data/eval/cs50_gen_v1.jsonl")
 KEYS = Path(".cache/loadtest_keys.json")
 OUT_DIR = Path("experiments")
 
 
-def user_keys(n: int) -> list[str]:
-    """API keys for loadtest users 1..n, created once and kept in a gitignored file."""
-    keys = json.loads(KEYS.read_text()) if KEYS.exists() else []
+def user_keys(n: int, courses: list[str]) -> list[str]:
+    """API keys for loadtest users 1..n, created once and kept in a gitignored file, each a student
+    of `courses`. Their names start with "loadtest-", which `app.maintenance cleanup` removes, along
+    with their enrollments and filed questions."""
+    keys = [k for k in (json.loads(KEYS.read_text()) if KEYS.exists() else []) if lookup(k) is not None]
     if len(keys) < n:
         create_tables()
         stamp = int(time.time())
         keys += [create_user(f"loadtest-{stamp}-{i}") for i in range(len(keys), n)]
         KEYS.parent.mkdir(exist_ok=True)
         KEYS.write_text(json.dumps(keys))
+    with DBSession(engine()) as db:
+        for key in keys[:n]:
+            for course in courses:
+                enroll(db, lookup(key).id, course)
     return keys[:n]
 
 
-def questions(seed: int = 0) -> list[dict]:
-    rows = [json.loads(line) for line in DATASET.read_text(encoding="utf-8").splitlines()]
-    rows = [{"question": r["question"], "libraries": [r["library"]]} for r in rows if r["library"] in SITES]
+def questions(dataset: Path = DATASET, seed: int = 0) -> list[dict]:
+    rows = [json.loads(line) for line in dataset.read_text(encoding="utf-8").splitlines()]
+    rows = [{"question": r["question"], "libraries": [r["library"]]} for r in rows]
     random.Random(seed).shuffle(rows)
     return rows
 
@@ -80,9 +90,10 @@ async def one_request(client: httpx.AsyncClient, key: str, body: dict, timeout: 
 
 
 async def round_(base_url: str, n_users: int, per_user: int, timeout: float, pool: list[dict]) -> dict:
-    for library in SITES:      # cold answer cache: every request must reach the model
+    courses = sorted({lib for q in pool for lib in q["libraries"]})
+    for library in courses:    # cold answer cache: every request must reach the model
         invalidate_now(library)
-    keys = user_keys(n_users)
+    keys = user_keys(n_users, courses)
     work = iter(pool)
     limits = httpx.Limits(max_connections=n_users + 5)
     async with httpx.AsyncClient(base_url=base_url, timeout=None, limits=limits) as client:
@@ -114,8 +125,10 @@ def main() -> None:
     parser.add_argument("--per-user", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=30)
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
+    parser.add_argument("--dataset", type=Path, default=DATASET)
+    parser.add_argument("--exp", default="M3-load", help="file name prefix in experiments/")
     args = parser.parse_args()
-    pool, rounds = questions(), []
+    pool, rounds = questions(args.dataset), []
     offset = 0
     for n in args.users:
         need = n * args.per_user
@@ -124,8 +137,9 @@ def main() -> None:
         rounds.append(r)
         print(json.dumps({k: v for k, v in r.items() if k != "requests_detail"}, ensure_ascii=False), flush=True)
     OUT_DIR.mkdir(exist_ok=True)
-    path = OUT_DIR / f"W3-load-{args.label}-{time.strftime('%Y%m%d-%H%M%S')}.json"
-    path.write_text(json.dumps({"label": args.label, "timeout_s": args.timeout, "per_user": args.per_user,
+    path = OUT_DIR / f"{args.exp}-{args.label}-{time.strftime('%Y%m%d-%H%M%S')}.json"
+    path.write_text(json.dumps({"label": args.label, "dataset": args.dataset.as_posix(), "timeout_s": args.timeout,
+                                "per_user": args.per_user,
                                 "rounds": rounds}, ensure_ascii=False, indent=1), encoding="utf-8")
     print("saved", path)
 
