@@ -1,9 +1,12 @@
-"""Ingestion steps shared by the synchronous build script and the Celery tasks.
+"""Ingestion steps shared by the course loader (app.ingest.cs50), teachers' uploads
+(app.ingest.materials) and students' notes (app.ingest.private).
 
-    source pages -> extract -> drop near-duplicates -> sections (MySQL) -> chunks -> embed -> Milvus
+    page -> sections (MySQL) -> chunks -> embed -> Milvus
 
 Every step is keyed by url/doc_id so it can be retried: documents are upserted in
 MySQL and a document's chunks are deleted from Milvus before its new ones go in.
+v0.7 also fed crawled and DevDocs pages through here, from a build script and Celery
+tasks; those went with v0.7's public libraries (see `git tag v0.7.0`).
 """
 from __future__ import annotations
 
@@ -16,13 +19,10 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Document, Section
-from app.ingest import devdocs
 from app.ingest.chunking.structural import Chunk, chunk_fixed, chunk_sections
-from app.ingest.crawl import cached_pages, page_path
-from app.ingest.dedup import near_duplicates
-from app.ingest.extract import Page, extract
+from app.ingest.page import Page
 from app.ingest.sections import split_sections
-from app.ingest.sites import SITES, Site
+from app.ingest.sites import SITES
 from app.retrieval import milvus_store
 from app.tokenizer import Tokenizer
 
@@ -39,31 +39,6 @@ def doc_id_for(url: str) -> str:
 
 def doc_type(url: str) -> str:
     return "reference" if _REFERENCE.search(url) else "guide"
-
-
-def source_urls(site: Site) -> list[str]:
-    if site.source == "devdocs":
-        return list(devdocs.pages(site.library))
-    return [url for url in cached_pages(site.library) if site.wants(url)]
-
-
-def load_html(site: Site, url: str) -> str:
-    if site.source == "devdocs":
-        return devdocs.pages(site.library)[url]
-    return page_path(site.library, url).read_text(encoding="utf-8")
-
-
-def load_page(library: str, url: str) -> Page | None:
-    site = SITES[library]
-    page = extract(site, url, load_html(site, url))
-    return page if page and page.markdown else None
-
-
-def prepare(library: str) -> tuple[dict[str, Page], dict[str, str]]:
-    """Extract every wanted page of a library; return (pages, near-duplicate url -> kept url)."""
-    site = SITES[library]
-    pages = {url: page for url in source_urls(site) if (page := load_page(library, url))}
-    return pages, near_duplicates({url: p.markdown for url, p in pages.items()})
 
 
 def drop_stale_documents(db: DBSession, library: str, kept_urls: list[str]) -> None:

@@ -85,5 +85,5 @@ The detailed documentation is in Chinese under [`docs/`](docs/): [design](docs/d
 
 - Parts of the code are adapted from [LightRAG](https://github.com/HKUDS/LightRAG) (MIT License, commit `aaebfe1`); see `third_party/LICENSES/LightRAG-MIT.txt`. Each adapted file names its source and changes at the top.
 - Course material: Harvard's [CS50x](https://cs50.harvard.edu/x/), as Markdown in the Hugging Face dataset [dev-jonathanb/cs50-educational-rag](https://huggingface.co/datasets/dev-jonathanb/cs50-educational-rag), CC BY-NC-SA 4.0. This repository does **not** distribute the course text or the questions generated from it.
-- v0.7's public documentation came from [DevDocs](https://devdocs.io) and the FastAPI and Redis sites, and is not redistributed. `eval/datasets/so_v1.jsonl` is from [Stack Overflow](https://stackoverflow.com) (CC BY-SA 4.0); every row links to its original question and answer.
+- v0.7's public documentation came from [DevDocs](https://devdocs.io) and the FastAPI and Redis sites, and is not redistributed. Its evaluation set came from [Stack Overflow](https://stackoverflow.com) (CC BY-SA 4.0), every row linking to its original question and answer. v0.7's code and evaluation sets are no longer on the main branch; they are under `git tag v0.7.0`.
 - The code is under the [MIT](LICENSE) license.

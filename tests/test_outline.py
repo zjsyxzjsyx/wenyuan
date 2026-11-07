@@ -19,9 +19,9 @@ def test_topic_docs_list_guides_before_reference_pages(monkeypatch):
                         lambda mc, coll, vec, text, top_k, libraries: seen.update(text=text) or hits)
     llm = FakeLLM()
     models = SimpleNamespace(embed=lambda texts: [[0.0]])
-    docs = o.topic_docs(llm, None, models, "c", "redis", "持久化", max_docs=3)
+    docs = o.topic_docs(llm, None, models, "c", "cs50", "持久化", max_docs=3)
     assert docs == ["persistence", "replication", "persist-cmd"]
-    assert "系统学习 Redis 的「持久化」" in llm.prompt          # asked as a learning goal, not a lookup
+    assert "系统学习 CS50x 2024 的「持久化」" in llm.prompt          # asked as a learning goal, not a lookup
     assert seen["text"].startswith("BGSAVE")                     # BM25 gets the inferred API names
 
 

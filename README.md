@@ -69,7 +69,7 @@ uv run python -m app.maintenance cleanup                                   # 列
 |---|---|
 | [设计文档](docs/design.md) | 方向与复盘、场景、架构、入库与查询链路、权限、评测方法；每个里程碑的实验记录 |
 | [评测与结果](docs/evaluation.md) | 评测集、检索 / 答案 / 拒答结果、v0.7 的实验、压测 |
-| [安装与运行](docs/running.md) | 架构图、网页工作台、全部命令、v0.7 语料的复现 |
+| [安装与运行](docs/running.md) | 架构图、网页工作台、全部命令 |
 | [接入 Agent（MCP）](docs/mcp.md) | MCP 配置、7 个工具、与知秋的关系 |
 
 ## 数据与隐私
@@ -94,5 +94,5 @@ uv run python -m eval.gate experiments/<新一轮>.json
 
 - 部分代码改编自 [LightRAG](https://github.com/HKUDS/LightRAG)（MIT License，commit `aaebfe1`），协议原文见 `third_party/LICENSES/LightRAG-MIT.txt`；每个改编文件的开头注明了来源和修改内容。
 - 演示课程资料来自哈佛 [CS50x](https://cs50.harvard.edu/x/)，经 Hugging Face 数据集 [dev-jonathanb/cs50-educational-rag](https://huggingface.co/datasets/dev-jonathanb/cs50-educational-rag) 整理成 Markdown，遵循 CC BY-NC-SA 4.0。本仓库**不分发**课程原文和由它生成的评测题，使用者运行命令自行下载。
-- v0.7 的公共文档取自 [DevDocs](https://devdocs.io)，以及 FastAPI、Redis 官网，版权归各项目所有，同样不在仓库中分发；评测集 `eval/datasets/so_v1.jsonl` 来自 [Stack Overflow](https://stackoverflow.com)，遵循 CC BY-SA 4.0，每行都保留了原问题和答案的链接。
+- v0.7 的公共文档取自 [DevDocs](https://devdocs.io)，以及 FastAPI、Redis 官网，版权归各项目所有，同样不在仓库中分发；评测集来自 [Stack Overflow](https://stackoverflow.com)，遵循 CC BY-SA 4.0，每行都保留了原问题和答案的链接；v0.7 的代码和评测集已从主分支移除，在 `git tag v0.7.0` 里。
 - 代码采用 [MIT](LICENSE) 协议。

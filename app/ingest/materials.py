@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Document, Section
 from app.ingest import pipeline
-from app.ingest.extract import Page
+from app.ingest.page import Page
 from app.ingest.private import MAX_BYTES, VARIANT, NoteError, clean_filename, title_of
 from app.models.local import ModelServer
 from app.tokenizer import Tokenizer

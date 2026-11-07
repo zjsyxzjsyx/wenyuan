@@ -1,6 +1,6 @@
 """Run a retrieval experiment over an eval set and save the scores.
 
-`python -m eval.run --exp E2 --collection chunks_struct_merge --mode hybrid [--rerank 50] [--understand] [--summaries]`
+`python -m eval.run --exp demo --collection chunks_v2 --mode hybrid [--understand] [--hyde dense] [--llm-rerank 20]`
 Chunks are retrieved, collapsed to their pages in rank order, and scored against
 the gold pages. Results (config, metrics, per-question ranks) go to
 experiments/<exp>-<timestamp>.json so every run stays comparable.
@@ -21,12 +21,11 @@ from app.db.models import engine
 from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
-from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.query import multihop
 from app.query.hyde import hypothetical_passage
 from app.query.understand import understand
 from app.retrieval import milvus_store
-from app.retrieval.fusion import best_per_block, rrf
+from app.retrieval.fusion import rrf
 from app.retrieval.llm_rerank import rerank_pages
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
@@ -34,7 +33,7 @@ from app.tracing import spans
 from eval.memory_guard import wait_for_memory
 from eval.metrics import evidence_ranks, hit_at, mrr, ndcg_at, percentile, recall_at, unique_in_order
 
-DATASET = Path("eval/datasets/so_v1.jsonl")
+DATASET = Path("data/eval/cs50_gen_v1.jsonl")
 OUT_DIR = Path("experiments")
 QUERY_CACHE = Path(".cache/eval_query_vectors.jsonl")
 EVIDENCE_DIR = Path(".cache/eval_evidence")   # top pages' excerpts per question, for eval.judge_retrieval
@@ -59,8 +58,6 @@ class Config:
     hyde_scope: str = "all"             # "shared": HyDE on the course side only; notes are searched with the question
     generate_only: bool = False         # run (and cache) the query-side LLM calls, then stop
     understand: bool = False            # LLM query understanding before retrieval (E6)
-    summaries: bool = False             # also search section summaries/questions, fuse by RRF (E5)
-    summary_weight: float = 1.0         # RRF weight of the summary list (chunks: 1.0)
     dense_query: str = "rewritten"      # with --understand: embed the LLM rewrite or the raw question
     history: bool = True                # multi-turn rows: give the conversation so far to understanding
     question_field: str = "question"    # e.g. "original_question" for the multi-turn upper bound
@@ -112,7 +109,7 @@ def load_labels(dataset: Path) -> dict[str, str]:
 
 
 def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top_k: int, libraries: list[str],
-             summaries: bool = False, summary_weight: float = 1.0, owner_id: int | None = None):
+             owner_id: int | None = None):
     if mode == "dense":
         hits = milvus_store.dense_search(mc, collection, vector, top_k=top_k, libraries=libraries, owner_id=owner_id)
     elif mode == "bm25":
@@ -120,10 +117,7 @@ def retrieve(mc, collection: str, mode: str, vector: list[float], text: str, top
     else:
         hits = milvus_store.hybrid_search(mc, collection, vector, text, top_k=top_k, libraries=libraries,
                                           owner_id=owner_id)
-    if not summaries:
-        return hits
-    extra = best_per_block(milvus_store.dense_search(mc, SUMMARIES, vector, top_k=top_k, libraries=libraries))
-    return rrf([hits, extra], limit=top_k, weights=[1.0, summary_weight])
+    return hits
 
 
 def hyde_passages(cfg: Config, rows: list[dict]) -> list[str]:
@@ -211,7 +205,7 @@ def evidence_metrics(evidence: list[str] | None, chunks: list[str]) -> dict:
 
 def run(cfg: Config) -> dict:
     with spans.span("eval", cfg.exp, collection=cfg.collection, mode=cfg.mode, rerank_top=cfg.rerank_top,
-                    understand=cfg.understand, summaries=cfg.summaries) as root:
+                    understand=cfg.understand) as root:
         result = _run(cfg)
         root.set(**result.get("overall", {}))
         result["trace_id"] = root.trace_id
@@ -259,7 +253,7 @@ def _run(cfg: Config) -> dict:
                 began -= elapsed / 1000
             else:
                 hits = retrieve(mc, cfg.collection, cfg.mode, vector, text, cfg.top_k, [row["library"]],
-                                cfg.summaries, cfg.summary_weight, None if split else owner_id)
+                                None if split else owner_id)
                 if split:
                     notes = retrieve(mc, cfg.collection, cfg.mode, plain_vectors[i], plain_texts[i], cfg.top_k, [],
                                      owner_id=owner_id)
@@ -360,8 +354,6 @@ def main() -> None:
                         help="only run and cache the query-side LLM calls (no model server needed)")
     parser.add_argument("--understand", action="store_true", help="LLM query understanding first (needs LLM_API_KEY)")
     parser.add_argument("--llm-workers", type=int, default=4)
-    parser.add_argument("--summaries", action="store_true", help="fuse in section summary/question hits (E5)")
-    parser.add_argument("--summary-weight", type=float, default=1.0)
     parser.add_argument("--multihop", choices=("decompose", "iterative"), help="multi-hop retrieval (E9)")
     parser.add_argument("--embed-model", default="BAAI/bge-m3", help="query embedding model (match the collection)")
     parser.add_argument("--query-prompt", help="the embedding model's query prompt name (Qwen3: query)")
@@ -381,7 +373,7 @@ def main() -> None:
         bm25_body_chars=args.bm25_body_chars, mode=args.mode, rerank_top=args.rerank,
         rerank_body_chars=args.rerank_body_chars, llm_rerank=args.llm_rerank, llm_rerank_plain=args.llm_rerank_plain, llm_rerank_unit=args.llm_rerank_unit, hyde=args.hyde or "", hyde_scope=args.hyde_scope,
         generate_only=args.generate_only, understand=args.understand, llm_workers=args.llm_workers,
-        summaries=args.summaries, summary_weight=args.summary_weight, dense_query=args.dense_query,
+        dense_query=args.dense_query,
         history=not args.no_history, question_field=args.question_field, multihop=args.multihop or "",
         embed_model=args.embed_model, query_prompt=args.query_prompt,
         dataset=args.dataset, owner=args.owner,

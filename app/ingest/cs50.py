@@ -29,7 +29,7 @@ from sqlalchemy.orm import Session as DBSession
 from app.cache.answers import invalidate_now
 from app.db.models import Section, create_tables, engine
 from app.ingest import pipeline
-from app.ingest.extract import Page
+from app.ingest.page import Page
 from app.models.local import ModelServer
 from app.query.ask import COLLECTION
 from app.retrieval import milvus_store

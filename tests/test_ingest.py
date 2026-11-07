@@ -1,7 +1,5 @@
 from app.ingest.chunking.structural import chunk_sections, top_level
-from app.ingest.extract import extract
 from app.ingest.sections import split_sections
-from app.ingest.sites import Site
 from test_fixed_token import CharTokenizer
 
 MD = """# Sorted sets
@@ -62,17 +60,3 @@ def test_merge_sections_respects_budget():
                             url="u", doc_id="d", max_tokens=120, merge_sections=True)
     assert len(chunks) > 1 and all(c.tokens <= 120 for c in chunks)
 
-
-def test_extract_drops_noise_and_extra_languages():
-    site = Site(library="x", name="X", sitemap="", content_selector="section.prose",
-                drop_selectors=(".tab-nav",), keep_code_langs=frozenset({"python"}))
-    html = """<html><body><nav>menu</nav><section class="prose"><h1>ZADD</h1>
-    <div class="tab-nav">Syntax | API</div><p>Adds members.</p>
-    <div data-lang="python"><pre><code class="language-python">r.zadd()</code></pre></div>
-    <div data-lang="java"><pre><code class="language-java">jedis.zadd()</code></pre>
-      <div data-lang="go">nested</div></div>
-    <script>x()</script></section></body></html>"""
-    page = extract(site, "https://x/zadd", html)
-    assert page.title == "ZADD"
-    assert "r.zadd()" in page.markdown and "```python" in page.markdown
-    assert "jedis" not in page.markdown and "Syntax | API" not in page.markdown and "x()" not in page.markdown

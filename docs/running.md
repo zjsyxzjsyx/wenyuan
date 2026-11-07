@@ -8,9 +8,9 @@
 学生（网页工作台 / 知秋等 MCP 客户端）──▶ FastAPI + SSE ──▶ 查询链路 ──▶ Milvus（向量 + BM25，jieba 分词）
                                           │                     ├──▶ 本地模型服务（bge-m3，GPU）
                                           │                     └──▶ LLM（默认本地 Ollama，可选 OpenAI 兼容 API）
-                                          ├──▶ Redis：按用户限流、GPU 闸门、问答缓存、Celery broker
+                                          ├──▶ Redis：按用户限流、GPU 闸门、问答缓存
                                           └──▶ MySQL：用户、文档、章节树、trace
-课程资料和笔记上传时同步入库；Celery 只用于 v0.7 的大批量文档库构建      检索范围 = 本人加入的课程 + 本人笔记
+课程资料和笔记上传时同步入库                     检索范围 = 本人加入的课程 + 本人笔记
 ```
 
 后端针对的是 LLM 应用的真实约束：**单个请求重、GPU 稀缺、多用户、数据一致性**，不是传统意义上的高并发。理由见 [设计文档](design.md) 1.3 节。
@@ -77,4 +77,4 @@ curl -N localhost:8000/v1/ask -H "Authorization: Bearer <key>" -H "Content-Type:
 uv run python -m eval.loadtest --label demo --users 1 5 10 20   # 压测
 ```
 
-v0.7 的官方文档语料（DevDocs、FastAPI 和 Redis 官网）和 SO 评测仍可复现：`app.ingest.devdocs`、`app.ingest.crawl`、`app.ingest.build`、`app.workers.submit`、`eval.build_so`，集合名 `chunks_struct_merge`。
+v0.7（官方文档 + Stack Overflow）的抓取和构建脚本、评测集和实验结果已从主分支移除，需要时检出 `git tag v0.7.0`。

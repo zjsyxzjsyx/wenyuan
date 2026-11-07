@@ -23,7 +23,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Document, Section
-from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
@@ -45,18 +44,11 @@ def _visible(doc: Document | None, owner_id: int | None, courses: list[str] | No
     return courses is None or doc.library in courses
 
 
-def _summaries(mc: MilvusClient, blocks: list[tuple[str, int]]) -> dict[tuple[str, int], str]:
-    if not blocks or not mc.has_collection(SUMMARIES):
-        return {}
-    ids = [f"{doc}:{idx}:s" for doc, idx in blocks]
-    rows = mc.query(SUMMARIES, filter=f"chunk_id in {ids!r}", output_fields=["doc_id", "parent_index", "text"])
-    return {(r["doc_id"], r["parent_index"]): r["text"] for r in rows}
-
-
 def topic_docs(llm: LLM, mc: MilvusClient, models: ModelServer, collection: str, library: str, topic: str,
                max_docs: int) -> list[str]:
     """Doc ids for a topic, best first, guide pages before reference pages."""
-    goal = f"我想系统学习 {SITES[library].name} 的「{topic}」，有哪些相关章节？"
+    name = SITES[library].name if library in SITES else library
+    goal = f"我想系统学习 {name} 的「{topic}」，有哪些相关章节？"
     u = understand(llm, goal, libraries=[library])
     hits = milvus_store.hybrid_search(mc, collection, models.embed([u.search_query_en])[0], u.bm25_text(),
                                       top_k=40, libraries=[library])
@@ -84,11 +76,8 @@ def outline(db: DBSession, mc: MilvusClient, models: ModelServer, collection: st
     for s in db.scalars(select(Section).where(Section.doc_id.in_([d.id for d in docs]), Section.level <= MAX_LEVEL)
                         .order_by(Section.doc_id, Section.idx)):
         sections[s.doc_id].append(s)
-    tops = [(s.doc_id, s.idx) for d in docs for s in sections[d.id] if s.parent_idx is None and s.level > 0]
-    summary = _summaries(mc, tops)
     return [{"doc_id": d.id, "title": d.title, "url": d.url,
-             "sections": [{"section_id": f"{d.id}:{s.idx}", "level": s.level, "heading": s.heading,
-                           **({"summary": summary[(d.id, s.idx)]} if (d.id, s.idx) in summary else {})}
+             "sections": [{"section_id": f"{d.id}:{s.idx}", "level": s.level, "heading": s.heading}
                           for s in sections[d.id] if s.level > 0 or s.text.strip()]}
             for d in docs]
 

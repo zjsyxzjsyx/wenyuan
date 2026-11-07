@@ -22,7 +22,6 @@ from sqlalchemy.orm import Session as DBSession
 from app.db.models import engine
 from app.generation.answer import REFUSAL, Answer, answer, apply_verification
 from app.generation.verify import verify
-from app.ingest.summarize import COLLECTION as SUMMARIES
 from app.ingest.sites import SITES
 from app.models.llm import LLM
 from app.models.local import ModelServer
@@ -30,7 +29,6 @@ from app.query import multihop
 from app.query.understand import Understanding, understand
 from app.retrieval import milvus_store
 from app.retrieval.context import Source, build_sources, parent_blocks
-from app.retrieval.fusion import best_per_block, rrf
 from app.retrieval.rerank import rerank
 from app.tokenizer import TiktokenTokenizer
 from app.tracing import spans
@@ -48,7 +46,6 @@ class AskConfig:
     mode: str = "hybrid"         # dense | hybrid
     top_k: int = 50
     rerank_top: int = 0          # rerank the first N hits; 0: off
-    summaries: bool = False      # also search section summaries/questions (E5)
     budget: int = 6000           # context tokens for the answer
     # Claim-level citation check after generation (E8, 99 SO questions, DeepSeek as judge): answers
     # with an unsupported claim 47.8% -> 23.0% (significant), fully correct answers unchanged,
@@ -119,9 +116,6 @@ def _retrieve(u: Understanding, libraries: list[str] | None, cfg: AskConfig, mod
         else:
             hits = milvus_store.dense_search(mc, cfg.collection, vector, top_k=cfg.top_k, libraries=scope,
                                              owner_id=owner_id)
-        if cfg.summaries:
-            extra = milvus_store.dense_search(mc, SUMMARIES, vector, top_k=cfg.top_k, libraries=scope)
-            hits = rrf([hits, best_per_block(extra)], limit=cfg.top_k)
         s.set(hits=len(hits), private_hits=sum(h["library"] == milvus_store.PRIVATE for h in hits))
     if cfg.multihop and llm is not None:
         hits = multihop.expand(u, hits, llm, models, cfg.collection, offered(libraries), scope,
@@ -188,11 +182,10 @@ def main() -> None:
     parser.add_argument("--library", action="append", help="restrict to these libraries (repeatable)")
     parser.add_argument("--mode", choices=("dense", "hybrid"), default="hybrid")
     parser.add_argument("--rerank", type=int, default=0)
-    parser.add_argument("--summaries", action="store_true")
     args = parser.parse_args()
     spans.configure(engine())
     r = ask(args.question, libraries=args.library,
-            cfg=AskConfig(mode=args.mode, rerank_top=args.rerank, summaries=args.summaries))
+            cfg=AskConfig(mode=args.mode, rerank_top=args.rerank))
     print(json.dumps({"understanding": asdict(r.understanding) if r.understanding else None,
                       "answer": asdict(r.answer), "retrieved": r.retrieved[:5], "trace_id": r.trace_id},
                      ensure_ascii=False, indent=1))

@@ -22,7 +22,7 @@ def db():
 def test_the_creator_teaches_and_ids_are_checked(db):
     assert c.create_course(db, "cs50", "CS50x 2024", 1)["role"] == "teacher"
     assert c.courses_of(db, 1) == [{"id": "cs50", "name": "CS50x 2024", "role": "teacher"}]
-    for bad in ("CS50", "a", "private", "redis", "has space"):
+    for bad in ("CS50", "a", "private", "has space"):
         with pytest.raises(c.CourseError):
             c.create_course(db, bad, "x", 1)
     with pytest.raises(c.CourseError):

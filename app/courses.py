@@ -19,15 +19,14 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Course, Enrollment, Invite, User, create_tables, engine
-from app.ingest.sites import SITES
 from app.retrieval.milvus_store import PRIVATE
 
 ROLES = ("teacher", "student")
 INVITE_USES = 200
 INVITE_DAYS = 14
 _ID = re.compile(r"^[a-z0-9][a-z0-9_-]{1,40}$")
-# v0.7 public-doc libraries still have documents under these ids; a course reusing one would mix them in.
-RESERVED = {PRIVATE} | {lib for lib, site in SITES.items() if site.source != "markdown"}
+# Notes live under this library id; a course reusing it would expose them.
+RESERVED = {PRIVATE}
 
 
 class CourseError(ValueError):
