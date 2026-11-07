@@ -59,6 +59,17 @@ def _strings(value, limit: int) -> list[str]:
     return list(dict.fromkeys(str(v).strip() for v in value if str(v).strip()))[:limit]
 
 
+def is_small_talk(question: str) -> bool:
+    """Short enough to be a greeting or a thank-you: at most 10 CJK characters, or 30 characters
+    without any. The model's "needs_retrieval": false is only trusted for these. Asked to skip
+    retrieval only for greetings, Qwen3-8B also skipped it for real course questions ("I have never
+    programmed, will I fall behind?", "may I work with classmates?"): 6 of the 9 refusals of
+    answerable questions in the M3 answer evaluation never searched the course at all."""
+    text = question.strip()
+    cjk = sum("一" <= ch <= "鿿" for ch in text)
+    return cjk <= 10 if cjk else len(text) <= 30
+
+
 def understand(llm: LLM, question: str, history: list[dict] | None = None,
                libraries: list[str] | None = None) -> Understanding:
     turns = "\n".join(f"{t['role']}: {t['content']}" for t in (history or [])[-6:]) or "(none)"
@@ -73,7 +84,7 @@ def understand(llm: LLM, question: str, history: list[dict] | None = None,
             candidate_apis=_strings(raw.get("candidate_apis"), 5),
             # Only libraries we actually index; a hallucinated id would filter everything out.
             libraries=[lib for lib in _strings(raw.get("libraries"), 5) if lib in known],
-            needs_retrieval=bool(raw.get("needs_retrieval", True)),
+            needs_retrieval=bool(raw.get("needs_retrieval", True)) or not is_small_talk(question),
         )
         s.set(candidate_apis=result.candidate_apis, libraries=result.libraries)
     return result

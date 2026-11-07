@@ -55,6 +55,15 @@ def test_understand_falls_back_to_question_on_sparse_reply():
     assert u.candidate_apis == [] and u.needs_retrieval is True
 
 
+def test_skipping_retrieval_is_only_trusted_for_small_talk():
+    skip = FakeLLM({"needs_retrieval": False})
+    assert understand(skip, "你好！").needs_retrieval is False
+    assert understand(skip, "thanks, that helped").needs_retrieval is False
+    assert understand(skip, "我之前完全没学过编程，上这门课会不会跟不上啊？").needs_retrieval is True
+    assert understand(skip, "Can I work with classmates on my homework, and what if I get too much help?"
+                      ).needs_retrieval is True
+
+
 def test_llm_uses_cache_and_requires_key(tmp_path, monkeypatch):
     monkeypatch.setattr(llm_module, "CACHE", tmp_path / "llm.jsonl")
     client = LLM(base_url="http://unused", api_key="", model="m")

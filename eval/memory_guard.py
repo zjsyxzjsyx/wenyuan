@@ -12,6 +12,7 @@ readings come from GlobalMemoryStatusEx; elsewhere the guard is a no-op.
 from __future__ import annotations
 
 import ctypes
+import os
 import sys
 import threading
 import time
@@ -45,9 +46,17 @@ def read_memory() -> Memory | None:
 _lock = threading.Lock()
 
 
-def wait_for_memory(min_free_gb: float = 2.0, max_commit: float = 0.85, poll_s: float = 15,
+def wait_for_memory(min_free_gb: float | None = None, max_commit: float | None = None, poll_s: float = 15,
                     read=read_memory) -> float:
-    """Block while memory is short; returns the seconds spent waiting."""
+    """Block while memory is short; returns the seconds spent waiting.
+
+    The thresholds default to 2 GB free and 85% commit; EVAL_MIN_FREE_GB and EVAL_MAX_COMMIT override
+    them for a run on a machine that is known to sit lower (Docker, both models and a desktop).
+    """
+    if min_free_gb is None:
+        min_free_gb = float(os.environ.get("EVAL_MIN_FREE_GB", 2.0))
+    if max_commit is None:
+        max_commit = float(os.environ.get("EVAL_MAX_COMMIT", 0.85))
     waited = 0.0
     with _lock:        # one waiting thread reports; the others queue behind it
         while (m := read()) is not None and (m.free_gb < min_free_gb or m.commit_used > max_commit):

@@ -1,0 +1,4303 @@
+{
+ "exp": "M3-answers-fix",
+ "dataset": "data/eval/cs50_gen_v1.jsonl",
+ "owner": null,
+ "judge": {
+  "model": "deepseek-flash",
+  "think": false
+ },
+ "summary": {
+  "n": 100,
+  "errors": 0,
+  "answered_before": 100,
+  "answered_after": 100,
+  "claims": 576,
+  "verifier_verdicts": {
+   "supported": 515,
+   "unsupported": 60,
+   "partial": 1
+  },
+  "judge_verdicts": {
+   "supported": 388,
+   "partial": 148,
+   "unsupported": 40
+  },
+  "unsupported_claims_before": 0.0694,
+  "unsupported_claims_after": 0.0484,
+  "answers_with_unsupported_before": 0.31,
+  "answers_with_unsupported_after": 0.2,
+  "removal_precision": 0.25,
+  "removal_recall": 0.375,
+  "correct2_before": 0.88,
+  "correct2_after": 0.85,
+  "mean_score_before": 1.87,
+  "verify_ms_p50": 2320,
+  "cites_gold": 0.72
+ },
+ "by_qtype": {
+  "chinese": {
+   "n": 37,
+   "errors": 0,
+   "answered_before": 37,
+   "answered_after": 37,
+   "claims": 220,
+   "verifier_verdicts": {
+    "supported": 197,
+    "unsupported": 23
+   },
+   "judge_verdicts": {
+    "supported": 143,
+    "partial": 63,
+    "unsupported": 14
+   },
+   "unsupported_claims_before": 0.0636,
+   "unsupported_claims_after": 0.0406,
+   "answers_with_unsupported_before": 0.3243,
+   "answers_with_unsupported_after": 0.1892,
+   "removal_precision": 0.2609,
+   "removal_recall": 0.4286,
+   "correct2_before": 0.9459,
+   "correct2_after": 0.9189,
+   "mean_score_before": 1.946,
+   "verify_ms_p50": 2284,
+   "cites_gold": 0.7568
+  },
+  "cross": {
+   "n": 23,
+   "errors": 0,
+   "answered_before": 23,
+   "answered_after": 23,
+   "claims": 142,
+   "verifier_verdicts": {
+    "supported": 130,
+    "unsupported": 12
+   },
+   "judge_verdicts": {
+    "supported": 90,
+    "partial": 42,
+    "unsupported": 10
+   },
+   "unsupported_claims_before": 0.0704,
+   "unsupported_claims_after": 0.0538,
+   "answers_with_unsupported_before": 0.3913,
+   "answers_with_unsupported_after": 0.3043,
+   "removal_precision": 0.25,
+   "removal_recall": 0.3,
+   "correct2_before": 0.7826,
+   "correct2_after": 0.7391,
+   "mean_score_before": 1.783,
+   "verify_ms_p50": 2322,
+   "cites_gold": 0.8696
+  },
+  "paraphrase": {
+   "n": 40,
+   "errors": 0,
+   "answered_before": 40,
+   "answered_after": 40,
+   "claims": 214,
+   "verifier_verdicts": {
+    "supported": 188,
+    "unsupported": 25,
+    "partial": 1
+   },
+   "judge_verdicts": {
+    "supported": 155,
+    "partial": 43,
+    "unsupported": 16
+   },
+   "unsupported_claims_before": 0.0748,
+   "unsupported_claims_after": 0.0529,
+   "answers_with_unsupported_before": 0.25,
+   "answers_with_unsupported_after": 0.15,
+   "removal_precision": 0.24,
+   "removal_recall": 0.375,
+   "correct2_before": 0.875,
+   "correct2_after": 0.85,
+   "mean_score_before": 1.85,
+   "verify_ms_p50": 2334,
+   "cites_gold": 0.6
+  }
+ },
+ "questions": [
+  {
+   "id": "gen-paraphrase-066",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2501,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-089",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1914,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-129",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2433,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-044",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2275,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-212",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2220,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-paraphrase-070",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1817,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-107",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2259,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-002",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2258,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-227",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 4279,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-117",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2234,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-047",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2334,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-113",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1834,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-093",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2598,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 1,
+   "correct_after": 0
+  },
+  {
+   "id": "gen-chinese-110",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2141,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-chinese-132",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2262,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-059",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2425,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-050",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2482,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-116",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2926,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-045",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2217,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-177",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2198,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-chinese-120",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2767,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-162",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2284,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-068",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1872,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-179",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2958,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-088",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2355,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-183",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 3197,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-128",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2074,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-152",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2077,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-234",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 1874,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-167",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2289,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-041",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1684,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-095",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1633,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 0,
+   "correct_after": 0
+  },
+  {
+   "id": "gen-chinese-135",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2849,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-210",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2249,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-158",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2502,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-014",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2855,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-197",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2678,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-168",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2029,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-031",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1678,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-052",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2402,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-119",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2385,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-098",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2417,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "partial",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-cross-199",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2108,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-paraphrase-060",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2440,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-cross-189",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2047,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-chinese-118",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1823,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-030",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1888,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-033",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2180,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-chinese-154",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1809,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-235",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2543,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-153",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 3791,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-136",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2666,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-020",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2454,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-111",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2471,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-170",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1672,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-219",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2322,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-072",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2320,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-173",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2521,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-cross-191",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2217,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-007",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2878,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-040",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 3109,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-160",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1857,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-100",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2520,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-221",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2176,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-cross-224",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2642,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-paraphrase-027",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2250,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-145",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1811,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-077",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2354,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-148",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2990,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-207",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2403,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-149",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 4030,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-005",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2481,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-147",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2435,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-096",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2351,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-012",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2096,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-051",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2010,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-124",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 3532,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-180",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2257,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-174",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1736,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-229",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2416,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-214",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2137,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 1,
+   "correct_after": 1
+  },
+  {
+   "id": "gen-cross-185",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2385,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-133",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1655,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-215",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 1957,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-069",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2226,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-171",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 3042,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-223",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2648,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-006",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1949,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-097",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 3159,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 1,
+   "correct_after": 0
+  },
+  {
+   "id": "gen-cross-204",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2039,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-013",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1861,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-008",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2437,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "unsupported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    }
+   ],
+   "cites_gold": false,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-055",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2404,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-105",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2038,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-022",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2973,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-151",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 2584,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "unsupported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-029",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 1669,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-cross-198",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "cross",
+   "verify_ms": 2739,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "partial",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-chinese-109",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "chinese",
+   "verify_ms": 1672,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  },
+  {
+   "id": "gen-paraphrase-035",
+   "library": "cs50",
+   "found_before": true,
+   "qtype": "paraphrase",
+   "verify_ms": 2091,
+   "found_after": true,
+   "claims": [
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "supported",
+     "judge": "supported",
+     "removed": false
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "unsupported",
+     "judge": "supported",
+     "removed": true
+    },
+    {
+     "verifier": "supported",
+     "judge": "partial",
+     "removed": false
+    }
+   ],
+   "cites_gold": true,
+   "correct_before": 2,
+   "correct_after": 2
+  }
+ ]
+}

@@ -7,8 +7,18 @@ and one LLM call judges every claim against the text of its sources. Unsupported
 claims are removed rather than rewritten (a rewrite is new, unchecked text); an
 answer left with no claims becomes a refusal.
 
-A sentence without its own [S#] (models often cite once at the end of a
-paragraph) is checked against all sources the answer cites.
+Every claim is checked against all the sources the answer was written from, not only
+the ones it cites. Answers cite about 2 of 11 sources and most sentences carry no
+[S#] of their own (models cite once at the end of a paragraph); checked against the
+cited sources only, true sentences grounded in an uncited source were removed, and
+verification cost 9 points of correct answers (M3: 70.7% -> 61.6%). Against all
+sources it cost none, and still removed 11 of the 16 claims the judge found in no
+source. The question it answers is "is this in the materials?", not "is the
+citation exact?".
+
+Sentences end at 。！？ or at . ! ? followed by whitespace and something that can start a
+sentence; code spans are never split, so `df.dropna()` or a Scratch block like
+`if <touching (mouse pointer)?> then` stays one claim.
 """
 from __future__ import annotations
 
@@ -38,9 +48,43 @@ Output one JSON object: {{"claims": [{{"id": "C1", "verdict": "supported|partial
 
 VERDICTS = ("supported", "partial", "unsupported")
 _CITE = re.compile(r"\[(S\d+)\]")
-# A sentence ends at 。！？!? or at a period followed by whitespace or the end, so the dots in
-# `df.dropna()` or "3.14" do not split; trailing [S#] markers stay with their sentence.
-_SENTENCE = re.compile(r".+?(?:[。！？!?]|\.(?=\s|$)|$)(?:\s*\[S\d+\])*", re.S)
+# Code is masked before looking for sentence ends. A CJK full stop always ends a sentence; . ! ?
+# only before whitespace and a character that can start one (not a lowercase letter or a
+# continuation like > ) , ;), so "3.14", "e.g. this" and "mouse pointer)? > then" do not split.
+# Trailing [S#] markers stay with their sentence.
+_CODE = re.compile(r"```.*?```|`[^`\n]+`", re.S)
+_END = re.compile(r"[。！？]|[.!?](?=\s*$|\s+[^\sa-z>)\]},;:|])")
+_TRAILING_CITES = re.compile(r"(?:\s*\[S\d+\])*")
+
+
+def _is_list_number(masked: str, dot: int) -> bool:
+    """The "." of a list item number ("steps: 1. Download", "... [S1]. 2. Unzip"): one or two digits
+    at the start of a line or after the end of a sentence or a colon. M3: these split off as claims
+    of their own ("Here's how you can do it: 1."), which no source supports."""
+    k = dot
+    while k > 0 and masked[k - 1].isdigit():
+        k -= 1
+    if not 1 <= dot - k <= 2:
+        return False
+    j = k
+    while j > 0 and masked[j - 1].isspace():
+        j -= 1
+    return j == 0 or "\n" in masked[j:k] or masked[j - 1] in ".。:：]"
+
+
+def _sentences(text: str) -> list[str]:
+    masked = _CODE.sub(lambda m: "X" * len(m.group()), text)
+    pieces, start = [], 0
+    for m in _END.finditer(masked):
+        if m.start() < start:          # inside the markers already taken by the previous sentence
+            continue
+        if masked[m.start()] == "." and _is_list_number(masked, m.start()):
+            continue
+        end = _TRAILING_CITES.match(masked, m.end()).end()
+        pieces.append(text[start:end])
+        start = end
+    pieces.append(text[start:])
+    return pieces
 
 
 @dataclass
@@ -64,7 +108,7 @@ class Verification:
 
 def split_claims(text: str) -> list[Claim]:
     claims = []
-    for piece in _SENTENCE.findall(text):
+    for piece in _sentences(text):
         sentence = piece.strip()
         if len(_CITE.sub("", sentence).strip(" 。.，,；;:：")) < 2:   # stray markers or punctuation
             if claims and sentence:
@@ -79,9 +123,7 @@ def verify(llm: LLM, text: str, sources: list[Source]) -> Verification:
     claims = split_claims(text)
     if not claims:
         return Verification(text)
-    by_id = {s.sid: s for s in sources}
-    cited_anywhere = list(dict.fromkeys(c for claim in claims for c in claim.cites if c in by_id))
-    shown = [by_id[sid] for sid in cited_anywhere] or sources
+    shown = sources              # every source, not only the cited ones (see the module docstring)
     listing = "\n".join(f"[{c.cid}] (cites {', '.join(c.cites) or 'all sources'}) {_CITE.sub('', c.text).strip()}"
                         for c in claims)
     prompt = PROMPT.format(sources="\n\n".join(f"[{s.sid}] {s.title} > {s.heading_path}\n{s.text}" for s in shown),

@@ -119,16 +119,13 @@ class LLM:
                     raise
         raise LLMError("model output kept looping (token repeat limit) at every temperature tried")
 
-    def chat_json(self, messages: list[dict], temperature: float = 0.0) -> dict[str, Any]:
-        key = self._key(messages)
-        cache = self._load_cache() if self.use_cache else {}
-        if key in cache:
-            spans.set_attrs(llm_cache="hit")
-            return cache[key]
+    def _complete(self, messages: list[dict], temperature: float, json_mode: bool) -> str:
         if not self.api_key:
             raise LLMError("LLM_API_KEY is not set; put it in .env (any non-empty value for a local Ollama)")
         body = {"model": self.model, "messages": messages if self.think else _no_think(self.model, messages),
-                "temperature": temperature, "response_format": {"type": "json_object"}}
+                "temperature": temperature}
+        if json_mode:
+            body["response_format"] = {"type": "json_object"}
         if _is_qwen3(self.model) and not self.think:
             body["reasoning_effort"] = "none"
         try:
@@ -138,10 +135,31 @@ class LLM:
                 raise
             response = self._unloop(body)
         body = response.json()
-        result = parse_json(body["choices"][0]["message"]["content"])
         usage = body.get("usage", {})
         spans.set_attrs(llm_model=self.model, llm_cache="miss", prompt_tokens=usage.get("prompt_tokens"),
                         completion_tokens=usage.get("completion_tokens"))
+        return body["choices"][0]["message"]["content"]
+
+    def chat_json(self, messages: list[dict], temperature: float = 0.0) -> dict[str, Any]:
+        key = self._key(messages)
+        cache = self._load_cache() if self.use_cache else {}
+        if key in cache:
+            spans.set_attrs(llm_cache="hit")
+            return cache[key]
+        result = parse_json(self._complete(messages, temperature, json_mode=True))
         if self.use_cache:
             self._store(key, result)
         return result
+
+    def chat_text(self, messages: list[dict], temperature: float = 0.0) -> str:
+        """Free text, for output that holds code: in JSON mode a model that writes an unescaped quote
+        (`{% extends "layout.html" %}`) ends the JSON string there, and the rest is lost (M3)."""
+        key = self._key([{"format": "text"}, *messages])
+        cache = self._load_cache() if self.use_cache else {}
+        if key in cache:
+            spans.set_attrs(llm_cache="hit")
+            return cache[key]["text"]
+        text = _THINK.sub("", self._complete(messages, temperature, json_mode=False)).strip()
+        if self.use_cache:
+            self._store(key, {"text": text})
+        return text

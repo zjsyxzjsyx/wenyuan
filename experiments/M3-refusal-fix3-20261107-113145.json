@@ -1,0 +1,599 @@
+{
+ "exp": "M3-refusal-fix3",
+ "absent": "data/eval/cs50_absent_v1.jsonl",
+ "answerable": "data/eval/cs50_gen_v1.jsonl",
+ "summary": {
+  "n": 80,
+  "errors": 0,
+  "refused_when_absent": {
+   "all": [
+    1.0,
+    40
+   ],
+   "zh": [
+    1.0,
+    20
+   ],
+   "en": [
+    1.0,
+    20
+   ]
+  },
+  "refused_when_answerable": {
+   "all": [
+    0.025,
+    40
+   ],
+   "zh": [
+    0.0,
+    16
+   ],
+   "en": [
+    0.0417,
+    24
+   ]
+  }
+ },
+ "questions": [
+  {
+   "id": "gen-absent-001",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-002",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-003",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-004",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-005",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-006",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-007",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-008",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-009",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-010",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-011",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-012",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-013",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-014",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-015",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-016",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-017",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-018",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-019",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-020",
+   "expected": "refuse",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-021",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-022",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-023",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-024",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-025",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-026",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-027",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-028",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-029",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-030",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-031",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-032",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-033",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-034",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-035",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-036",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-037",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-038",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-039",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-absent-040",
+   "expected": "refuse",
+   "language": "zh",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-paraphrase-066",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-089",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-chinese-129",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-044",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-cross-212",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-paraphrase-070",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-chinese-107",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-002",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-cross-227",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-117",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-047",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 3
+  },
+  {
+   "id": "gen-chinese-113",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-093",
+   "expected": "answer",
+   "language": "en",
+   "refused": true,
+   "citations": 0
+  },
+  {
+   "id": "gen-chinese-110",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-132",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-059",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 9
+  },
+  {
+   "id": "gen-paraphrase-050",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-116",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 3
+  },
+  {
+   "id": "gen-paraphrase-045",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-chinese-177",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-chinese-120",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-162",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-068",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-cross-179",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-088",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-cross-183",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-128",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-152",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-cross-234",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-167",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-041",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-paraphrase-095",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-135",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-cross-210",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-158",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 1
+  },
+  {
+   "id": "gen-paraphrase-014",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-cross-197",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-chinese-168",
+   "expected": "answer",
+   "language": "zh",
+   "refused": false,
+   "citations": 2
+  },
+  {
+   "id": "gen-paraphrase-031",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 3
+  },
+  {
+   "id": "gen-paraphrase-052",
+   "expected": "answer",
+   "language": "en",
+   "refused": false,
+   "citations": 2
+  }
+ ]
+}
