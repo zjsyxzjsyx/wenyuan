@@ -195,6 +195,7 @@
     </div>
     <div class="card" id="tr-detail" hidden>
       <div class="muted" id="tr-title"></div>
+      <label class="muted"><input type="checkbox" id="tr-raw"> 显示技术细节（进程、模型、token 等原始字段，排查问题时用）</label>
       <div class="wf" id="tr-waterfall"></div>
     </div>
   </section>
@@ -628,8 +629,38 @@ const SPAN_STAGE = {query_understanding: "understand", hybrid_search: "retrieve"
 const color = name => `var(--${name})`;
 const ms = v => v == null ? "–" : v >= 1000 ? (v / 1000).toFixed(1) + " s" : Math.round(v) + " ms";
 let selected = null, traceTimer = null;
+// What a learner reads; the raw span names and attributes stay behind "显示技术细节".
+const STAGE_LABEL = {queue: "排队", understand: "理解问题", retrieve: "检索", rerank: "重排",
+                     context: "整理资料", generate: "生成答案"};
+const SPAN_LABEL = {
+  "POST /v1/ask": "收到提问", "POST /v1/search": "收到检索请求", ask: "问答", search: "检索",
+  query_understanding: "理解问题", hybrid_search: "检索资料", dense_search: "检索资料",
+  multihop_decompose: "拆成子问题再检索", multihop_iterative: "多轮检索", rerank: "重排",
+  small_to_big: "整理资料", answer: "生成答案", verify_claims: "逐句校验", hyde: "写假想答案",
+  file_question: "记录提问（给老师的汇总）", "GET /v1/outline": "查学习目录", "GET /v1/sections": "看章节原文",
+  "POST /v1/notes": "上传笔记", "GET /v1/notes": "列出笔记", "DELETE /v1/notes": "删除笔记",
+  "POST /v1/courses": "开课", "POST /v1/courses/join": "加入课程", "POST /v1/courses/materials": "上传课程资料",
+  "DELETE /v1/courses/materials": "删除课程资料", "GET /v1/courses/questions": "查看高频问题",
+};
+const STATUS_LABEL = {ok: "完成", error: "出错", running: "进行中", interrupted: "中断"};
+const stageLabel = s => STAGE_LABEL[s] ?? s;
+const spanLabel = name => SPAN_LABEL[name] ?? name;
+function friendly(s) {
+  const a = s.attrs || {}, out = [];
+  if (a.queued_s > 0.05) out.push(`排队 ${a.queued_s.toFixed(1)} 秒`);
+  if (a.llm_cache === "hit") out.push("用了之前算过的结果，没有调用模型");
+  if (Array.isArray(a.candidate_apis) && a.candidate_apis.length) out.push(`推断的术语：${a.candidate_apis.join("、")}`);
+  if (a.hits != null) out.push(`找到 ${a.hits} 个片段`);
+  if (a.sources != null && s.name !== "answer") out.push(`交给模型 ${a.sources} 段资料`);
+  if (a.supported != null) out.push(`校验 ${a.supported + (a.partial || 0) + (a.unsupported || 0)} 句，删掉 ${a.removed ?? a.unsupported ?? 0} 句`);
+  if (s.kind === "request" && a.found === false) out.push("资料里没有，已拒答");
+  if (s.kind === "request" && a.found === true) out.push(`已回答，引用 ${a.citations ?? 0} 处`);
+  if (a.private_context) out.push("用到了你的笔记，只用本地模型");
+  if (a.error) out.push(`出错：${a.error}`);
+  return out.join(" · ");
+}
 
-$("tr-legend").innerHTML = ["queue", ...STAGES].map(s => `<span><i style="background:${color(s)}"></i>${s}</span>`).join("");
+$("tr-legend").innerHTML = ["queue", ...STAGES].map(s => `<span><i style="background:${color(s)}"></i>${stageLabel(s)}</span>`).join("");
 function stat(label, value, sub = "") {
   return `<div class="stat"><span class="muted">${label}</span><b>${value}</b><span class="muted">${sub}</span></div>`;
 }
@@ -637,7 +668,7 @@ function stageBar(r) {
   const total = Math.max(r.duration_ms || 1, 1);
   const parts = [["queue", r.queued_ms], ...STAGES.map(s => [s, r.stages[s] || 0])];
   return `<div class="bar">${parts.filter(([, v]) => v > 0)
-    .map(([s, v]) => `<span title="${s} ${ms(v)}" style="width:${100 * v / total}%;background:${color(s)}"></span>`)
+    .map(([s, v]) => `<span title="${stageLabel(s)} ${ms(v)}" style="width:${100 * v / total}%;background:${color(s)}"></span>`)
     .join("")}</div>`;
 }
 async function refreshTrace() {
@@ -650,41 +681,50 @@ async function refreshTrace() {
     stat("总耗时 p50", ms(stats.total_ms.p50), `p95 ${ms(stats.total_ms.p95)}`),
     stat("排队 p95", ms(stats.queued_ms.p95), "等 GPU 槽位"),
     ...STAGES.filter(s => stats.stages_ms[s].p50 != null)
-      .map(s => stat(`${s} p50`, ms(stats.stages_ms[s].p50), `p95 ${ms(stats.stages_ms[s].p95)}`)),
+      .map(s => stat(`${stageLabel(s)} p50`, ms(stats.stages_ms[s].p50), `p95 ${ms(stats.stages_ms[s].p95)}`)),
     stat("GPU 现在", `${live.gate_in_use ?? "–"} / ${live.gate_slots ?? "–"}`, "占用 / 槽位（所有人）"),
   ].join("");
   $("tr-rows").innerHTML = requests.map(r => `
     <tr data-trace="${esc(r.trace_id)}" class="${r.trace_id === selected ? "sel" : ""}">
-      <td>${new Date(r.started_ns / 1e6).toLocaleTimeString()}</td><td>${esc(r.name)}</td>
+      <td>${new Date(r.started_ns / 1e6).toLocaleTimeString()}</td><td>${esc(spanLabel(r.name))}</td>
       <td>${ms(r.duration_ms)}</td><td>${ms(r.queued_ms)}</td>
       <td>${stageBar(r)}</td>
-      <td class="${r.status === "error" ? "err" : ""}">${esc(r.status)}${r.error ? " · " + esc(r.error) : ""}</td>
+      <td class="${r.status === "error" ? "err" : ""}">${esc(STATUS_LABEL[r.status] ?? r.status)}${r.error ? " · " + esc(r.error) : ""}</td>
     </tr>`).join("");
-  $("tr-updated").textContent = `更新于 ${new Date().toLocaleTimeString()} · 每 5 秒刷新 · 点一行看 span 瀑布图`;
+  $("tr-updated").textContent = `更新于 ${new Date().toLocaleTimeString()} · 每 5 秒刷新 · 点一行看每一步花了多久`;
 }
 function startTrace() { refreshTrace(); traceTimer ??= setInterval(refreshTrace, 5000); }
 function stopTrace() { clearInterval(traceTimer); traceTimer = null; }
+let shownSpans = null;
 async function showTrace(traceId) {
   selected = traceId;
-  const spans = await (await api(`/v1/traces/${encodeURIComponent(traceId)}`)).json();
+  shownSpans = await (await api(`/v1/traces/${encodeURIComponent(traceId)}`)).json();
+  renderTrace(traceId, shownSpans);
+  refreshTrace();
+}
+function renderTrace(traceId, spans) {
+  const raw = $("tr-raw").checked;
   const start = Math.min(...spans.map(s => s.started_at_ns));
   const end = Math.max(...spans.map(s => s.started_at_ns + (s.duration_ms || 0) * 1e6));
   const span = Math.max(end - start, 1);
   const depth = {}, byId = Object.fromEntries(spans.map(s => [s.span_id, s]));
   const level = s => depth[s.span_id] ??= s.parent_span_id && byId[s.parent_span_id] ? level(byId[s.parent_span_id]) + 1 : 0;
   $("tr-detail").hidden = false;
-  $("tr-title").textContent = `trace ${traceId} · ${ms(span / 1e6)}`;
+  $("tr-title").textContent = raw ? `trace ${traceId} · ${ms(span / 1e6)}` : `这次请求共 ${ms(span / 1e6)}，每一步如下`;
   $("tr-waterfall").innerHTML = spans.map(s => {
     const left = 100 * (s.started_at_ns - start) / span, width = Math.max(0.4, 100 * (s.duration_ms || 0) * 1e6 / span);
-    const attrs = Object.entries(s.attrs).map(([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : v}`).join("  ");
+    const note = raw
+      ? Object.entries(s.attrs).map(([k, v]) => `${k}=${typeof v === "object" ? JSON.stringify(v) : v}`).join("  ")
+      : friendly(s);
+    const name = raw ? `${s.kind} · ${s.name}` : spanLabel(s.name);
     const fill = SPAN_STAGE[s.name] ? color(SPAN_STAGE[s.name]) : "var(--accent)";
-    return `<div style="padding-left:${level(s) * 14}px" class="${s.status === "error" ? "err" : ""}">${esc(s.kind)} · ${esc(s.name)}</div>
+    return `<div style="padding-left:${level(s) * 14}px" class="${s.status === "error" ? "err" : ""}">${esc(name)}</div>
       <div class="track"><span style="left:${left}%;width:${width}%;background:${fill}"></span></div>
       <div>${ms(s.duration_ms)}</div>
-      ${attrs ? `<div class="attrs">${esc(attrs)}</div>` : ""}`;
+      ${note ? `<div class="attrs">${esc(note)}</div>` : ""}`;
   }).join("");
-  refreshTrace();
 }
+$("tr-raw").onchange = () => { if (shownSpans) renderTrace(selected, shownSpans); };
 $("tr-rows").onclick = e => { const row = e.target.closest("tr[data-trace]"); if (row) showTrace(row.dataset.trace); };
 start();
 </script>
