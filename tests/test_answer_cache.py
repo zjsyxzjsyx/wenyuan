@@ -13,16 +13,16 @@ async def single_flight(cache: AnswerCache, key: str, compute) -> tuple[dict, st
     """The same protocol the API uses (app.api.main._from_cache / _store)."""
     if (hit := await cache.get(key)) is not None:
         return hit, "hit"
-    leader = await cache.claim(key)
-    if not leader and (shared := await cache.wait(key)) is not None:
+    token = await cache.claim(key)
+    if token is None and (shared := await cache.wait(key)) is not None:
         return shared, "shared"
     try:
         value = await compute()
         await cache.put(key, value)
         return value, "miss"
     finally:
-        if leader:
-            await cache.release(key)
+        if token is not None:
+            await cache.release(key, token)
 
 
 def test_key_ignores_spacing_and_case_but_not_history_or_scope():
@@ -75,6 +75,26 @@ def test_failed_leader_lets_a_waiter_compute():
             pass
         return follower
     assert run(go()) == ({"answer": "ok"}, "miss")
+
+
+def test_slow_leader_does_not_release_the_lock_of_the_request_after_it():
+    async def go():
+        redis = FakeAsyncRedis()
+        cache = AnswerCache(redis, lock_s=0.05)
+        key = await cache.key("ask", "q", None, [])
+        slow = await cache.claim(key)
+        await asyncio.sleep(0.1)                     # queued for the GPU past lock_s: the lock expired
+        second = await cache.claim(key)              # another request takes over
+        await cache.release(key, slow)               # the slow leader finishes and releases
+        after_stale_release = await redis.get(f"{key}:lock")
+        third = await cache.claim(key)
+        await cache.release(key, second)
+        return slow, second, after_stale_release, third, await redis.exists(f"{key}:lock")
+    slow, second, after_stale_release, third, left = run(go())
+    assert slow and second and slow != second
+    assert after_stale_release == second.encode()    # the second request's lock survives
+    assert third is None                             # so a third request waits instead of computing again
+    assert left == 0                                 # and the owner can still release it
 
 
 def test_reingest_invalidates_answers_for_that_library_only():

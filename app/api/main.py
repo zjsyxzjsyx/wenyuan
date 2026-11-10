@@ -192,17 +192,17 @@ def ask_payload(r: chain.AskResult) -> dict:
     return {"answer": asdict(r.answer), "trace_id": r.trace_id}
 
 
-async def _from_cache(cache: AnswerCache, key: str) -> tuple[dict | None, bool]:
-    """(cached or shared result, whether this request leads the computation)."""
+async def _from_cache(cache: AnswerCache, key: str) -> tuple[dict | None, str | None]:
+    """(cached or shared result, the lock token if this request leads the computation)."""
     if (hit := await cache.get(key)) is not None:
         await cache.count("hit")
-        return {**hit, "cached": "hit"}, False
-    if await cache.claim(key):
-        return None, True
+        return {**hit, "cached": "hit"}, None
+    if (token := await cache.claim(key)) is not None:
+        return None, token
     if (shared := await cache.wait(key)) is not None:
         await cache.count("shared")
-        return {**shared, "cached": "shared"}, False
-    return None, False   # the leader failed: compute without the lock
+        return {**shared, "cached": "shared"}, None
+    return None, None   # the leader failed: compute without the lock
 
 
 async def _store(cache: AnswerCache, key: str, result: dict) -> dict:
@@ -232,7 +232,7 @@ async def _respond(g: Guards, key: str, ticket: Ticket, run, payload):
         return await _store(g.cache, key, result)
     finally:
         if leader:
-            await g.cache.release(key)
+            await g.cache.release(key, leader)
 
 
 async def _stream_events(g: Guards, key: str, ticket: Ticket, run):
@@ -245,7 +245,7 @@ async def _stream_events(g: Guards, key: str, ticket: Ticket, run):
             yield chunk
     finally:
         if leader:
-            await g.cache.release(key)
+            await g.cache.release(key, leader)
 
 
 @app.get("/healthz")

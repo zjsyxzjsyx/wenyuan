@@ -12,6 +12,11 @@ Single-flight: when the same question arrives while it is being answered (a clas
 working through the same chapter), the first request takes a short lock and
 computes; the others wait for its result instead of each taking a GPU slot. If the
 leader fails, its lock is released (or expires) and a waiter computes itself.
+The lock holds a token unique to the request that took it, and release deletes it
+only if the token still matches: a leader slower than `lock_s` (queued for the GPU,
+then generating) finds its lock expired and maybe taken by another request, and an
+unconditional DEL would remove that request's lock, letting a third one compute
+the same answer again.
 
 Exact match only: a semantic cache ("similar enough" questions share an answer)
 needs a similarity threshold validated on data, or it serves wrong answers.
@@ -23,6 +28,7 @@ import hashlib
 import json
 import re
 import time
+import uuid
 from collections.abc import Sequence
 
 import redis
@@ -31,6 +37,12 @@ from redis.asyncio import Redis
 from app.config import get_settings
 
 ALL = "*"   # version bumped by every invalidation, used when no library is given
+
+# Delete the lock only while it still holds this request's token (GET and DEL in one step).
+_RELEASE = """
+if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end
+return 0
+"""
 
 
 def invalidate_now(library: str, prefix: str = "ans") -> None:
@@ -54,6 +66,7 @@ class AnswerCache:
     def __init__(self, redis: Redis, ttl_s: int = 86400, lock_s: float = 120, poll_s: float = 0.1,
                  prefix: str = "ans") -> None:
         self.redis, self.ttl_s, self.lock_ms, self.poll_s, self.prefix = redis, ttl_s, int(lock_s * 1000), poll_s, prefix
+        self._release = redis.register_script(_RELEASE)
 
     async def key(self, route: str, question: str, libraries: Sequence[str] | None, history: Sequence[dict],
                   owner_id: int | None = None) -> str:
@@ -72,12 +85,14 @@ class AnswerCache:
     async def put(self, key: str, value: dict) -> None:
         await self.redis.set(key, json.dumps(value, ensure_ascii=False), ex=self.ttl_s)
 
-    async def claim(self, key: str) -> bool:
-        """Become the one request computing this key."""
-        return bool(await self.redis.set(f"{key}:lock", "1", nx=True, px=self.lock_ms))
+    async def claim(self, key: str) -> str | None:
+        """Become the one request computing this key: the lock's token, or None if another holds it."""
+        token = uuid.uuid4().hex
+        return token if await self.redis.set(f"{key}:lock", token, nx=True, px=self.lock_ms) else None
 
-    async def release(self, key: str) -> None:
-        await self.redis.delete(f"{key}:lock")
+    async def release(self, key: str, token: str) -> None:
+        """Give the lock back, unless it expired and now belongs to another request."""
+        await self._release(keys=[f"{key}:lock"], args=[token])
 
     async def wait(self, key: str) -> dict | None:
         """Follower: the leader's result, or None once the leader is gone without one."""
